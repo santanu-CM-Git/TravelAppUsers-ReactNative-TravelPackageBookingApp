@@ -36,7 +36,7 @@ const ChatScreen = ({ navigation, route }) => {
   const [chatData, setChatData] = useState(null);
 
   const routepage = useRoute();
-
+  const agoraEngineRef = useRef(null);
   // For audio call
   const appId = AGORA_APP_ID;
   const [token, setToken] = useState('');
@@ -136,8 +136,10 @@ const ChatScreen = ({ navigation, route }) => {
       }
     };
     initialize();
-    return () => {
-      agoraEngineRef.current?.destroy();
+    return async() => {
+      //agoraEngineRef.current?.destroy();
+      await agoraEngineRef.current?.destroy();
+      agoraEngineRef.current = null;
     };
   }, [route.params.agentId]);
 
@@ -480,7 +482,7 @@ const ChatScreen = ({ navigation, route }) => {
 
 
   // audio call 
-  const agoraEngineRef = useRef(null); // IRtcEngine instance
+   // IRtcEngine instance
   const [isJoined, setIsJoined] = useState(false);
   const [remoteUid, setRemoteUid] = useState(null);
   const [localUid, setLocalUid] = useState(null);
@@ -1270,18 +1272,19 @@ const ChatScreen = ({ navigation, route }) => {
   // Add useFocusEffect to handle back navigation
   useFocusEffect(
     useCallback(() => {
-      const onBackPress = () => {
-        handleGoBack();
-        return true; // Prevent default back behavior
-      };
-
-      BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
-      return () => {
-        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-      };
-    }, [handleGoBack])
-  );
+        const backAction = () => {
+          handleGoBack();
+           return true
+          };
+      
+          const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            backAction,
+          );
+      
+          return () => backHandler.remove();
+    }, [ handleGoBack])
+);
 
   if (isLoading) {
     return (

@@ -94,14 +94,17 @@ export default function TopLocationScreenDetails({ navigation, route }) {
 
     useFocusEffect(
         useCallback(() => {
-            const onBackPress = () => {
-                navigation.goBack();
-                return true; // Prevents default back behavior
-            };
-
-            BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
-            return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+            const backAction = () => {
+               navigation.goBack()
+               return true
+              };
+          
+              const backHandler = BackHandler.addEventListener(
+                'hardwareBackPress',
+                backAction,
+              );
+          
+              return () => backHandler.remove();
         }, [navigation])
     );
 

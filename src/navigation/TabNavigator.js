@@ -177,6 +177,11 @@ const MessageStack = ({ navigation, route }) => {
         component={ChatListScreen}
         options={{ headerShown: false }}
       />
+       <Stack.Screen
+        name='ChatScreen'
+        component={ChatScreen}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   )
 
@@ -288,7 +293,7 @@ const TabNavigator = ({ navigation }) => {
             </View>
           ),
           tabBarLabel: ({ color, focused }) => (
-            <Text style={{ color, fontSize: responsiveFontSize(1.2), marginBottom: responsiveHeight(1) }}>Home</Text>
+            <Text style={{ color, fontSize: responsiveFontSize(1.2), marginBottom: responsiveHeight(1),marginTop: responsiveHeight(1) }}>Home</Text>
           ),
         })}
       />
@@ -325,7 +330,7 @@ const TabNavigator = ({ navigation }) => {
             </View>
           ),
           tabBarLabel: ({ color, focused }) => (
-            <Text style={{ color, fontSize: responsiveFontSize(1.2), marginBottom: responsiveHeight(1) }}>Quotes</Text>
+            <Text style={{ color, fontSize: responsiveFontSize(1.2), marginBottom: responsiveHeight(1),marginTop: responsiveHeight(1) }}>Quotes</Text>
           ),
         })}
       />
@@ -355,7 +360,7 @@ const TabNavigator = ({ navigation }) => {
             </View>
           ),
           tabBarLabel: ({ color, focused }) => (
-            <Text style={{ color, fontSize: responsiveFontSize(1.2), marginBottom: responsiveHeight(1) }}>Messages</Text>
+            <Text style={{ color, fontSize: responsiveFontSize(1.2), marginBottom: responsiveHeight(1),marginTop: responsiveHeight(1) }}>Messages</Text>
           ),
         })}
       />
@@ -385,7 +390,7 @@ const TabNavigator = ({ navigation }) => {
             </View>
           ),
           tabBarLabel: ({ color, focused }) => (
-            <Text style={{ color, fontSize: responsiveFontSize(1.2), marginBottom: responsiveHeight(1) }}>Menu</Text>
+            <Text style={{ color, fontSize: responsiveFontSize(1.2), marginBottom: responsiveHeight(1),marginTop: responsiveHeight(1) }}>Menu</Text>
           ),
         })}
       />

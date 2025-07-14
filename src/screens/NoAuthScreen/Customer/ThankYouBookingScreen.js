@@ -12,23 +12,26 @@ const ThankYouBookingScreen = ({ navigation, route }) => {
   const [data, setData] = useState(null);
 
   useFocusEffect(
-    React.useCallback(() => {
-      const onBackPress = () => {
-        if (navigation.isFocused()) {
-          // If you're not on the home screen, redirect to the home screen
-          navigation.navigate('Home'); // Replace 'Home' with the actual route name for your home screen
-          return true; // Prevent the default back action
-        } else {
-          // If already on the home screen, allow default back action (exit app)
-          return false;
-        }
-      };
-
-      BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
-      return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    useCallback(() => {
+        const backAction = () => {
+          if (navigation.isFocused()) {
+            // If you're not on the home screen, redirect to the home screen
+            navigation.navigate('Home'); // Replace 'Home' with the actual route name for your home screen
+            return true; // Prevent the default back action
+          } else {
+            // If already on the home screen, allow default back action (exit app)
+            return false;
+          }
+          };
+      
+          const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            backAction,
+          );
+      
+          return () => backHandler.remove();
     }, [navigation])
-  );
+);
 
   useEffect(() => {
     const detailsData = JSON.parse(route?.params?.detailsData);

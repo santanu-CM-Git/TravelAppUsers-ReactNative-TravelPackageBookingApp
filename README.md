@@ -23,3 +23,7 @@ npm i @d11/react-native-fast-image  new || react-native-fast-image
 react-native-star-rating-widget || react-native-star-rating
 
 npx react-native-asset
+npm install --save react-native-gifted-chat react-native-reanimated react-native-keyboard-controller
+
+return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+ return () => backHandler.remove();

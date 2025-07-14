@@ -36,7 +36,6 @@ import CustomHeader from '../../../components/CustomHeader';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_URL, GOOGLE_MAP_KEY } from '@env'
-import { useFocusEffect } from '@react-navigation/native';
 import { Dropdown } from 'react-native-element-dropdown';
 import messaging from '@react-native-firebase/messaging';
 import StarRating from 'react-native-star-rating-widget';
@@ -50,6 +49,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import RadioGroup from 'react-native-radio-buttons-group';
 import ShimmerPlaceholder from "react-native-shimmer-placeholder";
 import LinearGradient from 'react-native-linear-gradient';
+import { useFocusEffect } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 const itemWidth = width * 0.8; // 80% of screen width
@@ -217,21 +217,42 @@ export default function HomeScreen({ navigation }) {
     }
   }, [])
 
+  // useEffect(() => {
+  //   const backAction = () => {
+  //     if (Platform.OS === 'android') {
+  //       BackHandler.exitApp(); // Minimize the app (simulating background run)
+  //       return true; // Prevent default back action
+  //     }
+  //     return false;
+  //   };
+
+  //   const backHandler = BackHandler.addEventListener(
+  //     'hardwareBackPress',
+  //     backAction
+  //   );
+
+  //   return () => backHandler.remove(); // Cleanup the event listener on component unmount
+  // }, []);
+
   useEffect(() => {
     const backAction = () => {
-      if (Platform.OS === 'android') {
-        BackHandler.exitApp(); // Minimize the app (simulating background run)
-        return true; // Prevent default back action
-      }
-      return false;
+      Alert.alert('Hold on!', 'Are you sure you want to go back?', [
+        {
+          text: 'Cancel',
+          onPress: () => null,
+          style: 'cancel',
+        },
+        {text: 'YES', onPress: () => BackHandler.exitApp()},
+      ]);
+      return true;
     };
 
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
-      backAction
+      backAction,
     );
 
-    return () => backHandler.remove(); // Cleanup the event listener on component unmount
+    return () => backHandler.remove();
   }, []);
 
   const requestLocationPermission = async () => {
@@ -652,11 +673,11 @@ export default function HomeScreen({ navigation }) {
     }
   }, [countryName, latitude, longitude]);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchProfileDetails()
-    }, [])
-  )
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     fetchProfileDetails()
+  //   }, [])
+  // )
 
   // Function to save selected tab to AsyncStorage
   const saveSelectedTab = async (tabValue) => {
