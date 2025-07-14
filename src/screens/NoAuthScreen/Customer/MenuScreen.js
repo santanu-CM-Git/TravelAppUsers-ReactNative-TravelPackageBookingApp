@@ -18,7 +18,6 @@ import {
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import DocumentPicker from '@react-native-documents/picker';
 import InputField from '../../../components/InputField';
 import CustomButton from '../../../components/CustomButton';
 import { AuthContext } from '../../../context/AuthContext';

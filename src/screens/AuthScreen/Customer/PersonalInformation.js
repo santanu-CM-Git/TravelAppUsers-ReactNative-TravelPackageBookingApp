@@ -17,7 +17,8 @@ import {
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import DocumentPicker from '@react-native-documents/picker';
+
+import {launchImageLibrary} from 'react-native-image-picker';
 import InputField from '../../../components/InputField';
 import CustomButton from '../../../components/CustomButton';
 import { AuthContext } from '../../../context/AuthContext';
@@ -90,34 +91,47 @@ const PersonalInformation = ({ navigation, route }) => {
 
   const pickDocument = async () => {
     try {
-      const result = await DocumentPicker.pick({
-        type: [DocumentPicker.types.allFiles],
+      const options = {
+        mediaType: 'photo',
+        includeBase64: false,
+        maxHeight: 2000,
+        maxWidth: 2000,
+      };
+  
+      launchImageLibrary(options, (response) => {
+        if (response.didCancel) {
+          console.log('User cancelled image picker');
+          return;
+        }
+        
+        if (response.errorMessage) {
+          console.log('ImagePicker Error: ', response.errorMessage);
+          handleAlert('Oops..', response.errorMessage);
+          setIsPicUploadLoading(false);
+          return;
+        }
+  
+        if (response.assets && response.assets.length > 0) {
+          const pickedImage = response.assets[0];
+          setPickedDocument(pickedImage);
+  
+          // const formData = new FormData();
+          // if (pickedImage) {
+          //   formData.append("profile_pic", {
+          //     uri: pickedImage.uri,
+          //     type: pickedImage.type || 'image/jpeg',
+          //     name: pickedImage.fileName || 'photo.jpg',
+          //   });
+          // } else {
+          //   formData.append("profile_pic", "");
+          // }
+        }
       });
-
-      const pickedDocument = result[0];
-      setPickedDocument(pickedDocument);
-
-      // const formData = new FormData();
-      // if (pickedDocument) {
-      //   formData.append("profile_pic", {
-      //     uri: pickedDocument.uri,
-      //     type: pickedDocument.type || 'image/jpeg',
-      //     name: pickedDocument.name || 'photo.jpg',
-      //   });
-      // } else {
-      //   formData.append("profile_pic", "");
-      // }
-
+  
     } catch (err) {
       setIsPicUploadLoading(false);
-      if (DocumentPicker.isCancel(err)) {
-        console.log('Document picker was cancelled');
-      } else if (err.response) {
-        console.log('Error response:', err.response.data?.response?.records);
-        handleAlert('Oops..', err.response.data?.message);
-      } else {
-        console.error('Error picking document', err);
-      }
+      console.error('Error picking image', err);
+      handleAlert('Oops..', 'An error occurred while picking the image');
     }
   };
 

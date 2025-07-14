@@ -36,7 +36,7 @@ const ChatScreen = ({ navigation, route }) => {
   const [chatData, setChatData] = useState(null);
 
   const routepage = useRoute();
-
+  const agoraEngineRef = useRef(null);
   // For audio call
   const appId = AGORA_APP_ID;
   const [token, setToken] = useState('');
@@ -46,7 +46,7 @@ const ChatScreen = ({ navigation, route }) => {
   //const channelName = 'agoratest';
 
   const [messages, setMessages] = useState([])
-  const [agentId, setAgentId] = useState(route?.params?.agentId);
+  const [agentId, setAgentId] = useState(null);
   const [agentProfilePic, setAgentProfilePic] = useState('');
   const [agentName, setAgentName] = useState('');
   const [userId, setUserId] = useState(1);
@@ -85,8 +85,16 @@ const ChatScreen = ({ navigation, route }) => {
   // }, [routepage]);
 
   useEffect(() => {
+    //alert(route.params.agentId)
     const initialize = async () => {
       try {
+        if (!route?.params?.agentId) {
+          throw new Error('User ID is missing');
+        }
+
+        // Set userId from route params
+        setAgentId(route.params.agentId);
+        console.log('Initializing chat with agentId:', route.params.agentId);
         // Fetch customer message data
         const userToken = await AsyncStorage.getItem('userToken');
         if (!userToken) {
@@ -95,7 +103,7 @@ const ChatScreen = ({ navigation, route }) => {
 
         const response = await axios.post(`${API_URL}/customer/customer-message`,
           {
-            agent_id: agentId
+            agent_id: route.params.agentId
           }, {
           headers: {
             Accept: 'application/json',
@@ -128,10 +136,12 @@ const ChatScreen = ({ navigation, route }) => {
       }
     };
     initialize();
-    return () => {
+    return async() => {
       //agoraEngineRef.current?.destroy();
+      await agoraEngineRef.current?.destroy();
+      agoraEngineRef.current = null;
     };
-  }, [agentId]);
+  }, [route.params.agentId]);
 
   // Separate useEffect for Firestore listener
   useEffect(() => {
@@ -472,7 +482,7 @@ const ChatScreen = ({ navigation, route }) => {
 
 
   // audio call 
-  const agoraEngineRef = useRef(null); // IRtcEngine instance
+   // IRtcEngine instance
   const [isJoined, setIsJoined] = useState(false);
   const [remoteUid, setRemoteUid] = useState(null);
   const [localUid, setLocalUid] = useState(null);
@@ -759,7 +769,7 @@ const ChatScreen = ({ navigation, route }) => {
             clientRoleType: ClientRoleType.ClientRoleBroadcaster,
           });
 
-          alert('channel name ' + agoraChannelId + ' token ' + agoraToken + ' uid ' + uid);
+          //alert('channel name ' + agoraChannelId + ' token ' + agoraToken + ' uid ' + uid);
 
           setActiveTab('audio');
           await AsyncStorage.setItem('activeTab', 'audio');
@@ -791,9 +801,10 @@ const ChatScreen = ({ navigation, route }) => {
 
   const requestToTabSwitch = async (name) => {
     //await goingToactiveTab(name)
+    //alert(route.params.agentId)
     setIsLoading(true);
     const option = {
-      "agent_id": agentId,
+      "agent_id": route.params.agentId,
       "flag": name
     };
     // console.log(option);
@@ -842,7 +853,7 @@ const ChatScreen = ({ navigation, route }) => {
   const requestToCancel = async () => {
     const storedTab = await AsyncStorage.getItem('activeTab');
     const option = {
-      "agent_id": agentId,
+      "agent_id": route.params.agentId,
       "flag": storedTab,
       "screen": storedTab
     };
@@ -1225,6 +1236,7 @@ const ChatScreen = ({ navigation, route }) => {
   // Add this function to handle the API call when going back
   const handleGoBack = useCallback(async () => {
     console.log('handleGoBack');
+    //alert(route.params.agentId)
     try {
       const userToken = await AsyncStorage.getItem('userToken');
       if (!userToken) {
@@ -1233,9 +1245,11 @@ const ChatScreen = ({ navigation, route }) => {
 
       // Get the last message from messages array
       const lastMessage = messages.length > 0 ? messages[0].text : '';
+      console.log(route.params.agentId);
+      
 
       const response = await axios.post(`${API_URL}/customer/customer-message`, {
-        agent_id: agentId,
+        agent_id: route.params.agentId,
         last_message: lastMessage
       }, {
         headers: {
@@ -1253,23 +1267,24 @@ const ChatScreen = ({ navigation, route }) => {
       console.error('Error updating last message:', error);
       Alert.alert('Error', 'Failed to update last message');
     }
-  }, [agentId, messages, navigation]);
+  }, [messages, navigation]);
 
   // Add useFocusEffect to handle back navigation
   useFocusEffect(
     useCallback(() => {
-      const onBackPress = () => {
-        handleGoBack();
-        return true; // Prevent default back behavior
-      };
-
-      BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
-      return () => {
-        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-      };
-    }, [handleGoBack])
-  );
+        const backAction = () => {
+          handleGoBack();
+           return true
+          };
+      
+          const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            backAction,
+          );
+      
+          return () => backHandler.remove();
+    }, [ handleGoBack])
+);
 
   if (isLoading) {
     return (

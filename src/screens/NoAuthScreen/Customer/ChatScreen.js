@@ -25,7 +25,7 @@ import moment from 'moment-timezone'
 import Loader from '../../../utils/Loader'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
-import DocumentPicker from '@react-native-documents/picker';
+import {launchImageLibrary} from 'react-native-image-picker';
 import FileViewer from 'react-native-file-viewer';
 import RNFS from 'react-native-fs';
 
@@ -953,11 +953,13 @@ const ChatScreen = ({ navigation, route }) => {
         // If it's a content:// URI, we need to handle it differently
         if (uri.startsWith('content://')) {
           // Use the copyTo path if available
-          const response = await DocumentPicker.pickSingle({
-            type: [DocumentPicker.types.allFiles],
+          const response = await launchImageLibrary({
+            mediaType: 'file',
+            selectionLimit: 1,
+            includeBase64: false,
             copyTo: 'cachesDirectory'
           });
-          fileUri = response.fileCopyUri || response.uri;
+          fileUri = response.assets[0]?.uri;
         }
 
         console.log('Using file URI:', fileUri);
@@ -1017,28 +1019,32 @@ const ChatScreen = ({ navigation, route }) => {
     try {
       console.log('Starting document picker...');
 
-      const res = await DocumentPicker.pickSingle({
-        type: [DocumentPicker.types.allFiles],
+      const res = await launchImageLibrary({
+        mediaType: 'file',
+        selectionLimit: 1,
+        includeBase64: false,
         copyTo: 'cachesDirectory', // This creates a local copy
         allowMultiSelection: false,
       });
 
       console.log('Document picked:', {
-        name: res.name,
-        type: res.type,
-        size: res.size,
-        uri: res.uri,
-        fileCopyUri: res.fileCopyUri
+        name: res.assets[0]?.fileName,
+        type: res.assets[0]?.type,
+        size: res.assets[0]?.fileSize,
+        uri: res.assets[0]?.uri,
+        fileCopyUri: res.assets[0]?.fileCopyUri
       });
 
-      if (!res) {
+      if (!res.assets || res.assets.length === 0) {
         console.log('No document selected');
         return;
       }
 
+      const asset = res.assets[0];
+
       // Validate file size (limit to 10MB)
       const maxSize = 10 * 1024 * 1024; // 10MB
-      if (res.size && res.size > maxSize) {
+      if (asset.fileSize && asset.fileSize > maxSize) {
         Alert.alert('Error', 'File size is too large. Please select a file smaller than 10MB.');
         return;
       }
@@ -1047,9 +1053,9 @@ const ChatScreen = ({ navigation, route }) => {
       setIsLoading(true);
 
       // Use fileCopyUri if available (Android), otherwise use uri
-      const fileUri = res.fileCopyUri || res.uri;
-      const fileName = res.name || `file_${Date.now()}`;
-      const fileType = res.type || 'application/octet-stream';
+      const fileUri = asset.fileCopyUri || asset.uri;
+      const fileName = asset.fileName || `file_${Date.now()}`;
+      const fileType = asset.type || 'application/octet-stream';
 
       console.log('Uploading file with URI:', fileUri);
 
@@ -1080,7 +1086,7 @@ const ChatScreen = ({ navigation, route }) => {
           uri: uploadedFile.url,
           name: uploadedFile.name,
           type: uploadedFile.type,
-          size: res.size
+          size: asset.fileSize
         };
         messageData.isDocument = true;
       }
@@ -1105,7 +1111,7 @@ const ChatScreen = ({ navigation, route }) => {
     } catch (err) {
       console.error('Document picker error:', err);
 
-      if (DocumentPicker.isCancel(err)) {
+      if (err.code === 'cancelled') {
         console.log('User cancelled document picker');
         return;
       }
@@ -1134,28 +1140,32 @@ const ChatScreen = ({ navigation, route }) => {
     try {
       console.log('Starting image picker...');
 
-      const res = await DocumentPicker.pickSingle({
-        type: [DocumentPicker.types.images],
+      const res = await launchImageLibrary({
+        mediaType: 'image',
+        selectionLimit: 1,
+        includeBase64: false,
         copyTo: 'cachesDirectory',
         allowMultiSelection: false,
       });
 
       console.log('Image picked:', {
-        name: res.name,
-        type: res.type,
-        size: res.size,
-        uri: res.uri,
-        fileCopyUri: res.fileCopyUri
+        name: res.assets[0]?.fileName,
+        type: res.assets[0]?.type,
+        size: res.assets[0]?.fileSize,
+        uri: res.assets[0]?.uri,
+        fileCopyUri: res.assets[0]?.fileCopyUri
       });
 
-      if (!res) {
+      if (!res.assets || res.assets.length === 0) {
         console.log('No image selected');
         return;
       }
 
+      const asset = res.assets[0];
+
       // Validate file size (limit to 5MB for images)
       const maxSize = 5 * 1024 * 1024; // 5MB
-      if (res.size && res.size > maxSize) {
+      if (asset.fileSize && asset.fileSize > maxSize) {
         Alert.alert('Error', 'Image size is too large. Please select an image smaller than 5MB.');
         return;
       }
@@ -1164,9 +1174,9 @@ const ChatScreen = ({ navigation, route }) => {
       setIsLoading(true);
 
       // Use fileCopyUri if available (Android), otherwise use uri
-      const fileUri = res.fileCopyUri || res.uri;
-      const fileName = res.name || `image_${Date.now()}`;
-      const fileType = res.type || 'image/jpeg';
+      const fileUri = asset.fileCopyUri || asset.uri;
+      const fileName = asset.fileName || `image_${Date.now()}`;
+      const fileType = asset.type || 'image/jpeg';
 
       console.log('Uploading image with URI:', fileUri);
 
@@ -1209,7 +1219,7 @@ const ChatScreen = ({ navigation, route }) => {
     } catch (err) {
       console.error('Image picker error:', err);
 
-      if (DocumentPicker.isCancel(err)) {
+      if (err.code === 'cancelled') {
         console.log('User cancelled image picker');
         return;
       }
