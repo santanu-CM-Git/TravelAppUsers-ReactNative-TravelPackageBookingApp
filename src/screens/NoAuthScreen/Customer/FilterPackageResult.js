@@ -36,7 +36,7 @@ import CustomHeader from '../../../components/CustomHeader';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_URL } from '@env'
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import messaging from '@react-native-firebase/messaging';
 import LinearGradient from 'react-native-linear-gradient';
 import StarRating from 'react-native-star-rating-widget';
@@ -51,8 +51,8 @@ const itemWidth = width * 0.8; // 80% of screen width
 const imageHeight = itemWidth * 0.5; // Maintain a 4:3 aspect ratio
 
 
-export default function FilterPackageResult({ navigation, route }) {
-
+export default function FilterPackageResult({ route }) {
+    const navigation = useNavigation();
     const carouselRef = useRef(null);
     const dispatch = useDispatch();
     const { data: products, status } = useSelector(state => state.products)

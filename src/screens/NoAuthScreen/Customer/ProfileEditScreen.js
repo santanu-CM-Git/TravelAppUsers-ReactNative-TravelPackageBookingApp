@@ -33,7 +33,7 @@ import moment from "moment"
 import Toast from 'react-native-toast-message';
 import { plus, userPhoto } from '../../../utils/Images';
 import Svg, { Circle, Defs, LinearGradient, Stop, Mask, Rect } from 'react-native-svg';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 const dataGender = [
   { label: 'Male', value: 'Male' },
@@ -47,8 +47,8 @@ const dataMarital = [
   { label: 'Widowed', value: 'Widowed' }
 ];
 
-const ProfileEditScreen = ({ navigation, route }) => {
-
+const ProfileEditScreen = ({ route }) => {
+  const navigation = useNavigation();
   const [firstname, setFirstname] = useState('');
   const [lastname, setLastname] = useState('');
   const [mobile, setMobile] = useState('');

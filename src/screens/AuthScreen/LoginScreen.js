@@ -30,12 +30,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { gtIconImg, orImg, patientLoginImg } from '../../utils/Images';
 import Toast from 'react-native-toast-message';
 import CheckBox from '@react-native-community/checkbox';
+import { useNavigation } from '@react-navigation/native';
 
 const BannerWidth = Dimensions.get('window').width;
 const ITEM_WIDTH = Math.round(BannerWidth * 0.7)
 const { height, width } = Dimensions.get('screen')
 
-const LoginScreen = ({ navigation }) => {
+const LoginScreen = ({  }) => {
+  const navigation = useNavigation();
   const [phone, setPhone] = useState('');
   const [deviceId, setDeviceId] = useState('')
   const [mobileError, setMobileError] = useState('')

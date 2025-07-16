@@ -7,7 +7,7 @@ import { GiftedChat, InputToolbar, Bubble, Send, Composer } from 'react-native-g
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import InChatFileTransfer from '../../../components/InChatFileTransfer';
 import { API_URL, AGORA_APP_ID } from '@env'
-import { TabActions, useRoute, useFocusEffect } from '@react-navigation/native';
+import { TabActions, useRoute, useFocusEffect, useNavigation } from '@react-navigation/native';
 import KeepAwake from 'react-native-keep-awake';
 import firestore, { endBefore } from '@react-native-firebase/firestore'
 import storage from '@react-native-firebase/storage';
@@ -30,7 +30,8 @@ import FileViewer from 'react-native-file-viewer';
 import RNFS from 'react-native-fs';
 
 
-const ChatScreen = ({ navigation, route }) => {
+const ChatScreen = ({ route }) => {
+  const navigation = useNavigation();
   const [isRecording, setIsRecording] = useState(false);
   const [recordedURL, setRecordedURL] = useState(null);
   const [chatData, setChatData] = useState(null);

@@ -11,9 +11,10 @@ import * as Animatable from 'react-native-animatable';
 import CustomHeader from '../../../components/CustomHeader'
 import Svg, { Circle } from 'react-native-svg';
 import ConfettiCannon from 'react-native-confetti-cannon';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
-const PaymentSuccessScreen = ({ navigation, route }) => {
+const PaymentSuccessScreen = ({ route }) => {
+    const navigation = useNavigation();
     const [data, setData] = useState(JSON.stringify(route?.params?.message));
     const confettiRef = useRef(null);
     const numCircles = 20; // Number of scallops

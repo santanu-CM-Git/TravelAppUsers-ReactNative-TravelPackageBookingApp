@@ -11,7 +11,7 @@ import Icon from "react-native-vector-icons/Entypo";
 import { arrowRightImg, cancelSuccessImg, failedImg } from '../../../utils/Images';
 import { TouchableOpacity } from 'react-native';
 import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import Loader from '../../../utils/Loader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
@@ -19,7 +19,8 @@ import Modal from "react-native-modal";
 import axios from 'axios';
 import { API_URL } from '@env'
 
-const RefundScreen = ({ navigation, route }) => {
+const RefundScreen = ({ route }) => {
+    const navigation = useNavigation();
     const [data, setData] = useState(route?.params?.data);
     const [bookingData, setBookingData] = useState(route?.params?.bookingData);
     const [appendView, setAppendView] = useState(false)

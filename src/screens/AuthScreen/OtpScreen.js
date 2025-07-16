@@ -20,9 +20,11 @@ import { AuthContext } from '../../context/AuthContext';
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
 import Loader from '../../utils/Loader';
 import Toast from 'react-native-toast-message';
+import { useNavigation } from '@react-navigation/native';
 // import OTPVerify from 'react-native-otp-verify';
 
-const OtpScreen = ({ navigation, route }) => {
+const OtpScreen = ({ route }) => {
+    const navigation = useNavigation();
     const [otp, setOtp] = useState('');
     const [comingOTP, setComingOTP] = useState(route?.params?.otp)
     const [errors, setError] = useState(true)

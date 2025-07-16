@@ -7,9 +7,10 @@ import {
 import { WebView } from 'react-native-webview';
 import CustomHeader from '../../../components/CustomHeader';
 import Loader from '../../../utils/Loader';
+import { useNavigation } from '@react-navigation/native';
 
-export default function Termsofuse({ navigation }) {
-
+export default function Termsofuse({  }) {
+    const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(false);
     const { width } = useWindowDimensions();
     const privacyPolicyUrl = "https://www.google.co.in/";

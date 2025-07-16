@@ -10,9 +10,10 @@ import moment from 'moment-timezone';
 import Icon from "react-native-vector-icons/Entypo";
 import { failedImg } from '../../../utils/Images';
 import { TouchableOpacity } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
-const PaymentFailed = ({ navigation, route }) => {
+const PaymentFailed = ({ route }) => {
+    const navigation = useNavigation();
     const [data, setData] = useState(JSON.stringify(route?.params?.message));
     const { order_id, amount } = route?.params;
 

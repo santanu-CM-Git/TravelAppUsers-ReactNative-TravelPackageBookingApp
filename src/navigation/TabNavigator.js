@@ -1,7 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import { getFocusedRouteNameFromRoute, useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import { Text, Image, View, Platform } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -41,7 +41,8 @@ import TransactionScreen from '../screens/NoAuthScreen/Customer/TransactionScree
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-const HomeStack = ({ navigation }) => {
+const HomeStack = ({  }) => {
+  const navigation = useNavigation();
   useFocusEffect(
     React.useCallback(() => {
       // Reset to the initial screen (TherapistList) whenever the tab is focused
@@ -139,7 +140,8 @@ const HomeStack = ({ navigation }) => {
   );
 };
 
-const QuotesStack = ({ navigation, route }) => {
+const QuotesStack = ({ route }) => {
+  const navigation = useNavigation();
   useFocusEffect(
     React.useCallback(() => {
       // Reset to the initial screen (TherapistList) whenever the tab is focused
@@ -163,7 +165,8 @@ const QuotesStack = ({ navigation, route }) => {
 
 };
 
-const MessageStack = ({ navigation, route }) => {
+const MessageStack = ({ route }) => {
+  const navigation = useNavigation();
   useFocusEffect(
     React.useCallback(() => {
       // Reset to the initial screen (TherapistList) whenever the tab is focused
@@ -188,7 +191,8 @@ const MessageStack = ({ navigation, route }) => {
 };
 
 
-const MenuStack = ({ navigation, route }) => {
+const MenuStack = ({ route }) => {
+  const navigation = useNavigation();
   useFocusEffect(
     React.useCallback(() => {
       // Reset to the initial screen (TherapistList) whenever the tab is focused
@@ -252,7 +256,7 @@ const MenuStack = ({ navigation, route }) => {
 
 };
 
-const TabNavigator = ({ navigation }) => {
+const TabNavigator = ({  }) => {
   const cartProducts = useSelector(state => state.cart)
   console.log(cartProducts)
   return (

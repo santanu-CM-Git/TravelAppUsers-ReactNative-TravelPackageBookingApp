@@ -8,7 +8,8 @@ import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-nat
 import moment from 'moment-timezone';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
-const ThankYouBookingScreen = ({ navigation, route }) => {
+const ThankYouBookingScreen = ({ route }) => {
+  const navigation = useNavigation();
   const [data, setData] = useState(null);
 
   useFocusEffect(

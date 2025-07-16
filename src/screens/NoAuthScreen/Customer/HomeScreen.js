@@ -49,7 +49,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import RadioGroup from 'react-native-radio-buttons-group';
 import ShimmerPlaceholder from "react-native-shimmer-placeholder";
 import LinearGradient from 'react-native-linear-gradient';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 const itemWidth = width * 0.8; // 80% of screen width
@@ -62,8 +62,8 @@ const imageHeight = itemWidth * 0.5; // Maintain a 4:3 aspect ratio
 // ];
 
 
-export default function HomeScreen({ navigation }) {
-
+export default function HomeScreen({  }) {
+  const navigation = useNavigation();
   const carouselRef = useRef(null);
   const dispatch = useDispatch();
   const { data: products, status } = useSelector(state => state.products)

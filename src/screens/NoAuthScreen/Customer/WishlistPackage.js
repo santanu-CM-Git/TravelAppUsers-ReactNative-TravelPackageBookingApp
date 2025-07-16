@@ -36,7 +36,7 @@ import CustomHeader from '../../../components/CustomHeader';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_URL } from '@env'
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Dropdown } from 'react-native-element-dropdown';
 import messaging from '@react-native-firebase/messaging';
 import StarRating from 'react-native-star-rating-widget';
@@ -51,7 +51,8 @@ const { width } = Dimensions.get('window');
 const itemWidth = width * 0.8; // 80% of screen width
 const imageHeight = itemWidth * 0.5; // Maintain a 4:3 aspect ratio
 
-export default function WishlistPackage({ navigation, route }) {
+export default function WishlistPackage({ route }) {
+    const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(false);
     const [wishlistPackages, setWishlistPackages] = useState([]);
     const [refreshing, setRefreshing] = useState(false);

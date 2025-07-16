@@ -6,8 +6,10 @@ import Logo from '../..//assets/images/misc/logo.svg';
 import LinearGradient from 'react-native-linear-gradient';
 import CustomButton from '../../components/CustomButton';
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
+import { useNavigation } from '@react-navigation/native';
 
-const OnboardingScreen = ({ navigation }) => {
+const OnboardingScreen = ({  }) => {
+  const navigation = useNavigation();
   return (
 
     <LinearGradient

@@ -36,7 +36,7 @@ import CustomHeader from '../../../components/CustomHeader';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_URL, GOOGLE_MAP_KEY } from '@env'
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Dropdown } from 'react-native-element-dropdown';
 import messaging from '@react-native-firebase/messaging';
 import StarRating from 'react-native-star-rating-widget';
@@ -62,8 +62,8 @@ const imageHeight = itemWidth * 0.5; // Maintain a 4:3 aspect ratio
 // ];
 
 
-export default function HomeScreen({ navigation }) {
-
+export default function HomeScreen({  }) {
+  const navigation = useNavigation();
   const carouselRef = useRef(null);
   const dispatch = useDispatch();
   const { data: products, status } = useSelector(state => state.products)

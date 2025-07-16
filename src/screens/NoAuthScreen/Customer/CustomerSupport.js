@@ -22,7 +22,7 @@ import { emailIcon, facebookIcon, instagramIcon, linkedinIcon, whatsappIcon, you
 import Loader from '../../../utils/Loader';
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
 import CustomHeader from '../../../components/CustomHeader';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 const BannerWidth = Dimensions.get('window').width;
 const ITEM_WIDTH = Math.round(BannerWidth * 0.7)
@@ -34,8 +34,8 @@ const facebookURL = 'https://www.facebook.com/profile.php?id=61564987316705';
 
 const linkedinURL = 'https://www.linkedin.com/company/myjoie'
 
-export default function CustomerSupport({ navigation }) {
-
+export default function CustomerSupport({  }) {
+    const navigation = useNavigation();
     const dispatch = useDispatch();
     const { data: products, status } = useSelector(state => state.products)
     const { userInfo } = useContext(AuthContext)

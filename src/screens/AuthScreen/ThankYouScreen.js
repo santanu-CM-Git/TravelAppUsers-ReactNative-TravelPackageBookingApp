@@ -7,7 +7,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import CustomButton from '../../components/CustomButton';
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
 
-const ThankYouScreen = ({ navigation }) => {
+const ThankYouScreen = ({  }) => {
   return (
 
     <LinearGradient

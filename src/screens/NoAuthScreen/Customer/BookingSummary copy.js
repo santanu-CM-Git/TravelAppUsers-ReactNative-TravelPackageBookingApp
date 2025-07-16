@@ -15,14 +15,15 @@ import InputField from '../../../components/InputField';
 import CustomButton from '../../../components/CustomButton';
 import RazorpayCheckout from 'react-native-razorpay';
 import Toast from 'react-native-toast-message';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../../context/AuthContext';
 import { AppEventsLogger } from 'react-native-fbsdk-next';
 import analytics from '@react-native-firebase/analytics';
 import Icon from 'react-native-vector-icons/Feather';
 import CheckBox from '@react-native-community/checkbox';
 
-const BookingSummary = ({ navigation, route }) => {
+const BookingSummary = ({ route }) => {
+    const navigation = useNavigation();
     const { packageInfo, bookingDetails } = route.params;
     const { logout } = useContext(AuthContext);
     const [couponCode, setCouponCode] = useState('');

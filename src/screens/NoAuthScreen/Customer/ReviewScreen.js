@@ -17,13 +17,14 @@ import Icon from 'react-native-vector-icons/Entypo';
 import CheckBox from '@react-native-community/checkbox';
 import SelectMultiple from 'react-native-select-multiple'
 import { Dropdown } from 'react-native-element-dropdown';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import { AuthContext } from '../../../context/AuthContext';
 
 
-const ReviewScreen = ({ navigation, route }) => {
+const ReviewScreen = ({ route }) => {
+    const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(false)
     const [starCount, setStarCount] = useState(5)
     const [address, setaddress] = useState('');

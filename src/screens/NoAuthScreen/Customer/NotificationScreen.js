@@ -8,12 +8,13 @@ import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NoNotification from './NoNotification';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { API_URL } from '@env'
 import moment from 'moment-timezone';
 
-const NotificationScreen = ({ navigation }) => {
+const NotificationScreen = ({  }) => {
+  const navigation = useNavigation();
   const [notifications, setNotifications] = useState([]);
   const [notifyStatus, setnotifyStatus] = useState(true);
   const [loading, setLoading] = useState(false);
