@@ -25,7 +25,7 @@ import moment from 'moment-timezone'
 import Loader from '../../../utils/Loader'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
-import {launchImageLibrary} from 'react-native-image-picker';
+import DocumentPicker from 'react-native-document-picker';
 import FileViewer from 'react-native-file-viewer';
 import RNFS from 'react-native-fs';
 
@@ -233,127 +233,165 @@ const ChatScreen = ({ route }) => {
 
     if (currentMessage.isDocument && currentMessage.file) {
       return (
-        <TouchableOpacity
-          onPress={async () => {
-            try {
-              if (currentMessage.file.uri) {
-                // Show loading indicator
-                setIsLoading(true);
-
-                // Get the file extension
-                const fileExtension = currentMessage.file.name.split('.').pop().toLowerCase();
-
-                // Download the file first
-                const localPath = await downloadFileFromURL(currentMessage.file.uri, currentMessage.file.name);
-
-                // Handle different file types
-                if (['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'].includes(fileExtension)) {
-                  // For these file types, we can use FileViewer
-                  await FileViewer.open(localPath, {
-                    showOpenWithDialog: true,
-                    onDismiss: () => {
-                      setIsLoading(false);
-                    }
-                  });
-                } else {
-                  // For other file types, try to open with the device's default handler
-                  const supported = await Linking.canOpenURL(`file://${localPath}`);
-                  if (supported) {
-                    await Linking.openURL(`file://${localPath}`);
+        <View>
+          <TouchableOpacity
+            onPress={async () => {
+              try {
+                if (currentMessage.file.uri) {
+                  setIsLoading(true);
+                  const fileExtension = currentMessage.file.name.split('.').pop().toLowerCase();
+                  const localPath = await downloadFileFromURL(currentMessage.file.uri, currentMessage.file.name);
+                  if ([
+                    'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'
+                  ].includes(fileExtension)) {
+                    await FileViewer.open(localPath, {
+                      showOpenWithDialog: true,
+                      onDismiss: () => {
+                        setIsLoading(false);
+                      }
+                    });
                   } else {
-                    Alert.alert(
-                      'Cannot Open File',
-                      'This file type is not supported on your device.',
-                      [{ text: 'OK' }]
-                    );
+                    const supported = await Linking.canOpenURL(`file://${localPath}`);
+                    if (supported) {
+                      await Linking.openURL(`file://${localPath}`);
+                    } else {
+                      Alert.alert(
+                        'Cannot Open File',
+                        'This file type is not supported on your device.',
+                        [{ text: 'OK' }]
+                      );
+                    }
                   }
                 }
+              } catch (error) {
+                console.error('Error opening file:', error);
+                Alert.alert(
+                  'Error',
+                  'Unable to open this file. Please make sure you have an appropriate app installed to view this file type.',
+                  [{ text: 'OK' }]
+                );
+              } finally {
+                setIsLoading(false);
               }
-            } catch (error) {
-              console.error('Error opening file:', error);
-              Alert.alert(
-                'Error',
-                'Unable to open this file. Please make sure you have an appropriate app installed to view this file type.',
-                [{ text: 'OK' }]
-              );
-            } finally {
-              setIsLoading(false);
-            }
-          }}
-          activeOpacity={0.7}
-        >
-          <View style={{
-            backgroundColor: props.position === 'right' ? '#FF455C' : '#F3F3F3',
-            borderRadius: 12,
-            padding: 10,
-            margin: 4,
-            maxWidth: 220,
-            flexDirection: 'row',
-            alignItems: 'center',
-            height: 40,
-            width: responsiveWidth(50),
-          }}>
-            <Image
-              source={docsForChat}
-              style={{
-                width: 24,
-                height: 24,
-                marginRight: 8,
-                tintColor: props.position === 'right' ? '#fff' : '#7F66FF'
-              }}
-            />
-            <Text style={{
-              color: props.position === 'right' ? '#fff' : '#222',
-              flex: 1,
-              fontFamily: 'Poppins-Regular',
-              fontSize: 14
+            }}
+            activeOpacity={0.7}
+          >
+            <View style={{
+              backgroundColor: props.position === 'right' ? '#FF455C' : '#F3F3F3',
+              borderRadius: 12,
+              padding: 10,
+              margin: 4,
+              maxWidth: 220,
+              flexDirection: 'row',
+              alignItems: 'center',
+              height: 40,
+              width: responsiveWidth(50),
             }}>
-              {currentMessage.file.name}
-            </Text>
-          </View>
-        </TouchableOpacity>
+              <Image
+                source={docsForChat}
+                style={{
+                  width: 24,
+                  height: 24,
+                  marginRight: 8,
+                  tintColor: props.position === 'right' ? '#fff' : '#7F66FF'
+                }}
+              />
+              <Text style={{
+                color: props.position === 'right' ? '#fff' : '#222',
+                flex: 1,
+                fontFamily: 'Poppins-Regular',
+                fontSize: 14
+              }}>
+                {currentMessage.file.name}
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <Text
+            style={{
+              fontSize: 12,
+              color: '#888',
+              marginLeft: props.position === 'right' ? 0 : 10,
+              marginRight: props.position === 'right' ? 10 : 0,
+              marginTop: 2,
+              fontFamily: 'Poppins-Italic',
+              textAlign: props.position === 'right' ? 'right' : 'left',
+            }}
+          >
+            {`reply by ${currentMessage.user?.name || 'User'}`}
+          </Text>
+        </View>
       );
     }
 
     if (currentMessage.isImage && currentMessage.image) {
       return (
-        <TouchableOpacity
-          onPress={() => {
-            setPreviewImageUri(currentMessage.image);
-            setIsImageModalVisible(true);
-          }}
-          activeOpacity={0.8}
-        >
-          <View style={{
-            backgroundColor: props.position === 'right' ? '#FF455C' : '#F3F3F3',
-            borderRadius: 12,
-            padding: 6,
-            margin: 4,
-            maxWidth: 220,
-            alignItems: 'center',
-          }}>
-            <Image source={{ uri: currentMessage.image }} style={{ width: 120, height: 120, borderRadius: 8 }} />
-          </View>
-        </TouchableOpacity>
+        <View>
+          <TouchableOpacity
+            onPress={() => {
+              setPreviewImageUri(currentMessage.image);
+              setIsImageModalVisible(true);
+            }}
+            activeOpacity={0.8}
+          >
+            <View style={{
+              backgroundColor: props.position === 'right' ? '#FF455C' : '#F3F3F3',
+              borderRadius: 12,
+              padding: 6,
+              margin: 4,
+              maxWidth: 220,
+              alignItems: 'center',
+            }}>
+              <Image source={{ uri: currentMessage.image }} style={{ width: 120, height: 120, borderRadius: 8 }} />
+            </View>
+          </TouchableOpacity>
+          <Text
+            style={{
+              fontSize: 12,
+              color: '#888',
+              marginLeft: props.position === 'right' ? 0 : 10,
+              marginRight: props.position === 'right' ? 10 : 0,
+              marginTop: 2,
+              fontFamily: 'Poppins-Italic',
+              textAlign: props.position === 'right' ? 'right' : 'left',
+            }}
+          >
+            {`reply by ${currentMessage.user?.name || 'User'}`}
+          </Text>
+        </View>
       );
     }
 
     return (
-      <Bubble
-        {...props}
-        wrapperStyle={{
-          right: styles.bubbleRight,
-          left: styles.bubbleLeft,
-        }}
-        textStyle={{
-          right: styles.bubbleTextRight,
-          left: styles.bubbleTextLeft,
-        }}
-        timeTextStyle={{
-          right: styles.bubbleTime,
-          left: styles.bubbleTime,
-        }}
-      />
+      <View>
+        <Bubble
+          {...props}
+          wrapperStyle={{
+            right: styles.bubbleRight,
+            left: styles.bubbleLeft,
+          }}
+          textStyle={{
+            right: styles.bubbleTextRight,
+            left: styles.bubbleTextLeft,
+          }}
+          timeTextStyle={{
+            right: styles.bubbleTime,
+            left: styles.bubbleTime,
+          }}
+        />
+        <Text
+          style={{
+            fontSize: 12,
+            color: '#888',
+            marginLeft: props.position === 'right' ? 0 : 10,
+            marginRight: props.position === 'right' ? 10 : 0,
+            marginTop: 2,
+            fontFamily: 'Poppins-Italic',
+            textAlign: props.position === 'right' ? 'right' : 'left',
+          }}
+        >
+          {`reply by ${currentMessage.user?.name || 'User'}`}
+        </Text>
+      </View>
     );
   };
 
@@ -954,13 +992,11 @@ const ChatScreen = ({ route }) => {
         // If it's a content:// URI, we need to handle it differently
         if (uri.startsWith('content://')) {
           // Use the copyTo path if available
-          const response = await launchImageLibrary({
-            mediaType: 'file',
-            selectionLimit: 1,
-            includeBase64: false,
+          const response = await DocumentPicker.pick({
+            type: [DocumentPicker.types.allFiles],
             copyTo: 'cachesDirectory'
           });
-          fileUri = response.assets[0]?.uri;
+          fileUri = response[0]?.uri;
         }
 
         console.log('Using file URI:', fileUri);
@@ -1020,32 +1056,28 @@ const ChatScreen = ({ route }) => {
     try {
       console.log('Starting document picker...');
 
-      const res = await launchImageLibrary({
-        mediaType: 'file',
-        selectionLimit: 1,
-        includeBase64: false,
+      const res = await DocumentPicker.pickSingle({
+        type: [DocumentPicker.types.allFiles],
         copyTo: 'cachesDirectory', // This creates a local copy
         allowMultiSelection: false,
       });
 
       console.log('Document picked:', {
-        name: res.assets[0]?.fileName,
-        type: res.assets[0]?.type,
-        size: res.assets[0]?.fileSize,
-        uri: res.assets[0]?.uri,
-        fileCopyUri: res.assets[0]?.fileCopyUri
+        name: res.name,
+        type: res.type,
+        size: res.size,
+        uri: res.uri,
+        fileCopyUri: res.fileCopyUri
       });
 
-      if (!res.assets || res.assets.length === 0) {
+      if (!res) {
         console.log('No document selected');
         return;
       }
 
-      const asset = res.assets[0];
-
       // Validate file size (limit to 10MB)
       const maxSize = 10 * 1024 * 1024; // 10MB
-      if (asset.fileSize && asset.fileSize > maxSize) {
+      if (res.size && res.size > maxSize) {
         Alert.alert('Error', 'File size is too large. Please select a file smaller than 10MB.');
         return;
       }
@@ -1054,9 +1086,9 @@ const ChatScreen = ({ route }) => {
       setIsLoading(true);
 
       // Use fileCopyUri if available (Android), otherwise use uri
-      const fileUri = asset.fileCopyUri || asset.uri;
-      const fileName = asset.fileName || `file_${Date.now()}`;
-      const fileType = asset.type || 'application/octet-stream';
+      const fileUri = res.fileCopyUri || res.uri;
+      const fileName = res.name || `file_${Date.now()}`;
+      const fileType = res.type || 'application/octet-stream';
 
       console.log('Uploading file with URI:', fileUri);
 
@@ -1087,7 +1119,7 @@ const ChatScreen = ({ route }) => {
           uri: uploadedFile.url,
           name: uploadedFile.name,
           type: uploadedFile.type,
-          size: asset.fileSize
+          size: res.size
         };
         messageData.isDocument = true;
       }
@@ -1112,7 +1144,7 @@ const ChatScreen = ({ route }) => {
     } catch (err) {
       console.error('Document picker error:', err);
 
-      if (err.code === 'cancelled') {
+      if (DocumentPicker.isCancel(err)) {
         console.log('User cancelled document picker');
         return;
       }
@@ -1141,28 +1173,26 @@ const ChatScreen = ({ route }) => {
     try {
       console.log('Starting image picker...');
 
-      const res = await launchImageLibrary({
-        mediaType: 'image',
-        selectionLimit: 1,
-        includeBase64: false,
+      const res = await DocumentPicker.pick({
+        type: [DocumentPicker.types.images],
         copyTo: 'cachesDirectory',
         allowMultiSelection: false,
       });
 
       console.log('Image picked:', {
-        name: res.assets[0]?.fileName,
-        type: res.assets[0]?.type,
-        size: res.assets[0]?.fileSize,
-        uri: res.assets[0]?.uri,
-        fileCopyUri: res.assets[0]?.fileCopyUri
+        name: res[0]?.fileName,
+        type: res[0]?.type,
+        size: res[0]?.fileSize,
+        uri: res[0]?.uri,
+        fileCopyUri: res[0]?.fileCopyUri
       });
 
-      if (!res.assets || res.assets.length === 0) {
+      if (!res || res.length === 0) {
         console.log('No image selected');
         return;
       }
 
-      const asset = res.assets[0];
+      const asset = res[0];
 
       // Validate file size (limit to 5MB for images)
       const maxSize = 5 * 1024 * 1024; // 5MB

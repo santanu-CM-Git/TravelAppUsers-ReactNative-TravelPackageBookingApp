@@ -11,13 +11,14 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  BackHandler
+  BackHandler,
+  ActivityIndicator
 } from 'react-native';
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import {launchImageLibrary} from 'react-native-image-picker';
+import DocumentPicker from 'react-native-document-picker';
 import InputField from '../../../components/InputField';
 import CustomButton from '../../../components/CustomButton';
 import { AuthContext } from '../../../context/AuthContext';
@@ -136,49 +137,37 @@ const ProfileEditScreen = ({ route }) => {
 
   const pickDocument = async () => {
     try {
-      const options = {
-        mediaType: 'photo',
-        includeBase64: false,
-        maxHeight: 2000,
-        maxWidth: 2000,
-      };
-  
-      launchImageLibrary(options, (response) => {
-        if (response.didCancel) {
-          console.log('User cancelled image picker');
-          return;
-        }
-        
-        if (response.errorMessage) {
-          console.log('ImagePicker Error: ', response.errorMessage);
-          handleAlert('Oops..', response.errorMessage);
-          setIsPicUploadLoading(false);
-          return;
-        }
-  
-        if (response.assets && response.assets.length > 0) {
-          const pickedImage = response.assets[0];
-          setPickedDocument(pickedImage);
-  
-          const formData = new FormData();
-          formData.append("profile_pic", {
-            uri: pickedImage.uri,
-            type: pickedImage.type || 'image/jpeg',
-            name: pickedImage.fileName || 'photo.jpg',
-          });
-  
-          // Continue with your upload logic here
-          
-        } else {
-          const formData = new FormData();
-          formData.append("profile_pic", "");
-        }
+      setIsPicUploadLoading(true);
+      const result = await DocumentPicker.pick({
+        type: [DocumentPicker.types.images],
       });
-  
+
+      const pickedImage = result[0];
+      setPickedDocument(pickedImage);
+
+      const formData = new FormData();
+      if (pickedImage) {
+        formData.append("profile_pic", {
+          uri: pickedImage.uri,
+          type: pickedImage.type || 'image/jpeg',
+          name: pickedImage.name || 'photo.jpg',
+        });
+      } else {
+        formData.append("profile_pic", "");
+      }
+      setIsPicUploadLoading(false);
+      // Continue with your upload logic here if needed
     } catch (err) {
       setIsPicUploadLoading(false);
-      console.error('Error picking image', err);
-      handleAlert('Oops..', 'An error occurred while picking the image');
+      if (DocumentPicker.isCancel(err)) {
+        console.log('Document picker was cancelled');
+      } else if (err.response) {
+        console.log('Error response:', err.response.data?.response?.records);
+        handleAlert('Oops..', err.response.data?.message);
+      } else {
+        console.error('Error picking document', err);
+        handleAlert('Oops..', 'An error occurred while picking the image');
+      }
     }
   };
   const changeFirstname = (text) => {
