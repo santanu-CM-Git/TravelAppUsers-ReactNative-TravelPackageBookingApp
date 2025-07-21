@@ -728,7 +728,7 @@ const ChatScreen = ({ route }) => {
 
         const response = await axios.post(`${API_URL}/customer/customer-message`,
           {
-            agent_id: agentId
+            agent_id: route.params.agentId
           }, {
           headers: {
             Accept: 'application/json',
