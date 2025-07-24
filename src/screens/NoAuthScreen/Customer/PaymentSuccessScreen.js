@@ -106,7 +106,7 @@ const PaymentSuccessScreen = ({ route }) => {
 
             <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', marginTop: responsiveHeight(8), marginBottom: responsiveHeight(4) }}>
                 <Text style={styles.amountPaidText}>Amount Paid</Text>
-                <Text style={styles.amountPaidValue}>₹ {route?.params?.bookingDetails[0]?.amount}</Text>
+                <Text style={styles.amountPaidValue}>₹ {route?.params?.bookingDetails[0]?.final_amount}</Text>
             </View>
             {/* <Text style={styles.returnText}>You will be redirected to the home page shortly or click here to return to home page</Text> */}
             <View style={styles.buttonSection}>

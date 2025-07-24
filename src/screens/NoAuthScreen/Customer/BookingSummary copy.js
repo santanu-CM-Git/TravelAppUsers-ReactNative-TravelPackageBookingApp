@@ -32,6 +32,7 @@ const BookingSummary = ({ route }) => {
     const [bookingFees, setBookingFees] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const [isCouponLoading, setIsCouponLoading] = useState(false);
+    const [userData, setUserData] = useState(null);
     const [starCount, setStarCount] = useState(4);
     const [isEnabled, setIsEnabled] = useState(false);
     const [minTime, setMinTime] = useState(null);
@@ -44,21 +45,7 @@ const BookingSummary = ({ route }) => {
     const [couponData, setCouponData] = useState(null);
     const [couponError, setCouponError] = useState('');
     const [appliedCoupon, setAppliedCoupon] = useState(null);
-    const [availableCoupons, setAvailableCoupons] = useState([{
-        "id": 2,
-        "coupon_code": "Coupon-2",
-        "coupon_type": "percentage",
-        "discount_unit": 15,
-        "user_type": "new_user",
-        "sdate": "2025-04-01",
-        "edate": "2025-07-01",
-        "status": "Active",
-        "available_for": 100,
-        "applied": 0,
-        "created_at": "2025-04-30T11:50:19.000000Z",
-        "updated_at": "2025-04-30T11:50:19.000000Z",
-        "deleted_at": null
-    }]);
+    const [availableCoupons, setAvailableCoupons] = useState([]);
 
     const razorpayKeyId = RAZORPAY_KEY_ID;
     const razorpayKeySecret = RAZORPAY_KEY_SECRET;
@@ -99,119 +86,196 @@ const BookingSummary = ({ route }) => {
         }, [navigation])
     );
 
-    // const beforeHandlePayment = () => {
-    //     const option = {
-    //         "therapist_id": bookingDetails?.therapist_id,
-    //         "slot_ids": bookingDetails?.slot_ids,
-    //         "date": bookingDetails?.date,
-    //         "booking_type": 'paid'
-    //     }
-    //     AsyncStorage.getItem('userToken', (err, usertoken) => {
-    //         axios.post(`${API_URL}/patient/slot-book-checking`, option, {
-    //             headers: {
-    //                 Accept: 'application/json',
-    //                 "Authorization": `Bearer ${usertoken}`,
-    //             },
-    //         })
-    //             .then(res => {
-    //                 if (res.data.response == true) {
-    //                     setIsLoading(false)
-    //                     handlePayment()
-    //                 } else {
-    //                     setIsLoading(false)
-    //                     Alert.alert('Oops..', res?.data?.message || "Something went wrong", [
-    //                         { text: 'OK', onPress: () => console.log('OK Pressed') },
-    //                     ]);
-    //                 }
-    //             })
-    //             .catch(e => {
-    //                 setIsLoading(false)
-    //                 console.log(`slot booking checking error ${e}`)
-    //                 console.log(e.response)
-    //                 Alert.alert('Oops..', e.response?.data?.message, [
-    //                     { text: 'OK', onPress: () => e.response?.data?.message == 'Unauthorized' ? logout() : console.log('OK Pressed') },
-    //                 ]);
-    //             });
-    //     });
-    // }
+    const beforeHandlePayment = () => {
+        setIsLoading(true)
+        const formData = new FormData();
+        formData.append("agent_id", packageInfo?.agent_id);
+        formData.append("sub_agent_id", packageInfo?.sub_agent_id ? packageInfo?.sub_agent_id : "");
+        formData.append("booking_type", "App");
+        formData.append("package_id", packageInfo?.id);
+        formData.append("start_date", moment(bookingDetails?.fromDate).format('YYYY-MM-DD'));
+        formData.append("end_date", moment(bookingDetails?.toDate).format('YYYY-MM-DD'));
+        formData.append("adult", bookingDetails?.adults);
+        formData.append("children", bookingDetails?.children);
+        formData.append("amount", bookingDetails?.totalPrice);
+        formData.append("coupon_code", appliedCoupon?.id ? appliedCoupon?.id : "");
+        formData.append("coupon_discount", calculateTotalAmount().couponDiscount.toFixed(2));
+        formData.append("tax", calculateTotalAmount().taxAmount);
+        formData.append("booking_fee", calculateTotalAmount().bookingFeesAmount);
+        formData.append("final_amount", calculateTotalAmount().finalAmount.toFixed(2));
 
-    const handlePayment = async () => {
-        const totalAmount = bookingDetails?.totalPrice;
-
-        if (totalAmount === 0) {
-            submitForm(""); // Handle free payments
-        } else {
-            try {
-                // Step 1: Retrieve the user token from AsyncStorage
-                AsyncStorage.getItem('userToken', async (err, userToken) => {
-                    console.log(userToken)
-                    if (err || !userToken) {
-                        console.error('Error retrieving user token:', err);
-                        navigation.navigate('PaymentFailed', { message: 'User authentication failed' });
-                        return;
-                    }
-
-                    // Step 2: Create an order on the server
-                    const response = await axios.post(
-                        `${API_URL}/patient/razorpay-order-create`,
-                        {
-                            "amount": totalAmount * 100, // Convert to smallest currency unit
-                        },
-                        {
-                            headers: {
-                                Accept: 'application/json',
-                                Authorization: `Bearer ${userToken}`, // Add token to headers
-                            },
-                        }
-                    );
-
-                    const { order_id } = response.data; // Assuming the response includes { order_id: 'order_xyz' }
-
-                    console.log(order_id)
-
-                    if (order_id) {
-                        // Step 3: Open Razorpay Checkout
-                        const options = {
-                            description: 'MYJOIE',
-                            image: `https://res.cloudinary.com/dzl5v6ndv/image/upload/v1733826925/mtxdsgytrery6npks4qq.png`,
-                            currency: 'INR',
-                            key: razorpayKeyId,
-                            amount: totalAmount * 100, // Amount in smallest currency unit
-                            name: bookingDetails?.name,
-                            order_id: order_id, // Use the order ID from the server
-                            prefill: {
-                                email: bookingDetails?.email,
-                                contact: bookingDetails?.mobile,
-                                name: bookingDetails?.name,
-                            },
-                            theme: { color: '#519ED8' },
-                        };
-
-                        RazorpayCheckout.open(options)
-                            .then((data) => {
-                                // Payment successful
-                                submitForm(data.razorpay_payment_id);
-                            })
-                            .catch((error) => {
-                                // Payment failed
-                                console.error('Payment failed:', error.description);
-                                navigation.navigate('PaymentFailed', { message: error.description });
-                            });
+        console.log(formData, 'formDataformDataformData')
+        AsyncStorage.getItem('userToken', (err, usertoken) => {
+            axios.post(`${API_URL}/customer/booking-check`, formData, {
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'multipart/form-data',
+                    "Authorization": `Bearer ${usertoken}`,
+                },
+            })
+                .then(res => {
+                    console.log(res)
+                    if (res.data.response == true) {
+                        //setIsLoading(false)
+                        handlePayment()
                     } else {
-                        navigation.navigate('PaymentFailed', { message: 'Order creation failed' });
+                        setIsLoading(false)
+                        Alert.alert('Oops..', res?.data?.message || "Something went wrong", [
+                            { text: 'OK', onPress: () => console.log('OK Pressed') },
+                        ]);
                     }
+                })
+                .catch(e => {
+                    setIsLoading(false)
+                    console.log(`slot booking checking error ${e}`)
+                    console.log(e)
+                    Alert.alert('Oops..', e.response?.data?.message || "Something went wrong", [
+                        { text: 'OK', onPress: () => e.response?.data?.message == 'Unauthorized' ? logout() : console.log('OK Pressed') },
+                    ]);
                 });
-            } catch (error) {
-                console.error('Error creating order:', error);
-                navigation.navigate('PaymentFailed', { message: 'Failed to create order' });
-            }
+        });
+    }
+
+    const fetchProfileData = async () => {
+        try {
+            AsyncStorage.getItem('userToken', async (err, userToken) => {
+                setIsLoading(true);
+                const response = await axios.post(`${API_URL}/customer/profile-details`, {}, {
+                    headers: {
+                        "Authorization": `Bearer ${userToken}`,
+                        "Content-Type": 'application/json'
+                    },
+                });
+
+                const userData = response.data.data;
+                setUserData(userData)
+                setIsLoading(false);
+            });
+        } catch (error) {
+            console.log('Error fetching profile:', error);
+            setIsLoading(false);
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Failed to fetch profile data',
+                position: 'top',
+                topOffset: Platform.OS == 'ios' ? 55 : 20
+            });
         }
     };
 
-    const submitForm = (transactionId) => {
+    useEffect(() => {
+        fetchProfileData();
+    }, []);
+
+    const formatPhoneForRazorpay = (countryCode, mobile) => {
+        if (!countryCode || !mobile) return '';
+
+        // Clean country code - remove '+' and non-numeric characters
+        const cleanCountryCode = countryCode.replace(/\D/g, '');
+
+        // Clean mobile number - remove all non-numeric characters
+        const cleanMobile = mobile.replace(/\D/g, '');
+
+        // If mobile already starts with country code, return mobile only
+        if (cleanMobile.startsWith(cleanCountryCode)) {
+            return cleanMobile;
+        }
+
+        // Combine country code and mobile
+        return cleanCountryCode + cleanMobile;
+    };
+
+    const handlePayment = async () => {
+       
+        const totalAmount = calculateTotalAmount().finalAmount.toFixed(2);
+        console.log('asdgaskdgaksdgaks')
+        console.log(totalAmount, 'totalAmounttotalAmounttotalAmount')
         console.log(packageInfo, 'packageInfopackageInfopackageInfo')
         console.log(bookingDetails, 'bookingDetailsbookingDetailsbookingDetails')
-       
+        console.log(userData, 'userDatauserDatauserData')
+        console.log(userData?.mobile, 'mobile')
+
+        try {
+            // Step 1: Retrieve the user token from AsyncStorage
+            AsyncStorage.getItem('userToken', async (err, userToken) => {
+                console.log(userToken)
+                if (err || !userToken) {
+                    console.error('Error retrieving user token:', err);
+                    navigation.navigate('PaymentFailed', { message: 'User authentication failed' });
+                    return;
+                }
+                console.log(calculateTotalAmount().taxAmount * 100);
+                console.log(calculateTotalAmount().bookingFeesAmount * 100);
+                console.log(packageInfo?.agent_id);
+                console.log(totalAmount * 100);
+
+                // Step 2: Create an order on the server
+                const response = await axios.post(
+                    `${API_URL}/customer/razorpay-order-create`,
+                    {
+                        "amount": totalAmount * 100, // Convert to smallest currency unit
+                        "tax": calculateTotalAmount().taxAmount * 100,
+                        "booking_charge": calculateTotalAmount().bookingFeesAmount * 100,
+                        "agent_id": packageInfo?.agent_id,
+                        "currency": 'INR'
+                    },
+                    {
+                        headers: {
+                            Accept: 'application/json',
+                            Authorization: `Bearer ${userToken}`, // Add token to headers
+                        },
+                    }
+                );
+
+                console.log(JSON.stringify(response.data.order.transfers[0].id), 'response from razorpay-order-create')
+
+                const { id: order_id } = response.data.order; // Assuming the response includes { order_id: 'order_xyz' }
+
+                console.log(order_id)
+                if (order_id) {
+                    setIsLoading(false)
+                    // Step 3: Open Razorpay Checkout
+                    const options = {
+                        description: 'Group Tour',
+                        image: `https://res.cloudinary.com/dzl5v6ndv/image/upload/v1749474430/gt_icon_JPG_1_1_b29bdc.png`,
+                        currency: 'INR',
+                        key: razorpayKeyId,
+                        amount: totalAmount * 100, // Amount in smallest currency unit
+                        name: bookingDetails?.description,
+                        order_id: order_id, // Use the order ID from the server
+                        prefill: {
+                            contact: formatPhoneForRazorpay(userData?.country_code, userData?.mobile),
+                            name: userData?.full_name,
+                        },
+                        theme: { color: '#FF455C' },
+                    };
+
+                    RazorpayCheckout.open(options)
+                        .then((data) => {
+                            // Payment successful
+                            console.log("razorpay response data", data);
+                            submitForm(data.razorpay_payment_id,order_id,data.razorpay_signature,response.data.order.transfers[0].id);
+                        })
+                        .catch((error) => {
+                            // Payment failed
+                            console.error('Payment failed:', error.description);
+                            navigation.navigate('PaymentFailed', { message: error.description, order_id: order_id, amount: totalAmount });
+                        });
+                } else {
+                    navigation.navigate('PaymentFailed', { message: 'Order creation failed' });
+                }
+            });
+        } catch (error) {
+            console.error('Error creating order:', error);
+            navigation.navigate('PaymentFailed', { message: 'Failed to create order' });
+        }
+    };
+
+    const submitForm = (transactionId,order_id,razorpay_signature,transfer_id) => {
+        console.log(packageInfo, 'packageInfopackageInfopackageInfo')
+        console.log(bookingDetails, 'bookingDetailsbookingDetailsbookingDetails')
+
         setIsLoading(true);
 
         const formData = new FormData();
@@ -229,10 +293,12 @@ const BookingSummary = ({ route }) => {
         formData.append("tax", calculateTotalAmount().taxAmount);
         formData.append("booking_fee", calculateTotalAmount().bookingFeesAmount);
         formData.append("final_amount", calculateTotalAmount().finalAmount.toFixed(2));
-        formData.append("transaction_no", "fjfhdjsfsf");
+        formData.append("transaction_no", transactionId);
         formData.append("refund_condition", "");
         formData.append("refund_amount", "");
-
+        formData.append("order_id", order_id);
+        formData.append("signature", razorpay_signature);
+        formData.append("trf_id", transfer_id);
         console.log(formData, 'formDataformDataformData')
 
         AsyncStorage.getItem('userToken', (err, usertoken) => {
@@ -307,10 +373,11 @@ const BookingSummary = ({ route }) => {
                     Authorization: `Bearer ${userToken}`,
                 },
             });
-
-            if (response.data.response === true) {
-                setAvailableCoupons(response.data.data);
+            let coupons = response.data.data;
+            if (coupons && !Array.isArray(coupons)) {
+                coupons = [coupons];
             }
+            setAvailableCoupons(coupons);
         } catch (error) {
             console.error('Error fetching available coupons:', error);
         }
@@ -321,8 +388,12 @@ const BookingSummary = ({ route }) => {
             setCouponError('Please enter a coupon code');
             return;
         }
-
-        // Find the coupon in available coupons
+        console.log(availableCoupons,'sdfdsf')
+        
+        if (!Array.isArray(availableCoupons)) {
+            setCouponError('No available coupons');
+            return;
+        }
         const coupon = availableCoupons.find(c => c.coupon_code.toLowerCase() === couponCode.toLowerCase());
 
         if (!coupon) {
@@ -503,7 +574,7 @@ const BookingSummary = ({ route }) => {
                     {/* Persons */}
                     <View style={styles.row}>
                         <Text style={styles.label}>Adults ({bookingDetails?.adults})</Text>
-                        <Text style={styles.value}>₹ {packageInfo?.price * bookingDetails?.adults}</Text>
+                        <Text style={styles.value}>₹ {packageInfo?.discounted_price * bookingDetails?.adults}</Text>
                     </View>
                     <View style={styles.row}>
                         <Text style={styles.label}>Children ({bookingDetails?.children})</Text>
@@ -556,7 +627,7 @@ const BookingSummary = ({ route }) => {
                     {/* Table Header */}
                     <View style={[styles.cancelRow, styles.cancelHeader]}>
                         <Text style={[styles.cancelText, styles.cancelBold]}>Time Of Cancellation</Text>
-                        <Text style={[styles.cancelText, styles.cancelBold]}>Penalty Amount</Text>
+                        <Text style={[styles.cancelText, styles.cancelBold]}>Refund Percentage</Text>
                     </View>
 
                     {/* 
@@ -579,7 +650,7 @@ const BookingSummary = ({ route }) => {
                             <View key={index} style={styles.cancelRow}>
                                 <Text style={styles.cancelText}>{getCancellationTimeLabel(item.condition)}</Text>
                                 <Text style={[styles.cancelText, isNonRefundable && styles.cancelGreyText]}>
-                                    {isNonRefundable ? 'Non Refundable' : `₹ ${item.refund}`}
+                                    {isNonRefundable ? 'Non Refundable' : `${item.refund} %`}
                                 </Text>
                             </View>
                         );
@@ -599,17 +670,26 @@ const BookingSummary = ({ route }) => {
                     </Text>
                 </View>
             </ScrollView>
-            <View style={styles.buttonwrapper}>
-                <View style={styles.buttonwrapperSection1}>
-                    <Text style={styles.buttonwrapperText2}>₹ {calculateTotalAmount().finalAmount.toFixed(2)}</Text>
+            {!packageInfo?.agent_bank_details ?
+                <View style={styles.buttonwrapper}>
+                    <Text style={styles.termsText}>Please contact the agent to complete the payment</Text>
                 </View>
-                <View style={{ marginTop: responsiveHeight(1) }}>
-                    <CustomButton label={"Pay Now"}
-                        //onPress={() => navigation.navigate('PaymentSuccessScreen')}
-                        onPress={() => submitForm()}
-                    />
+                 :
+                <View style={styles.buttonwrapper}>
+                    <View style={styles.buttonwrapperSection1}>
+                        <Text style={styles.buttonwrapperText2}>₹ {calculateTotalAmount().finalAmount.toFixed(2)}</Text>
+                    </View>
+                    <View style={{ marginTop: responsiveHeight(1) }}>
+
+                        <CustomButton
+                            label={isLoading ? "Processing..." : "Pay Now"}
+                            onPress={beforeHandlePayment}
+                            disabled={isLoading || !packageInfo?.agent_bank_details}
+                            style={(!packageInfo?.agent_bank_details || isLoading) ? styles.disabledButton : null}
+                        />
+                    </View>
                 </View>
-            </View>
+            }
         </SafeAreaView>
     )
 }
@@ -824,5 +904,8 @@ const styles = StyleSheet.create({
         color: '#FF0000',
         fontSize: 14,
         fontWeight: 'bold',
+    },
+    disabledButton: {
+        opacity: 0.5,
     },
 });

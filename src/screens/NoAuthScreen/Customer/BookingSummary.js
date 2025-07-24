@@ -86,8 +86,56 @@ const BookingSummary = ({ route }) => {
         }, [navigation])
     );
 
+    // Updated GST calculation logic based on client requirements
+    const calculateTotalAmount = () => {
+        const baseAmount = bookingDetails?.totalPrice || 0;
+
+        // Step 1: Calculate coupon discount on base amount
+        let couponDiscount = 0;
+        if (appliedCoupon) {
+            couponDiscount = (baseAmount * appliedCoupon.discount_unit) / 100;
+        }
+
+        // Step 2: Price after discount (PD)
+        const priceAfterDiscount = baseAmount - couponDiscount;
+
+        // Step 3: Calculate GST on package (18% of discounted price)
+        const packageGST = (priceAfterDiscount * gstPercentage) / 100;
+
+        // Step 4: Customer pays for package = Price after discount + GST on package
+        const packageTotalForCustomer = priceAfterDiscount + packageGST;
+
+        // Step 5: Calculate Platform Fee (booking fees % of discounted price)
+        const platformFee = (priceAfterDiscount * bookingFees) / 100;
+
+        // Step 6: Calculate GST on Platform Fee (18% of platform fee)
+        const platformFeeGST = (platformFee * gstPercentage) / 100;
+
+        // Step 7: Total amount customer pays
+        const finalAmount = packageTotalForCustomer + platformFee + platformFeeGST;
+
+        // Step 8: Amount agency receives (Total - Platform Fee - Platform Fee GST)
+        const agencyReceives = finalAmount - platformFee - platformFeeGST;
+
+        return {
+            baseAmount,
+            couponDiscount,
+            priceAfterDiscount,
+            packageGST,
+            packageTotalForCustomer,
+            platformFee,
+            platformFeeGST,
+            finalAmount,
+            agencyReceives,
+            // Legacy properties for backward compatibility
+            taxAmount: packageGST + platformFeeGST, // Total GST
+            bookingFeesAmount: platformFee + platformFeeGST // Platform fee + its GST
+        };
+    };
+
     const beforeHandlePayment = () => {
         setIsLoading(true)
+        const calculation = calculateTotalAmount();
         const formData = new FormData();
         formData.append("agent_id", packageInfo?.agent_id);
         formData.append("sub_agent_id", packageInfo?.sub_agent_id ? packageInfo?.sub_agent_id : "");
@@ -99,10 +147,10 @@ const BookingSummary = ({ route }) => {
         formData.append("children", bookingDetails?.children);
         formData.append("amount", bookingDetails?.totalPrice);
         formData.append("coupon_code", appliedCoupon?.id ? appliedCoupon?.id : "");
-        formData.append("coupon_discount", calculateTotalAmount().couponDiscount.toFixed(2));
-        formData.append("tax", calculateTotalAmount().taxAmount);
-        formData.append("booking_fee", calculateTotalAmount().bookingFeesAmount);
-        formData.append("final_amount", calculateTotalAmount().finalAmount.toFixed(2));
+        formData.append("coupon_discount", calculation.couponDiscount.toFixed(2));
+        formData.append("tax", calculation.packageGST + calculation.platformFeeGST);
+        formData.append("booking_fee", calculation.platformFee);
+        formData.append("final_amount", calculation.finalAmount.toFixed(2));
 
         console.log(formData, 'formDataformDataformData')
         AsyncStorage.getItem('userToken', (err, usertoken) => {
@@ -187,8 +235,8 @@ const BookingSummary = ({ route }) => {
     };
 
     const handlePayment = async () => {
-       
-        const totalAmount = calculateTotalAmount().finalAmount.toFixed(2);
+        const calculation = calculateTotalAmount();
+        const totalAmount = calculation.finalAmount.toFixed(2);
         console.log('asdgaskdgaksdgaks')
         console.log(totalAmount, 'totalAmounttotalAmounttotalAmount')
         console.log(packageInfo, 'packageInfopackageInfopackageInfo')
@@ -205,8 +253,8 @@ const BookingSummary = ({ route }) => {
                     navigation.navigate('PaymentFailed', { message: 'User authentication failed' });
                     return;
                 }
-                console.log(calculateTotalAmount().taxAmount * 100);
-                console.log(calculateTotalAmount().bookingFeesAmount * 100);
+                console.log((calculation.packageGST + calculation.platformFeeGST) * 100);
+                console.log(calculation.platformFee * 100);
                 console.log(packageInfo?.agent_id);
                 console.log(totalAmount * 100);
 
@@ -215,8 +263,8 @@ const BookingSummary = ({ route }) => {
                     `${API_URL}/customer/razorpay-order-create`,
                     {
                         "amount": totalAmount * 100, // Convert to smallest currency unit
-                        "tax": calculateTotalAmount().taxAmount * 100,
-                        "booking_charge": calculateTotalAmount().bookingFeesAmount * 100,
+                        "tax": (calculation.packageGST + calculation.platformFeeGST) * 100,
+                        "booking_charge": calculation.platformFee * 100,
                         "agent_id": packageInfo?.agent_id,
                         "currency": 'INR'
                     },
@@ -277,6 +325,7 @@ const BookingSummary = ({ route }) => {
         console.log(bookingDetails, 'bookingDetailsbookingDetailsbookingDetails')
 
         setIsLoading(true);
+        const calculation = calculateTotalAmount();
 
         const formData = new FormData();
         formData.append("agent_id", packageInfo?.agent_id);
@@ -289,10 +338,10 @@ const BookingSummary = ({ route }) => {
         formData.append("children", bookingDetails?.children);
         formData.append("amount", bookingDetails?.totalPrice);
         formData.append("coupon_code", appliedCoupon?.id ? appliedCoupon?.id : "");
-        formData.append("coupon_discount", calculateTotalAmount().couponDiscount.toFixed(2));
-        formData.append("tax", calculateTotalAmount().taxAmount);
-        formData.append("booking_fee", calculateTotalAmount().bookingFeesAmount);
-        formData.append("final_amount", calculateTotalAmount().finalAmount.toFixed(2));
+        formData.append("coupon_discount", calculation.couponDiscount.toFixed(2));
+        formData.append("tax", calculation.packageGST + calculation.platformFeeGST);
+        formData.append("booking_fee", calculation.platformFee);
+        formData.append("final_amount", calculation.finalAmount.toFixed(2));
         formData.append("transaction_no", transactionId);
         formData.append("refund_condition", "");
         formData.append("refund_amount", "");
@@ -434,32 +483,87 @@ const BookingSummary = ({ route }) => {
         setCouponError('');
     };
 
-    const calculateTotalAmount = () => {
-        const baseAmount = bookingDetails?.totalPrice || 0;
+    // Updated price summary render function
+    const renderPriceSummary = () => {
+        const calculation = calculateTotalAmount();
+        
+        return (
+            <View style={styles.containerpricebreckdown}>
+                {/* Base Package Details */}
+                <View style={styles.row}>
+                    <Text style={styles.label}>Adults ({bookingDetails?.adults})</Text>
+                    <Text style={styles.value}>₹ {packageInfo?.discounted_price * bookingDetails?.adults}</Text>
+                </View>
+                <View style={styles.row}>
+                    <Text style={styles.label}>Children ({bookingDetails?.children})</Text>
+                    <Text style={styles.value}>₹ {packageInfo?.children_price * bookingDetails?.children}</Text>
+                </View>
 
-        // Calculate coupon discount first on base amount
-        let couponDiscount = 0;
-        if (appliedCoupon) {
-            couponDiscount = (baseAmount * appliedCoupon.discount_unit) / 100;
-        }
+                <View style={styles.divider} />
 
-        // Apply discount to base amount
-        const discountedAmount = baseAmount - couponDiscount;
+                {/* Package Subtotal */}
+                <View style={styles.row}>
+                    <Text style={[styles.label, styles.bold]}>Package Subtotal</Text>
+                    <Text style={[styles.value, styles.bold]}>₹ {calculation.baseAmount}</Text>
+                </View>
 
-        // Calculate tax and booking fees on discounted amount
-        const taxAmount = (discountedAmount * gstPercentage) / 100;
-        const bookingFeesAmount = (discountedAmount * bookingFees) / 100;
+                {/* Coupon Discount */}
+                {calculation.couponDiscount > 0 && (
+                    <>
+                        <View style={styles.row}>
+                            <Text style={styles.label}>Coupon Discount ({appliedCoupon?.discount_unit}%)</Text>
+                            <Text style={styles.value}>- ₹ {calculation.couponDiscount.toFixed(2)}</Text>
+                        </View>
+                        <Text style={styles.subText}>Promo Code Applied "{appliedCoupon?.coupon_code}"</Text>
+                    </>
+                )}
 
-        // Calculate final amount
-        const finalAmount = discountedAmount + taxAmount + bookingFeesAmount;
+                {/* Price After Discount */}
+                <View style={styles.row}>
+                    <Text style={[styles.label, styles.bold]}>Price After Discount</Text>
+                    <Text style={[styles.value, styles.bold]}>₹ {calculation.priceAfterDiscount.toFixed(2)}</Text>
+                </View>
 
-        return {
-            baseAmount,
-            taxAmount,
-            bookingFeesAmount,
-            couponDiscount,
-            finalAmount
-        };
+                {/* GST on Package */}
+                <View style={styles.row}>
+                    <Text style={styles.label}>GST on Package ({gstPercentage}%)</Text>
+                    <Text style={styles.value}>₹ {calculation.packageGST.toFixed(2)}</Text>
+                </View>
+
+                {/* Package Total */}
+                <View style={styles.row}>
+                    <Text style={[styles.label, styles.bold, styles.red]}>Package Total</Text>
+                    <Text style={[styles.value, styles.bold, styles.red]}>₹ {calculation.packageTotalForCustomer.toFixed(2)}</Text>
+                </View>
+
+                <View style={styles.divider} />
+
+                {/* Platform Fee */}
+                <View style={styles.row}>
+                    <Text style={styles.label}>Platform Fee ({bookingFees}%)</Text>
+                    <Text style={styles.value}>₹ {calculation.platformFee.toFixed(2)}</Text>
+                </View>
+
+                {/* GST on Platform Fee */}
+                <View style={styles.row}>
+                    <Text style={styles.label}>GST on Platform Fee ({gstPercentage}%)</Text>
+                    <Text style={styles.value}>₹ {calculation.platformFeeGST.toFixed(2)}</Text>
+                </View>
+
+                <View style={styles.divider} />
+
+                {/* Grand Total */}
+                <View style={styles.row}>
+                    <Text style={[styles.label, styles.bold, styles.red, styles.large]}>Grand Total</Text>
+                    <Text style={[styles.value, styles.bold, styles.red, styles.large]}>₹ {calculation.finalAmount.toFixed(2)}</Text>
+                </View>
+
+                {/* Additional Info (Optional - for transparency)
+                <Text style={[styles.subText, { marginTop: 10, fontStyle: 'italic' }]}>
+                    Agency Receives: ₹ {calculation.agencyReceives.toFixed(2)}
+                </Text> */}
+            </View>
+        );
     };
 
     useEffect(() => {
@@ -570,56 +674,10 @@ const BookingSummary = ({ route }) => {
                 <View style={{ marginHorizontal: 10, }}>
                     <Text style={styles.productText3}>Price Summary</Text>
                 </View>
-                <View style={styles.containerpricebreckdown}>
-                    {/* Persons */}
-                    <View style={styles.row}>
-                        <Text style={styles.label}>Adults ({bookingDetails?.adults})</Text>
-                        <Text style={styles.value}>₹ {packageInfo?.discounted_price * bookingDetails?.adults}</Text>
-                    </View>
-                    <View style={styles.row}>
-                        <Text style={styles.label}>Children ({bookingDetails?.children})</Text>
-                        <Text style={styles.value}>₹ {packageInfo?.children_price * bookingDetails?.children}</Text>
-                    </View>
-
-                    {/* Price Details */}
-                    <View style={styles.row}>
-                        <Text style={styles.label}>Tax ({gstPercentage}%)</Text>
-                        <Text style={styles.value}>₹ {calculateTotalAmount().taxAmount}</Text>
-                    </View>
-
-                    <View style={styles.row}>
-                        <Text style={styles.label}>Booking Fees ({bookingFees}%)</Text>
-                        <Text style={styles.value}>₹ {calculateTotalAmount().bookingFeesAmount}</Text>
-                    </View>
-
-                    <View style={styles.divider} />
-
-                    {/* Subtotal */}
-                    <View style={styles.row}>
-                        <Text style={[styles.label, styles.bold, styles.red]}>Subtotal</Text>
-                        <Text style={[styles.value, styles.bold, styles.red]}>₹ {bookingDetails?.totalPrice}</Text>
-                    </View>
-
-                    <View style={styles.divider} />
-
-                    {/* Discounts */}
-                    {calculateTotalAmount().couponDiscount > 0 && (
-                        <>
-                            <View style={styles.row}>
-                                <Text style={styles.label}>Coupon Discount ({appliedCoupon?.discount_unit}%)</Text>
-                                <Text style={styles.value}>- ₹ {calculateTotalAmount().couponDiscount.toFixed(2)}</Text>
-                            </View>
-                            <Text style={styles.subText}>Promo Code Applied "{appliedCoupon?.coupon_code}"</Text>
-                            <View style={styles.divider} />
-                        </>
-                    )}
-
-                    {/* Grand Total */}
-                    <View style={styles.row}>
-                        <Text style={[styles.label, styles.bold, styles.red, styles.large]}>Grand Total</Text>
-                        <Text style={[styles.value, styles.bold, styles.red, styles.large]}>₹ {calculateTotalAmount().finalAmount.toFixed(2)}</Text>
-                    </View>
-                </View>
+                
+                {/* Use the new renderPriceSummary function */}
+                {renderPriceSummary()}
+                
                 <View style={{ marginHorizontal: 10, }}>
                     <Text style={styles.productText3}>Cancellation Policy</Text>
                 </View>
@@ -630,20 +688,6 @@ const BookingSummary = ({ route }) => {
                         <Text style={[styles.cancelText, styles.cancelBold]}>Refund Percentage</Text>
                     </View>
 
-                    {/* 
-                    {[
-                        { time: '48 hrs before chart Preparation', amount: '₹ 70' },
-                        { time: '48-12 Hrs Before Chart Preparation', amount: '₹ 70' },
-                        { time: '12-4 Hrs Before Chart Preparation', amount: '₹ 50' },
-                        { time: '4 Hrs Before Chart Preparation', amount: 'Non Refundable', isNonRefundable: true },
-                    ].map((item, index) => (
-                        <View key={index} style={styles.cancelRow}>
-                            <Text style={styles.cancelText}>{item.time}</Text>
-                            <Text style={[styles.cancelText, item.isNonRefundable && styles.cancelGreyText]}>
-                                {item.amount}
-                            </Text>
-                        </View>
-                    ))} */}
                     {packageInfo?.refund.map((item, index) => {
                         const isNonRefundable = item.refund === "0";
                         return (
