@@ -136,6 +136,8 @@ const BookingSummary = ({ route }) => {
     const beforeHandlePayment = () => {
         setIsLoading(true)
         const calculation = calculateTotalAmount();
+        console.log(calculation, 'calculationcalculationcalculation')
+        // return
         const formData = new FormData();
         formData.append("agent_id", packageInfo?.agent_id);
         formData.append("sub_agent_id", packageInfo?.sub_agent_id ? packageInfo?.sub_agent_id : "");
@@ -339,8 +341,9 @@ const BookingSummary = ({ route }) => {
         formData.append("amount", bookingDetails?.totalPrice);
         formData.append("coupon_code", appliedCoupon?.id ? appliedCoupon?.id : "");
         formData.append("coupon_discount", calculation.couponDiscount.toFixed(2));
-        formData.append("tax", calculation.packageGST + calculation.platformFeeGST);
+        formData.append("tax", calculation.packageGST);
         formData.append("booking_fee", calculation.platformFee);
+        formData.append("booking_tax", calculation.platformFeeGST);
         formData.append("final_amount", calculation.finalAmount.toFixed(2));
         formData.append("transaction_no", transactionId);
         formData.append("refund_condition", "");
