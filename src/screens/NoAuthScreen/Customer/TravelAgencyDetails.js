@@ -23,7 +23,6 @@ import {
 import Modal from "react-native-modal";
 import { AuthContext } from '../../../context/AuthContext';
 import { getProducts } from '../../../store/productSlice'
-import FastImage from '@d11/react-native-fast-image';
 import moment from 'moment-timezone';
 import CustomButton from '../../../components/CustomButton'
 import axios from 'axios';

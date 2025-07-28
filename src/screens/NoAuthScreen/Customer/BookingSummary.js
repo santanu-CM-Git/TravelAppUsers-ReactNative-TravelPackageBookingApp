@@ -17,7 +17,6 @@ import RazorpayCheckout from 'react-native-razorpay';
 import Toast from 'react-native-toast-message';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../../context/AuthContext';
-import { AppEventsLogger } from 'react-native-fbsdk-next';
 import analytics from '@react-native-firebase/analytics';
 import Icon from 'react-native-vector-icons/Feather';
 import CheckBox from '@react-native-community/checkbox';
@@ -386,20 +385,6 @@ const BookingSummary = ({ route }) => {
         });
     };
 
-    const logPurchaseEvent = async (finalPayAmount) => {
-        const params = {
-            fb_currency: 'INR',
-        };
-
-        try {
-            console.log("Logging purchase on iOS:", finalPayAmount, "INR");
-            AppEventsLogger.logPurchase(finalPayAmount, 'INR', params);
-            return true;
-        } catch (error) {
-            console.error("Error logging purchase event:", error);
-            return false;
-        }
-    };
     const logPurchaseEventGoogle = async (amount, transactionId) => {
         try {
             await analytics().logEvent('purchase', {

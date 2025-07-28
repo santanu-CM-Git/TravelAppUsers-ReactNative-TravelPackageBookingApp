@@ -12,7 +12,6 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
-    "@d11/react-native-fast-image": "^8.10.0",
     "@notifee/react-native": "^9.1.8",
     "@ptomasroos/react-native-multi-slider": "^2.2.2",
     "@react-native-async-storage/async-storage": "^2.2.0",
@@ -58,7 +57,6 @@
     "react-native-document-picker": "^9.3.1",
     "react-native-dotenv": "^3.4.11",
     "react-native-element-dropdown": "^2.12.4",
-    "react-native-fbsdk-next": "^13.4.1",
     "react-native-file-viewer": "^2.1.5",
     "react-native-fs": "^2.20.0",
     "react-native-geolocation-service": "^5.3.1",

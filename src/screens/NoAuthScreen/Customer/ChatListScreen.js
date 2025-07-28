@@ -24,7 +24,6 @@ import {
 import Modal from "react-native-modal";
 import { AuthContext } from '../../../context/AuthContext';
 import { getProducts } from '../../../store/productSlice'
-import FastImage from '@d11/react-native-fast-image';
 import moment from 'moment-timezone';
 import CustomButton from '../../../components/CustomButton'
 import axios from 'axios';
@@ -54,7 +53,7 @@ const itemWidth = width * 0.8; // 80% of screen width
 const imageHeight = itemWidth * 0.5; // Maintain a 4:3 aspect ratio
 
 
-export default function ChatListScreen({  }) {
+export default function ChatListScreen({ }) {
     const navigation = useNavigation();
     const [refreshing, setRefreshing] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -81,7 +80,7 @@ export default function ChatListScreen({  }) {
                 return;
             }
 
-            const response = await axios.post(`${API_URL}/customer/message-list`,{}, {
+            const response = await axios.post(`${API_URL}/customer/message-list`, {}, {
                 params: {
                     page
                 },
@@ -93,13 +92,13 @@ export default function ChatListScreen({  }) {
 
             if (response.data.response) {
                 const { data, current_page, last_page } = response.data.data;
-                
+
                 if (isRefreshing || page === 1) {
                     setChatList(data);
                 } else {
                     setChatList(prevList => [...prevList, ...data]);
                 }
-                
+
                 setCurrentPage(current_page);
                 setLastPage(last_page);
             }
@@ -122,7 +121,7 @@ export default function ChatListScreen({  }) {
         if (searchText.trim() === '') {
             setFilteredChatList(chatList);
         } else {
-            const filtered = chatList.filter(item => 
+            const filtered = chatList.filter(item =>
                 item.agent.name.toLowerCase().includes(searchText.toLowerCase())
             );
             setFilteredChatList(filtered);
@@ -193,7 +192,7 @@ export default function ChatListScreen({  }) {
                             onChangeText={setSearchText}
                         />
                         {searchText.length > 0 && (
-                            <TouchableOpacity 
+                            <TouchableOpacity
                                 onPress={() => setSearchText('')}
                                 style={styles.clearButton}
                             >
@@ -207,14 +206,14 @@ export default function ChatListScreen({  }) {
                 data={filteredChatList}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={styles.chatItem}
-                        onPress={() => navigation.navigate('ChatScreen', { 
+                        onPress={() => navigation.navigate('ChatScreen', {
                             agentId: item?.agent?.id
                         })}
                     >
-                        <FastImage 
-                            source={{ uri: item.agent.profile_photo_url }} 
+                        <Image
+                            source={{ uri: item.agent.profile_photo_url }}
                             style={styles.avatar}
                             defaultSource={productImg}
                         />
