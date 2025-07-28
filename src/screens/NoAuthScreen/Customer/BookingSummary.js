@@ -115,7 +115,7 @@ const BookingSummary = ({ route }) => {
         const finalAmount = packageTotalForCustomer + platformFee + platformFeeGST;
 
         // Step 8: Amount agency receives (Total - Platform Fee - Platform Fee GST)
-        const agencyReceives = finalAmount - platformFee - platformFeeGST;
+        const agencyReceives = packageTotalForCustomer - platformFee - platformFeeGST;
 
         return {
             baseAmount,
@@ -345,6 +345,7 @@ const BookingSummary = ({ route }) => {
         formData.append("booking_fee", calculation.platformFee);
         formData.append("booking_tax", calculation.platformFeeGST);
         formData.append("final_amount", calculation.finalAmount.toFixed(2));
+        formData.append("agency_received", calculation.agencyReceives);
         formData.append("transaction_no", transactionId);
         formData.append("refund_condition", "");
         formData.append("refund_amount", "");
@@ -561,10 +562,10 @@ const BookingSummary = ({ route }) => {
                     <Text style={[styles.value, styles.bold, styles.red, styles.large]}>₹ {calculation.finalAmount.toFixed(2)}</Text>
                 </View>
 
-                {/* Additional Info (Optional - for transparency)
-                <Text style={[styles.subText, { marginTop: 10, fontStyle: 'italic' }]}>
+                {/* Additional Info (Optional - for transparency)*/}
+                {/* <Text style={[styles.subText, { marginTop: 10, fontStyle: 'italic' }]}>
                     Agency Receives: ₹ {calculation.agencyReceives.toFixed(2)}
-                </Text> */}
+                </Text>  */}
             </View>
         );
     };
