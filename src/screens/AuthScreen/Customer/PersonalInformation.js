@@ -35,7 +35,7 @@ import Toast from 'react-native-toast-message';
 import { plus, userPhoto } from '../../../utils/Images';
 import Svg, { Circle, Defs, LinearGradient, Stop, Mask, Rect } from 'react-native-svg';
 import Geolocation from 'react-native-geolocation-service';
-
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 const PersonalInformation = ({ navigation, route }) => {
   const concatNo = route?.params?.countrycode + '-' + route?.params?.phoneno;
@@ -143,7 +143,7 @@ const PersonalInformation = ({ navigation, route }) => {
         {
           title: 'Location Permission Required',
           message: 'This app needs to access your location',
-        },
+        }
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         getCurrentLocation();
@@ -151,7 +151,22 @@ const PersonalInformation = ({ navigation, route }) => {
         Alert.alert('Permission Denied', 'Location permission is required');
       }
     } else {
-      getCurrentLocation(); // iOS handles via Info.plist
+      const status = await check(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+      if (status === RESULTS.GRANTED) {
+        getCurrentLocation();
+      } else if (status === RESULTS.DENIED) {
+        const result = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+        if (result === RESULTS.GRANTED) {
+          getCurrentLocation();
+        } else {
+          Alert.alert('Permission Denied', 'Location permission is required');
+        }
+      } else if (status === RESULTS.BLOCKED) {
+        Alert.alert(
+          'Permission Blocked',
+          'Please enable location permissions from settings',
+        );
+      }
     }
   };
 

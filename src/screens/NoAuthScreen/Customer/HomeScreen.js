@@ -49,6 +49,7 @@ import RadioGroup from 'react-native-radio-buttons-group';
 import ShimmerPlaceholder from "react-native-shimmer-placeholder";
 import LinearGradient from 'react-native-linear-gradient';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 const { width } = Dimensions.get('window');
 const itemWidth = width * 0.8; // 80% of screen width
@@ -61,7 +62,7 @@ const imageHeight = itemWidth * 0.5; // Maintain a 4:3 aspect ratio
 // ];
 
 
-export default function HomeScreen({  }) {
+export default function HomeScreen() {
   const navigation = useNavigation();
   const carouselRef = useRef(null);
   const dispatch = useDispatch();
@@ -261,7 +262,7 @@ export default function HomeScreen({  }) {
         {
           title: 'Location Permission Required',
           message: 'This app needs to access your location',
-        },
+        }
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         getCurrentLocation();
@@ -269,7 +270,22 @@ export default function HomeScreen({  }) {
         Alert.alert('Permission Denied', 'Location permission is required');
       }
     } else {
-      getCurrentLocation(); // iOS handles via Info.plist
+      const status = await check(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+      if (status === RESULTS.GRANTED) {
+        getCurrentLocation();
+      } else if (status === RESULTS.DENIED) {
+        const result = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+        if (result === RESULTS.GRANTED) {
+          getCurrentLocation();
+        } else {
+          Alert.alert('Permission Denied', 'Location permission is required');
+        }
+      } else if (status === RESULTS.BLOCKED) {
+        Alert.alert(
+          'Permission Blocked',
+          'Please enable location permissions from settings',
+        );
+      }
     }
   };
 

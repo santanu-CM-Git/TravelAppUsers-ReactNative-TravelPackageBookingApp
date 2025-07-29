@@ -27,12 +27,32 @@
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
-		<false/>
-		<key>NSAllowsLocalNetworking</key>
 		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>103.191.208.50</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSExceptionRequiresForwardSecrecy</key>
+				<false/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>This app requires access to your camera capturing photos.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This App needs access to your microphone to enable audio during audio calls so you can hear and be heard.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This App needs to access your Photo Library to upload media.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This App needs to access your Photo Library to upload media.</string>
+	<key>NSUserNotificationUsageDescription</key>
+	<string>This App would like to send you notifications to keep you updated.</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UIAppFonts</key>

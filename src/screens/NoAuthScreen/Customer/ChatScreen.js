@@ -841,7 +841,8 @@ const ChatScreen = ({ route }) => {
   };
 
   const requestToTabSwitch = async (name) => {
-    //await goingToactiveTab(name)
+    await goingToactiveTab(name)
+    return
     //alert(route.params.agentId)
     setIsLoading(true);
     const option = {
