@@ -12,11 +12,12 @@ import messaging from '@react-native-firebase/messaging';
 import { requestPermissions, setupNotificationHandlers } from './src/utils/NotificationService';
 import { navigate } from './src/navigation/NavigationService'; // Import the navigation function
 import { requestCameraAndAudioPermissions } from './src/utils/PermissionHandler';
-
+import { PERMISSIONS, request } from 'react-native-permissions';
+ 
 function App() {
   const [notifications, setNotifications] = useState([]);
   const [notifyStatus, setnotifyStatus] = useState(false);
-
+  
   useEffect(() => {
     // Hide splash screen
     SplashScreen.hide();
@@ -55,6 +56,7 @@ function App() {
   }, []);
 
   async function requestUserPermission() {
+    const result = await request(PERMISSIONS.IOS.CAMERA);
     const authorizationStatus = await messaging().requestPermission();
   
     if (authorizationStatus) {
