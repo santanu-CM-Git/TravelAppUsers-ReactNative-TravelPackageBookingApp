@@ -1,6 +1,6 @@
 import { Alert, Linking, Platform } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
-import { PERMISSIONS, request, check, RESULTS } from 'react-native-permissions';
+import { PERMISSIONS, request, check, RESULTS, checkNotifications } from 'react-native-permissions';
 
 // Request notification permission
 export const requestNotificationPermission = async () => {
@@ -55,16 +55,15 @@ export const openSettings = () => {
 
 // Combined permission request function
 export const requestPermissions = async () => {
-  const notificationPermission = await checkNotificationPermission();
+  // const notificationPermission = await checkNotificationPermission();
   const { camera, audio } = await checkCameraAudioPermissions();
 
   // Log current permissions
-  console.log('Current permissions - Notification:', notificationPermission, 'Camera:', camera, 'Audio:', audio);
+  // console.log('Current permissions - Notification:', notificationPermission, 'Camera:', camera, 'Audio:', audio);
 
-  // Handle notification permission
-  if (notificationPermission !== RESULTS.GRANTED) {
-    const result = await requestNotificationPermission();
-    if (result !== RESULTS.GRANTED) {
+  checkNotifications().then(({status, settings}) => {
+//  console.log('statusstatus', status);
+   if (status !== RESULTS.GRANTED) {
       if(Platform.OS == 'android'){
         Alert.alert(
           'Notification Permission Required',
@@ -78,7 +77,26 @@ export const requestPermissions = async () => {
         );
       }
     }
-  }
+  });
+
+  // Handle notification permission
+  // if (notificationPermission !== RESULTS.GRANTED) {
+  //   const result = await requestNotificationPermission();
+  //   if (result !== RESULTS.GRANTED) {
+  //     if(Platform.OS == 'android'){
+  //       Alert.alert(
+  //         'Notification Permission Required',
+  //         'Please enable notifications to stay updated.',
+  //         [{
+  //           text: 'Cancel',
+  //           onPress: () => console.log('Cancel Pressed'),
+  //           style: 'cancel',
+  //         },
+  //         { text: 'OK', onPress: openSettings }]
+  //       );
+  //     }
+  //   }
+  // }
 
   // Handle camera and audio permissions
   if (camera !== RESULTS.GRANTED || audio !== RESULTS.GRANTED) {
