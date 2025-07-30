@@ -72,16 +72,16 @@ const BookingSummary = ({ route }) => {
     useFocusEffect(
         useCallback(() => {
             const backAction = () => {
-               navigation.goBack()
-               return true
-              };
-          
-              const backHandler = BackHandler.addEventListener(
+                navigation.goBack()
+                return true
+            };
+
+            const backHandler = BackHandler.addEventListener(
                 'hardwareBackPress',
                 backAction,
-              );
-          
-              return () => backHandler.remove();
+            );
+
+            return () => backHandler.remove();
         }, [navigation])
     );
 
@@ -115,6 +115,7 @@ const BookingSummary = ({ route }) => {
 
         // Step 8: Amount agency receives (Total - Platform Fee - Platform Fee GST)
         const agencyReceives = packageTotalForCustomer - platformFee - platformFeeGST;
+        //const agencyReceives = finalAmount - platformFee - platformFeeGST;
 
         return {
             baseAmount,
@@ -264,7 +265,8 @@ const BookingSummary = ({ route }) => {
                     `${API_URL}/customer/razorpay-order-create`,
                     {
                         "amount": totalAmount * 100, // Convert to smallest currency unit
-                        "tax": (calculation.packageGST + calculation.platformFeeGST) * 100,
+                        "tax": (calculation.packageGST) * 100,
+                        "booking_tax": (calculation.platformFeeGST) * 100,
                         "booking_charge": calculation.platformFee * 100,
                         "agent_id": packageInfo?.agent_id,
                         "currency": 'INR'
@@ -304,7 +306,7 @@ const BookingSummary = ({ route }) => {
                         .then((data) => {
                             // Payment successful
                             console.log("razorpay response data", data);
-                            submitForm(data.razorpay_payment_id,order_id,data.razorpay_signature,response.data.order.transfers[0].id);
+                            submitForm(data.razorpay_payment_id, order_id, data.razorpay_signature, response.data.order.transfers[0].id);
                         })
                         .catch((error) => {
                             // Payment failed
@@ -321,7 +323,7 @@ const BookingSummary = ({ route }) => {
         }
     };
 
-    const submitForm = (transactionId,order_id,razorpay_signature,transfer_id) => {
+    const submitForm = (transactionId, order_id, razorpay_signature, transfer_id) => {
         console.log(packageInfo, 'packageInfopackageInfopackageInfo')
         console.log(bookingDetails, 'bookingDetailsbookingDetailsbookingDetails')
 
@@ -426,8 +428,8 @@ const BookingSummary = ({ route }) => {
             setCouponError('Please enter a coupon code');
             return;
         }
-        console.log(availableCoupons,'sdfdsf')
-        
+        console.log(availableCoupons, 'sdfdsf')
+
         if (!Array.isArray(availableCoupons)) {
             setCouponError('No available coupons');
             return;
@@ -475,7 +477,7 @@ const BookingSummary = ({ route }) => {
     // Updated price summary render function
     const renderPriceSummary = () => {
         const calculation = calculateTotalAmount();
-        
+
         return (
             <View style={styles.containerpricebreckdown}>
                 {/* Base Package Details */}
@@ -663,10 +665,10 @@ const BookingSummary = ({ route }) => {
                 <View style={{ marginHorizontal: 10, }}>
                     <Text style={styles.productText3}>Price Summary</Text>
                 </View>
-                
+
                 {/* Use the new renderPriceSummary function */}
                 {renderPriceSummary()}
-                
+
                 <View style={{ marginHorizontal: 10, }}>
                     <Text style={styles.productText3}>Cancellation Policy</Text>
                 </View>
@@ -707,7 +709,7 @@ const BookingSummary = ({ route }) => {
                 <View style={styles.buttonwrapper}>
                     <Text style={styles.termsText}>Please contact the agent to complete the payment</Text>
                 </View>
-                 :
+                :
                 <View style={styles.buttonwrapper}>
                     <View style={styles.buttonwrapperSection1}>
                         <Text style={styles.buttonwrapperText2}>₹ {calculateTotalAmount().finalAmount.toFixed(2)}</Text>

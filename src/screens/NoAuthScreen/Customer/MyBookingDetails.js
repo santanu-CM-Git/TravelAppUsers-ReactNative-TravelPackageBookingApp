@@ -353,6 +353,9 @@ export default function MyBookingDetails({ route }) {
         try {
             const refund_condition = refundData.refund_percentage;
             const refund_amount = refundData.refund_amount;
+            console.log(refundData)
+            console.log(refund_condition)
+            console.log(refund_amount)
             const token = await AsyncStorage.getItem('userToken');
             const response = await axios.post(
                 `${API_URL}/customer/refund`,
@@ -535,7 +538,7 @@ export default function MyBookingDetails({ route }) {
                         )}
                     </View>
                     <View style={styles.invoiceContainer}>
-                        <TouchableOpacity style={styles.invoiceItem} onPress={() => navigation.navigate('Menu', { screen: 'PackageDetailsScreen', params: { packageId: bookingData.package.id }, key: Math.random().toString() })}>
+                        <TouchableOpacity style={styles.invoiceItem} onPress={() => navigation.navigate('Menu', { screen: 'MenuPackageDetailsScreen', params: { packageId: bookingData.package.id }, key: Math.random().toString() })}>
                             <Text style={styles.invoiceText}>View Detail</Text>
                             <Image
                                 source={arrowRightImg}
@@ -712,14 +715,14 @@ export default function MyBookingDetails({ route }) {
                     </View>
                     <ScrollView>
                         <View style={{ padding: 16, justifyContent: 'center', alignItems: 'center' }}>
-                            <Text style={styles.unsuccessfullbookingText}>Refund of ₹{refundData?.refund_amount} processed</Text>
+                            <Text style={styles.unsuccessfullbookingText}>Refund of ₹{refundData?.refund_amount.toFixed(2)} processed</Text>
                             <Text style={styles.unsuccessfullbookingValue}>You are going to cancel all traveler(s)</Text>
                         </View>
                         <View style={styles.cardcontainer}>
                             {/* Booking Amount */}
                             <View style={styles.amountContainer}>
                                 <Text style={styles.amountLabel}>Refundable Amount</Text>
-                                <Text style={styles.amountValue}>₹{refundData?.refund_amount}</Text>
+                                <Text style={styles.amountValue}>₹{refundData?.refund_amount.toFixed(2)}</Text>
                             </View>
                             <View
                                 style={{

@@ -245,9 +245,8 @@ const MenuStack = ({ route }) => {
         component={TransactionScreen}
         options={{ headerShown: false }}
       />
-      {/* Renamed to avoid conflict with HomeStack */}
       <Stack.Screen
-        name="MenuPackageDetailsScreen"
+        name="PackageDetailsScreen"
         component={PackageDetailsScreen}
         options={{ headerShown: false }}
       />
@@ -418,8 +417,6 @@ const getTabBarVisibility = route => {
   } else if (routeName == 'PaymentFailed') {
     return 'none';
   } else if (routeName == 'ProfileScreen') {
-    return 'none';
-  } else if (routeName == 'MenuPackageDetailsScreen') {
     return 'none';
   } else {
     return 'flex';

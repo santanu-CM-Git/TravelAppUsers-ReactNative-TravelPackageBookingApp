@@ -137,7 +137,7 @@ const RefundScreen = ({ route }) => {
                     {/* Booking Amount */}
                     <View style={styles.amountContainer}>
                         <Text style={styles.amountLabel}>Refundable Amount</Text>
-                        <Text style={styles.amountValue}>₹{data?.refund_amount}</Text>
+                        <Text style={styles.amountValue}>₹{data?.refund_amount.toFixed(2)}</Text>
                     </View>
                     <View
                         style={{
@@ -170,7 +170,7 @@ const RefundScreen = ({ route }) => {
                                 <View style={styles.verticalLine} />
                             </View>
                             <View style={styles.stepContent}>
-                                <Text style={styles.stepTitle}>Refund Processed : ₹{data?.refund_amount}</Text>
+                                <Text style={styles.stepTitle}>Refund Processed : ₹{data?.refund_amount.toFixed(2)}</Text>
                                 <Text style={styles.stepTime}>{moment().format('DD-MM-YYYY hh:mm A')}</Text>
                             </View>
                         </View>
@@ -187,7 +187,7 @@ const RefundScreen = ({ route }) => {
                                 {/* Message Box */}
                                 <View style={styles.messageBox}>
                                     <Text style={styles.messageText}>
-                                        Refund of ₹{data?.refund_amount} has been processed to your bank account.
+                                        Refund of ₹{data?.refund_amount.toFixed(2)} has been processed to your bank account.
                                         It takes 2-7 working days for refund to reflect in bank account.
                                     </Text>
                                 </View>
