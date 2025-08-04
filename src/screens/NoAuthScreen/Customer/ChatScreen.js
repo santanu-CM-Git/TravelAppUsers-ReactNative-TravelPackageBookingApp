@@ -118,8 +118,8 @@ const ChatScreen = ({ route }) => {
           setChatData(data);
           setToken(data.agora_token);
           setChannelName(data.agora_channel_id);
-          //setToken('007eJxTYMh/eLvQUO7jv/jXkq8+Hl/x8YJ85+WqcuGQbs/6PRM51k1XYDCwtLQ0NzI1TjQyMjAxTTOySDNLNDdOMzJKMUsyMTCwWOsfl9EQyMhQqfCeiZEBAkF8TobE9PyixJLU4hIGBgCdpCLj');
-          //setChannelName('agoratest');
+          //setToken('007eJxTYPhyWf+KRJvX1/3Lbh2Qf7NL/ktV4I5m5xRW76ZrN8qeif9XYDCwtLQ0NzI1TjQyMjAxTTOySDNLNDdOMzJKMUsyMTCwEPGZkNEQyMjAepSHkZEBAkF8ToaS1OKSxPT8okQGBgB4eyHb');
+          //setChannelName('testagora');
           setChatgenidres(data.uuid);
           setAgentProfilePic(data.agent.profile_photo_url);
           setUserProfilePic(data.customer.profile_photo_url);
@@ -755,72 +755,134 @@ const ChatScreen = ({ route }) => {
     setIsVideoEnabled(false);
   };
 
+  // const goingToactiveTab = async (name) => {
+  //   try {
+  //     if (name === 'audio') {
+  //       setIsLoading(true);
+
+  //       // Fetch channel details before initializing engine
+  //       const userToken = await AsyncStorage.getItem('userToken');
+  //       if (!userToken) {
+  //         throw new Error('User token is missing');
+  //       }
+
+  //       const response = await axios.post(`${API_URL}/customer/customer-message`,
+  //         {
+  //           agent_id: route.params.agentId
+  //         }, {
+  //         headers: {
+  //           Accept: 'application/json',
+  //           "Authorization": 'Bearer ' + userToken,
+  //         },
+  //       });
+
+  //       if (response.data.response === true) {
+  //         const data = response.data.data;
+  //         // Store the values in variables instead of state
+  //         const agoraToken = data.agora_token;
+  //         const agoraChannelId = data.agora_channel_id;
+
+  //         //const agoraToken = '007eJxTYMh/eLvQUO7jv/jXkq8+Hl/x8YJ85+WqcuGQbs/6PRM51k1XYDCwtLQ0NzI1TjQyMjAxTTOySDNLNDdOMzJKMUsyMTCwWOsfl9EQyMhQqfCeiZEBAkF8TobE9PyixJLU4hIGBgCdpCLj';
+  //         //const agoraChannelId = 'agoratest';
+
+  //         // Update state for other components
+  //         //setToken(agoraToken);
+  //         //setChannelName(agoraChannelId);
+  //         setToken('007eJxTYPhyWf+KRJvX1/3Lbh2Qf7NL/ktV4I5m5xRW76ZrN8qeif9XYDCwtLQ0NzI1TjQyMjAxTTOySDNLNDdOMzJKMUsyMTCwEPGZkNEQyMjAepSHkZEBAkF8ToaS1OKSxPT8okQGBgB4eyHb');
+  //         setChannelName('testagora');
+
+  //         // Initialize engine after getting channel details
+  //         await setupVideoSDKEngine();
+
+  //         const engine = agoraEngineRef.current;
+  //         if (!engine) {
+  //           throw new Error('Failed to initialize Agora engine');
+  //         }
+
+  //         // Configure for audio call
+  //         await engine.enableAudio();
+  //         await engine.disableVideo();
+  //         await engine.setDefaultAudioRouteToSpeakerphone(true);
+  //         await engine.muteLocalAudioStream(false);
+
+  //         // Join the channel using the direct values
+  //         await engine.joinChannel(agoraToken, agoraChannelId, uid, {
+  //           clientRoleType: ClientRoleType.ClientRoleBroadcaster,
+  //         });
+
+  //         //alert('channel name ' + agoraChannelId + ' token ' + agoraToken + ' uid ' + uid);
+
+  //         setActiveTab('audio');
+  //         await AsyncStorage.setItem('activeTab', 'audio');
+  //         setIsVideoEnabled(false);
+  //         setSpeakerOn(true);
+  //         setMicOn(true);
+  //         setIsLoading(false);
+  //       } else {
+  //         throw new Error('Failed to get channel details');
+  //       }
+  //     } else if (name === 'chat') {
+  //       const engine = agoraEngineRef.current;
+  //       if (engine) {
+  //         await engine.leaveChannel();
+  //         await engine.muteLocalAudioStream(true);
+  //         await engine.stopPreview();
+  //         await engine.muteLocalVideoStream(true);
+  //       }
+  //       setActiveTab('chat');
+  //       await AsyncStorage.setItem('activeTab', 'chat');
+  //       setIsVideoEnabled(false);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error in goingToactiveTab:', error);
+  //     setIsLoading(false);
+  //     Alert.alert('Error', `Failed to ${name === 'audio' ? 'start audio call' : 'switch to chat'}. Please try again.`);
+  //   }
+  // };
+
   const goingToactiveTab = async (name) => {
     try {
       if (name === 'audio') {
         setIsLoading(true);
-
-        // Fetch channel details before initializing engine
-        const userToken = await AsyncStorage.getItem('userToken');
-        if (!userToken) {
-          throw new Error('User token is missing');
-        }
-
-        const response = await axios.post(`${API_URL}/customer/customer-message`,
-          {
-            agent_id: route.params.agentId
-          }, {
-          headers: {
-            Accept: 'application/json',
-            "Authorization": 'Bearer ' + userToken,
-          },
-        });
-
-        if (response.data.response === true) {
-          const data = response.data.data;
-          // Store the values in variables instead of state
-          const agoraToken = data.agora_token;
-          const agoraChannelId = data.agora_channel_id;
-
-          //const agoraToken = '007eJxTYMh/eLvQUO7jv/jXkq8+Hl/x8YJ85+WqcuGQbs/6PRM51k1XYDCwtLQ0NzI1TjQyMjAxTTOySDNLNDdOMzJKMUsyMTCwWOsfl9EQyMhQqfCeiZEBAkF8TobE9PyixJLU4hIGBgCdpCLj';
-          //const agoraChannelId = 'agoratest';
-
-          // Update state for other components
-           setToken(agoraToken);
-           setChannelName(agoraChannelId);
-          //setToken('007eJxTYMh/eLvQUO7jv/jXkq8+Hl/x8YJ85+WqcuGQbs/6PRM51k1XYDCwtLQ0NzI1TjQyMjAxTTOySDNLNDdOMzJKMUsyMTCwWOsfl9EQyMhQqfCeiZEBAkF8TobE9PyixJLU4hIGBgCdpCLj');
-          //setChannelName('agoratest');
-
-          // Initialize engine after getting channel details
+  
+        // Define token and channel name directly
+        //const agoraToken = '007eJxTYPhyWf+KRJvX1/3Lbh2Qf7NL/ktV4I5m5xRW76ZrN8qeif9XYDCwtLQ0NzI1TjQyMjAxTTMySDNLNDdOMzJKMUsyMTCwEPGZkNEQyMjAepSHkZEBAkF8ToaS1OKSxPT8okQGBgB4eyHb';
+        //const agoraChannelId = 'testagora';
+  
+        // Update state for UI purposes (optional)
+        setToken(token);
+        setChannelName(channelName);
+  
+        // Initialize engine if not already done
+        if (!agoraEngineRef.current) {
           await setupVideoSDKEngine();
-
-          const engine = agoraEngineRef.current;
-          if (!engine) {
-            throw new Error('Failed to initialize Agora engine');
-          }
-
-          // Configure for audio call
-          await engine.enableAudio();
-          await engine.disableVideo();
-          await engine.setDefaultAudioRouteToSpeakerphone(true);
-          await engine.muteLocalAudioStream(false);
-
-          // Join the channel using the direct values
-          await engine.joinChannel(agoraToken, agoraChannelId, uid, {
-            clientRoleType: ClientRoleType.ClientRoleBroadcaster,
-          });
-
-          //alert('channel name ' + agoraChannelId + ' token ' + agoraToken + ' uid ' + uid);
-
-          setActiveTab('audio');
-          await AsyncStorage.setItem('activeTab', 'audio');
-          setIsVideoEnabled(false);
-          setSpeakerOn(true);
-          setMicOn(true);
-          setIsLoading(false);
-        } else {
-          throw new Error('Failed to get channel details');
         }
+  
+        const engine = agoraEngineRef.current;
+        if (!engine) {
+          throw new Error('Failed to initialize Agora engine');
+        }
+  
+        // Configure for audio call
+        await engine.enableAudio();
+        await engine.disableVideo();
+        await engine.setDefaultAudioRouteToSpeakerphone(true);
+        await engine.muteLocalAudioStream(false);
+  
+        // Join the channel using the direct values (not state)
+        await engine.joinChannel(token, channelName, uid, {
+          clientRoleType: ClientRoleType.ClientRoleBroadcaster,
+        });
+  
+        console.log('Joined channel:', channelName, 'with token:', token);
+  
+        setActiveTab('audio');
+        await AsyncStorage.setItem('activeTab', 'audio');
+        setIsVideoEnabled(false);
+        setSpeakerOn(true);
+        setMicOn(true);
+        setIsLoading(false);
+  
       } else if (name === 'chat') {
         const engine = agoraEngineRef.current;
         if (engine) {
@@ -841,9 +903,10 @@ const ChatScreen = ({ route }) => {
   };
 
   const requestToTabSwitch = async (name) => {
-    await goingToactiveTab(name)
-    return
+    //await goingToactiveTab(name)
+    //alert(token + " " + channelName)
     //alert(route.params.agentId)
+    
     setIsLoading(true);
     const option = {
       "agent_id": route.params.agentId,
