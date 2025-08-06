@@ -10,7 +10,6 @@ import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Loader from '../../../utils/Loader';
 import moment from "moment"
-import StarRating from 'react-native-star-rating-widget';
 import InputField from '../../../components/InputField';
 import CustomButton from '../../../components/CustomButton';
 import RazorpayCheckout from 'react-native-razorpay';
@@ -111,7 +110,8 @@ const BookingSummary = ({ route }) => {
         const platformFeeGST = (platformFee * gstPercentage) / 100;
 
         // Step 7: Total amount customer pays
-        const finalAmount = packageTotalForCustomer + platformFee + platformFeeGST;
+        //const finalAmount = packageTotalForCustomer + platformFee + platformFeeGST;
+        const finalAmount = packageTotalForCustomer;
 
         // Step 8: Amount agency receives (Total - Platform Fee - Platform Fee GST)
         const agencyReceives = packageTotalForCustomer - platformFee - platformFeeGST;
@@ -527,27 +527,27 @@ const BookingSummary = ({ route }) => {
                     <Text style={[styles.value, styles.bold, styles.red]}>₹ {calculation.packageTotalForCustomer.toFixed(2)}</Text>
                 </View>
 
-                <View style={styles.divider} />
+                {/* <View style={styles.divider} /> */}
 
                 {/* Platform Fee */}
-                <View style={styles.row}>
+                {/* <View style={styles.row}>
                     <Text style={styles.label}>Platform Fee ({bookingFees}%)</Text>
                     <Text style={styles.value}>₹ {calculation.platformFee.toFixed(2)}</Text>
-                </View>
+                </View> */}
 
                 {/* GST on Platform Fee */}
-                <View style={styles.row}>
+                {/* <View style={styles.row}>
                     <Text style={styles.label}>GST on Platform Fee ({gstPercentage}%)</Text>
                     <Text style={styles.value}>₹ {calculation.platformFeeGST.toFixed(2)}</Text>
-                </View>
+                </View> */}
 
-                <View style={styles.divider} />
+                {/* <View style={styles.divider} /> */}
 
                 {/* Grand Total */}
-                <View style={styles.row}>
+                {/* <View style={styles.row}>
                     <Text style={[styles.label, styles.bold, styles.red, styles.large]}>Grand Total</Text>
                     <Text style={[styles.value, styles.bold, styles.red, styles.large]}>₹ {calculation.finalAmount.toFixed(2)}</Text>
-                </View>
+                </View> */}
 
                 {/* Additional Info (Optional - for transparency)*/}
                 {/* <Text style={[styles.subText, { marginTop: 10, fontStyle: 'italic' }]}>
@@ -621,9 +621,9 @@ const BookingSummary = ({ route }) => {
                         </View>
                     </View>
 
-                    <Text style={styles.cancellationText}>
+                    {/* <Text style={styles.cancellationText}>
                         Free Cancellation (48-Hours Notice)
-                    </Text>
+                    </Text> */}
                 </View>
                 <View style={styles.card}>
                     <View style={{ marginTop: 10 }}>

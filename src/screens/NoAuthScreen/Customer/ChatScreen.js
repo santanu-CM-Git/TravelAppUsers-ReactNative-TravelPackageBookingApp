@@ -28,7 +28,7 @@ import axios from 'axios'
 import DocumentPicker from 'react-native-document-picker';
 import FileViewer from 'react-native-file-viewer';
 import RNFS from 'react-native-fs';
-
+import { PERMISSIONS, request, check, RESULTS } from 'react-native-permissions';
 
 const ChatScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -137,7 +137,7 @@ const ChatScreen = ({ route }) => {
       }
     };
     initialize();
-    return async() => {
+    return async () => {
       //agoraEngineRef.current?.destroy();
       leaveChannel();
       KeepAwake.deactivate();
@@ -523,7 +523,7 @@ const ChatScreen = ({ route }) => {
 
 
   // audio call 
-   // IRtcEngine instance
+  // IRtcEngine instance
   const [isJoined, setIsJoined] = useState(false);
   const [remoteUid, setRemoteUid] = useState(null);
   const [localUid, setLocalUid] = useState(null);
@@ -535,7 +535,7 @@ const ChatScreen = ({ route }) => {
 
   const setupVideoSDKEngine = async () => {
     try {
-      if (Platform.OS === 'android') {
+      if (Platform.OS === 'android' || Platform.OS === 'ios') {
         await getPermission();
       }
 
@@ -583,13 +583,26 @@ const ChatScreen = ({ route }) => {
   };
   const getPermission = async () => {
     try {
-      const granted = await PermissionsAndroid.requestMultiple([
-        PermissionsAndroid.PERMISSIONS.CAMERA,
-        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-      ]);
-      return granted;
+      if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.requestMultiple([
+          //PermissionsAndroid.PERMISSIONS.CAMERA,
+          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+        ]);
+        return granted;
+      } else {
+        //const cameraStatus = await check(PERMISSIONS.IOS.CAMERA);
+        const micStatus = await check(PERMISSIONS.IOS.MICROPHONE);
+  
+        // if (cameraStatus !== RESULTS.GRANTED) {
+        //   await request(PERMISSIONS.IOS.CAMERA);
+        // }
+  
+        if (micStatus !== RESULTS.GRANTED) {
+          await request(PERMISSIONS.IOS.MICROPHONE);
+        }
+      }
     } catch (err) {
-      console.warn(err);
+      console.warn('Permission error:', err);
     }
   };
 
@@ -844,45 +857,45 @@ const ChatScreen = ({ route }) => {
     try {
       if (name === 'audio') {
         setIsLoading(true);
-  
+
         // Define token and channel name directly
         //const agoraToken = '007eJxTYPhyWf+KRJvX1/3Lbh2Qf7NL/ktV4I5m5xRW76ZrN8qeif9XYDCwtLQ0NzI1TjQyMjAxTTMySDNLNDdOMzJKMUsyMTCwEPGZkNEQyMjAepSHkZEBAkF8ToaS1OKSxPT8okQGBgB4eyHb';
         //const agoraChannelId = 'testagora';
-  
+
         // Update state for UI purposes (optional)
         setToken(token);
         setChannelName(channelName);
-  
+
         // Initialize engine if not already done
         if (!agoraEngineRef.current) {
           await setupVideoSDKEngine();
         }
-  
+
         const engine = agoraEngineRef.current;
         if (!engine) {
           throw new Error('Failed to initialize Agora engine');
         }
-  
+
         // Configure for audio call
         await engine.enableAudio();
         await engine.disableVideo();
         await engine.setDefaultAudioRouteToSpeakerphone(true);
         await engine.muteLocalAudioStream(false);
-  
+
         // Join the channel using the direct values (not state)
         await engine.joinChannel(token, channelName, uid, {
           clientRoleType: ClientRoleType.ClientRoleBroadcaster,
         });
-  
+
         console.log('Joined channel:', channelName, 'with token:', token);
-  
+
         setActiveTab('audio');
         await AsyncStorage.setItem('activeTab', 'audio');
         setIsVideoEnabled(false);
         setSpeakerOn(true);
         setMicOn(true);
         setIsLoading(false);
-  
+
       } else if (name === 'chat') {
         const engine = agoraEngineRef.current;
         if (engine) {
@@ -906,7 +919,7 @@ const ChatScreen = ({ route }) => {
     //await goingToactiveTab(name)
     //alert(token + " " + channelName)
     //alert(route.params.agentId)
-    
+
     setIsLoading(true);
     const option = {
       "agent_id": route.params.agentId,
@@ -1353,7 +1366,7 @@ const ChatScreen = ({ route }) => {
       // Get the last message from messages array
       const lastMessage = messages.length > 0 ? messages[0].text : '';
       console.log(route.params.agentId);
-      
+
 
       const response = await axios.post(`${API_URL}/customer/customer-message`, {
         agent_id: route.params.agentId,
@@ -1379,19 +1392,19 @@ const ChatScreen = ({ route }) => {
   // Add useFocusEffect to handle back navigation
   useFocusEffect(
     useCallback(() => {
-        const backAction = () => {
-          handleGoBack();
-           return true
-          };
-      
-          const backHandler = BackHandler.addEventListener(
-            'hardwareBackPress',
-            backAction,
-          );
-      
-          return () => backHandler.remove();
-    }, [ handleGoBack])
-);
+      const backAction = () => {
+        handleGoBack();
+        return true
+      };
+
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        backAction,
+      );
+
+      return () => backHandler.remove();
+    }, [handleGoBack])
+  );
 
   if (isLoading) {
     return (
@@ -1468,14 +1481,20 @@ const ChatScreen = ({ route }) => {
             <GestureTouchableOpacity onPress={() => toggleMic()}>
               <Image
                 source={micOn ? audioonIcon : audiooffIcon}
-                style={styles.iconStyle}
+                style={[styles.iconStyle,{marginRight: responsiveWidth(2)}]}
               />
             </GestureTouchableOpacity>
             <GestureTouchableOpacity onPress={() => toggleSpeaker()}>
               <Image
                 source={speakerOn ? speakeronIcon : speakeroffIcon}
-                style={styles.iconStyle}
+                style={[styles.iconStyle,{marginRight: responsiveWidth(2)}]}
               />
+            </GestureTouchableOpacity>
+            {/* 🔴 End Button */}
+            <GestureTouchableOpacity onPress={() => requestToTabSwitch('chat')}>
+              <View style={styles.endButton}>
+                <Text style={styles.endButtonText}>End</Text>
+              </View>
             </GestureTouchableOpacity>
           </View>
         </LinearGradient>
@@ -1499,7 +1518,7 @@ const ChatScreen = ({ route }) => {
               <Text style={styles.attachLabel}>Images</Text>
             </GestureTouchableOpacity>
             <TouchableOpacity onPress={() => setIsAttachPopupVisible(false)}>
-              <Text style={{ fontSize: responsiveFontSize(2), fontWeight: 'bold', color: '#222', marginTop: -10,zIndex:20 }}>✕</Text>
+              <Text style={{ fontSize: responsiveFontSize(2), fontWeight: 'bold', color: '#222', marginTop: -10, zIndex: 20 }}>✕</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -1770,9 +1789,9 @@ const styles = StyleSheet.create({
   },
   audioButtonSection: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
     alignItems: 'center',
-    width: responsiveWidth(30),
+    width: responsiveWidth(40),
     position: 'absolute',
     bottom: 20,
   },
@@ -1832,5 +1851,19 @@ const styles = StyleSheet.create({
     color: '#222',
     fontFamily: 'Poppins-Medium',
     marginTop: 2,
+  },
+  endButton: {
+    backgroundColor: 'red',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  
+  endButtonText: {
+    color: 'white',
+    fontFamily: 'Poppins-Medium',
+    fontSize: responsiveFontSize(1.5),
   },
 });

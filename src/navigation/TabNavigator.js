@@ -251,6 +251,11 @@ const MenuStack = ({ route }) => {
         component={PackageDetailsScreen}
         options={{ headerShown: false }}
       />
+       <Stack.Screen
+        name="BookingSummary"
+        component={BookingSummary}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   )
 
@@ -416,6 +421,8 @@ const getTabBarVisibility = route => {
   } else if (routeName == 'WalletScreen') {
     return 'none';
   } else if (routeName == 'PaymentFailed') {
+    return 'none';
+  } else if (routeName == 'BookingSummary') {
     return 'none';
   } else if (routeName == 'ProfileScreen') {
     return 'none';

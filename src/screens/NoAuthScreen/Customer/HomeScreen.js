@@ -338,6 +338,10 @@ export default function HomeScreen() {
         setCountryName(countryName);
         setIsLocationDataReady(true);
 
+        if (countryName) {
+          await AsyncStorage.setItem('countryName', countryName);
+        }
+
         // Update profile with location information
         const usertoken = await AsyncStorage.getItem('userToken');
         if (usertoken) {
@@ -438,6 +442,7 @@ export default function HomeScreen() {
 
           if (res.data.response == true) {
             let banner = res.data.data;
+            console.log(banner,'hjghjg');
             setIsBannerShown(banner)
           } else {
             setIsBannerShown([])
@@ -1281,7 +1286,7 @@ export default function HomeScreen() {
         </View>
       </TouchableOpacity> */}
         {isBannerShown.length > 0 ?
-          <TouchableOpacity onPress={() => navigation.navigate('ReviewScreen')}>
+          <TouchableOpacity onPress={() => navigation.navigate('ReviewScreen',{agentId: isBannerShown[0].agent_id,packageId:isBannerShown[0].package_id})}>
             <Image
               source={freebannerPlaceHolder}
               style={styles.freebannerImg}
@@ -1687,7 +1692,7 @@ export default function HomeScreen() {
                   disabled={false}
                   maxStars={5}
                   rating={starCount}
-                  selectedStar={(rating) => setStarCount(rating)}
+                  onChange={(rating) => setStarCount(rating)}
                   fullStarColor={'#FFCB45'}
                   starSize={28}
                   starStyle={{ marginHorizontal: responsiveWidth(1) }}

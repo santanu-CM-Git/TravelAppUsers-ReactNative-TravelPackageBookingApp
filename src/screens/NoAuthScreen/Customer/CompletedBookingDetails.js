@@ -352,7 +352,7 @@ export default function CompletedBookingDetails({  }) {
                             disabled={false}
                             maxStars={5}
                             rating={starCount}
-                            selectedStar={(rating) => setStarCount(rating)}
+                            onChange={(rating) => setStarCount(rating)}
                             fullStarColor={'#FFCB45'}
                             starSize={30}
                             starStyle={{ marginHorizontal: responsiveWidth(1) }}

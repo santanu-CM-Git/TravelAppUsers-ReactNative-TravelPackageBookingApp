@@ -57,6 +57,7 @@ const ReviewScreen = ({ route }) => {
         } else {
             const option = {
                 "agent_id": route?.params?.agentId,
+                "package_id":route?.params?.packageId,
                 "message": address,
                 "star": starCount
             }
@@ -144,7 +145,7 @@ const ReviewScreen = ({ route }) => {
                             disabled={false}
                             maxStars={5}
                             rating={starCount}
-                            selectedStar={(rating) => setStarCount(rating)}
+                            onChange={(rating) => setStarCount(rating)}
                             fullStarColor={'#FFCB45'}
                             starSize={30}
                             starStyle={{ marginHorizontal: responsiveWidth(1) }}

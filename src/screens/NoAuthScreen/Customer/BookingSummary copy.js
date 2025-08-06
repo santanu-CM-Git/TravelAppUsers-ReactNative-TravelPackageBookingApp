@@ -10,7 +10,6 @@ import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Loader from '../../../utils/Loader';
 import moment from "moment"
-import StarRating from 'react-native-star-rating-widget';
 import InputField from '../../../components/InputField';
 import CustomButton from '../../../components/CustomButton';
 import RazorpayCheckout from 'react-native-razorpay';

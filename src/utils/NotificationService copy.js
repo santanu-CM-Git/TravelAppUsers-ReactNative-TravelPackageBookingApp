@@ -1,94 +1,136 @@
 import { Alert, Linking, Platform } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
-import { PERMISSIONS, request, check, RESULTS } from 'react-native-permissions';
+import { PERMISSIONS, request, check, RESULTS, checkNotifications } from 'react-native-permissions';
 
+// Request notification permission
 export const requestNotificationPermission = async () => {
   const permission = Platform.OS === 'android'
     ? PERMISSIONS.ANDROID.POST_NOTIFICATIONS
-    : PERMISSIONS.IOS.NOTIFICATIONS;
-
-  const result = await request(permission);
-  return result;
+    : PERMISSIONS.IOS.POST_NOTIFICATIONS;
+  return await request(permission);
 };
 
+// Check notification permission
 export const checkNotificationPermission = async () => {
   const permission = Platform.OS === 'android'
     ? PERMISSIONS.ANDROID.POST_NOTIFICATIONS
-    : PERMISSIONS.IOS.NOTIFICATIONS;
-
-  const result = await check(permission);
-  return result;
+    : PERMISSIONS.IOS.POST_NOTIFICATIONS;
+  return await check(permission);
 };
 
+// Request camera and audio permissions
+export const requestCameraAudioPermissions = async () => {
+  const cameraPermission = Platform.OS === 'android'
+    ? PERMISSIONS.ANDROID.CAMERA
+    : PERMISSIONS.IOS.CAMERA;
+  const audioPermission = Platform.OS === 'android'
+    ? PERMISSIONS.ANDROID.RECORD_AUDIO
+    : PERMISSIONS.IOS.MICROPHONE;
+
+  const cameraResult = await request(cameraPermission);
+  const audioResult = await request(audioPermission);
+
+  return { camera: cameraResult, audio: audioResult };
+};
+
+// Check camera and audio permissions
+export const checkCameraAudioPermissions = async () => {
+  const cameraPermission = Platform.OS === 'android'
+    ? PERMISSIONS.ANDROID.CAMERA
+    : PERMISSIONS.IOS.CAMERA;
+  const audioPermission = Platform.OS === 'android'
+    ? PERMISSIONS.ANDROID.RECORD_AUDIO
+    : PERMISSIONS.IOS.MICROPHONE;
+
+  const cameraResult = await check(cameraPermission);
+  const audioResult = await check(audioPermission);
+
+  return { camera: cameraResult, audio: audioResult };
+};
+
+// Open app settings
 export const openSettings = () => {
   Linking.openSettings();
 };
 
-// export const requestPermission = async () => {
-//   const checkPermission = await checkNotificationPermission();
+// Combined permission request function
+export const requestPermissions = async () => {
+  // const notificationPermission = await checkNotificationPermission();
+  const { camera, audio } = await checkCameraAudioPermissions();
 
-//   if (checkPermission === RESULTS.GRANTED) {
-//     console.log('Notification permission already granted.');
-//     return;
-//   }
+  // Log current permissions
+  // console.log('Current permissions - Notification:', notificationPermission, 'Camera:', camera, 'Audio:', audio);
 
-//   const request = await requestNotificationPermission();
+  checkNotifications().then(({status, settings}) => {
+//  console.log('statusstatus', status);
+   if (status !== RESULTS.GRANTED) {
+      if(Platform.OS == 'android'){
+        Alert.alert(
+          'Notification Permission Required',
+          'Please enable notifications to stay updated.',
+          [{
+            text: 'Cancel',
+            onPress: () => console.log('Cancel Pressed'),
+            style: 'cancel',
+          },
+          { text: 'OK', onPress: openSettings }]
+        );
+      }
+    }
+  });
 
-//   if (request !== RESULTS.GRANTED) {
-//     Alert.alert(
-//       'Notification Permission Required',
-//       'Please enable notifications to stay updated.',
-//       [{ text: 'OK', onPress: openSettings }]
-//     );
-//   }
-// };
-export const requestPermission = async () => {
-  const checkPermission = await checkNotificationPermission();
+  // Handle notification permission
+  // if (notificationPermission !== RESULTS.GRANTED) {
+  //   const result = await requestNotificationPermission();
+  //   if (result !== RESULTS.GRANTED) {
+  //     if(Platform.OS == 'android'){
+  //       Alert.alert(
+  //         'Notification Permission Required',
+  //         'Please enable notifications to stay updated.',
+  //         [{
+  //           text: 'Cancel',
+  //           onPress: () => console.log('Cancel Pressed'),
+  //           style: 'cancel',
+  //         },
+  //         { text: 'OK', onPress: openSettings }]
+  //       );
+  //     }
+  //   }
+  // }
 
-  console.log('Current notification permission status:', checkPermission);
+  // Handle camera and audio permissions
+  if (camera !== RESULTS.GRANTED || audio !== RESULTS.GRANTED) {
+    const { camera: cameraRequest, audio: audioRequest } = await requestCameraAudioPermissions();
 
-  if (checkPermission === RESULTS.GRANTED) {
-    console.log('Notification permission already granted.');
-    return;
-  }
-
-  if (checkPermission === RESULTS.BLOCKED) {
-    console.log('Notification permission is blocked.');
-    Alert.alert(
-      'Notification Permission Blocked',
-      'Notifications are currently blocked. Please enable them in your device settings.',
-      [{ text: 'OK', onPress: openSettings }]
-    );
-    return;
-  }
-
-  const request = await requestNotificationPermission();
-
-  console.log('Request notification permission status:', request);
-
-  if (request !== RESULTS.GRANTED) {
-    Alert.alert(
-      'Notification Permission Required',
-      'Please enable notifications to stay updated.',
-      [{ text: 'OK', onPress: openSettings }]
-    );
+    if (cameraRequest !== RESULTS.GRANTED || audioRequest !== RESULTS.GRANTED) {
+      Alert.alert(
+        'Camera and Audio Permissions Required',
+        'This app needs access to your camera to enable video calls, allowing you to see and be seen during your call sessions. It also requires access to your microphone to enable audio during video calls, so you can hear and be heard. Please enable camera and audio permissions for a full app experience.',
+        [
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Cancel Pressed'),
+            style: 'cancel',
+          },
+          { text: 'OK', onPress: openSettings }
+        ]
+      );
+    }
   }
 };
 
-
+// Handle notifications with actions
 export const handleNotification = (remoteMessage, setNotifications, setnotifyStatus, navigation) => {
-  //Alert.alert('A new FCM message arrived!!!', JSON.stringify(remoteMessage));
-
-  // const action = remoteMessage?.data?.action;
-  // if (action) {
-  //   handleAction(action, remoteMessage, navigation);
-  // } else {
-  //   setNotifications(prevNotifications => {
-  //     const newNotifications = [...prevNotifications, remoteMessage];
-  //     setnotifyStatus(true);
-  //     return newNotifications;
-  //   });
-  // }
+  const action = remoteMessage?.data?.action;
+  if (action) {
+    handleAction(action, remoteMessage, navigation);
+  } else {
+    setNotifications(prevNotifications => {
+      const newNotifications = [...prevNotifications, remoteMessage];
+      setnotifyStatus(true);
+      return newNotifications;
+    });
+  }
 };
 
 const handleAction = (action, remoteMessage, navigation) => {
@@ -101,13 +143,11 @@ const handleAction = (action, remoteMessage, navigation) => {
       break;
     default:
       console.log('Unknown action:', action);
-      if (navigation && navigation.current) {
-        navigation.current.navigate('ScheduleScreen');
-      }
       break;
   }
 };
 
+// Setup notification handlers
 export const setupNotificationHandlers = (setNotifications, setnotifyStatus, navigation) => {
   const unsubscribeForeground = messaging().onMessage(async remoteMessage => {
     console.log('Received foreground message:', JSON.stringify(remoteMessage));

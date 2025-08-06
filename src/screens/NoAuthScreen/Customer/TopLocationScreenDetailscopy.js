@@ -596,7 +596,7 @@ export default function TopLocationScreenDetails({ route }) {
                                     disabled={false}
                                     maxStars={5}
                                     rating={starCount}
-                                    selectedStar={(rating) => setStarCount(rating)}
+                                    onChange={(rating) => setStarCount(rating)}
                                     fullStarColor={'#FFCB45'}
                                     starSize={28}
                                     starStyle={{ marginHorizontal: responsiveWidth(1) }}

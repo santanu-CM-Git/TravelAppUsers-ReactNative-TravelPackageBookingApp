@@ -71,6 +71,7 @@ export default function PackageDetailsScreen({ route }) {
     const [showFromDatePicker, setShowFromDatePicker] = useState(false);
     const [showToDatePicker, setShowToDatePicker] = useState(false);
     const [loadingLikes, setLoadingLikes] = useState({});
+    const [countryName, setCountryName] = useState('');
 
     useEffect(() => {
         if (packageInfo?.date_type == 0) {
@@ -227,8 +228,25 @@ export default function PackageDetailsScreen({ route }) {
     }
 
     useEffect(() => {
-        fetchPackageDetails();
-    }, []);
+        const init = async () => {
+          fetchPackageDetails();
+      
+          try {
+            const storedCountry = await AsyncStorage.getItem('countryName');
+            if (storedCountry) {
+              console.log('Fetched country name from AsyncStorage:', storedCountry);
+              // Optionally, set it to a state
+               setCountryName(storedCountry);
+            } else {
+              console.log('No country name found in AsyncStorage');
+            }
+          } catch (error) {
+            console.log('Error fetching country name:', error);
+          }
+        };
+      
+        init();
+      }, []);
 
     const handleWishlist = async (packageId) => {
         try {
@@ -414,7 +432,7 @@ export default function PackageDetailsScreen({ route }) {
 
                 <View style={{ margin: 5, paddingHorizontal: 10 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Text style={styles.productText3}>{packageInfo?.agent?.name || 'Travel Agency'}</Text>
+                        <Text style={styles.productText3}>{packageInfo?.name || 'Travel Agency'}</Text>
                         <Text style={styles.priceText22}>₹{packageInfo?.discounted_price || 0}</Text>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -424,7 +442,9 @@ export default function PackageDetailsScreen({ route }) {
                         />
                         <Text style={styles.addressText}>{packageInfo?.location || 'Location'}</Text>
                     </View>
-                    <Text style={styles.travelerText}>{packageInfo?.agent?.tag_line || 'Travel Agency'}</Text>
+                    <TouchableWithoutFeedback onPress={() => { navigation.navigate('HOME', { screen: 'TravelAgencyDetails', params: { item: packageInfo?.agent,countryName: countryName||'India' } }) }}>
+                        <Text style={styles.travelerText}>{packageInfo?.agent?.name || 'Travel Agency'}</Text>
+                    </TouchableWithoutFeedback>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                         {packageInfo?.date_type == 0 ? (
                             <Text style={styles.packageAvlTextMain}>{moment(packageInfo?.start_date).format('DD MMMM YYYY')}</Text>
@@ -563,7 +583,7 @@ export default function PackageDetailsScreen({ route }) {
                     </View>
                     <ScrollView style={{ marginBottom: responsiveHeight(0) }}>
                         <View style={{ borderTopColor: '#E3E3E3', borderTopWidth: 0, paddingHorizontal: 15, marginBottom: 5 }}>
-                            <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Please Select a tour date</Text>
+                            <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>{packageInfo?.date_type == 1 ? 'Please Select a tour date' : 'Scheduled travel date'}</Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: responsiveHeight(2) }}>
                                 <View style={{ flexDirection: 'column' }}>
                                     <Text style={styles.textinputHeader}>Departure Date</Text>

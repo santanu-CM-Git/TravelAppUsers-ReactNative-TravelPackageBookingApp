@@ -60,7 +60,7 @@ export default function TopLocationScreenDetails({ route }) {
     // const { userInfo } = useContext(AuthContext)
     const [refreshing, setRefreshing] = useState(false);
     const [isLoading, setIsLoading] = useState(false)
-    const [starCount, setStarCount] = useState(0)
+    const [starCount, setStarCount] = useState(5)
     const [isFilterModalVisible, setFilterModalVisible] = useState(false);
 
     const [fromDate, setFromDate] = useState(new Date());
@@ -623,7 +623,7 @@ export default function TopLocationScreenDetails({ route }) {
                                     disabled={false}
                                     maxStars={5}
                                     rating={starCount}
-                                    selectedStar={(rating) => setStarCount(rating)}
+                                    onChange={(rating) => setStarCount(rating)}
                                     fullStarColor={'#FFCB45'}
                                     starSize={28}
                                     starStyle={{ marginHorizontal: responsiveWidth(1) }}

@@ -311,16 +311,36 @@ const SearchScreen = ({ route }) => {
         </View>
     );
 
-    if (isLoading) {
-        return (
-            <Loader />
-        )
-    }
+    const submitForFilter = async () => {
+        try {
+          const filters = {
+            flag: selectedId2 == "1" ? "all_packages" : selectedId2 == "2" ? "international" : "domestic",
+            country: countryName,
+            departute_date: moment(fromDateModal).format('YYYY-MM-DD'),
+            return_date: moment(toDateModal).format('YYYY-MM-DD'),
+            min_price: pricevalues[0],
+            max_price: pricevalues[1],
+            rating: starCount
+          };
+          console.log(filters)
+          navigation.navigate('FilterPackageResult', { filters });
+          // Close the filter modal
+          toggleFilterModal();
+        } catch (error) {
+          console.log('Error applying filters:', error);
+        }
+      };
 
     useEffect(()=>{
         fetchSearchHistory();
         fetchMostPopular();
     },[])
+
+    if (isLoading) {
+        return (
+            <Loader />
+        )
+    }
 
     useFocusEffect(
         useCallback(() => {
@@ -541,7 +561,7 @@ const SearchScreen = ({ route }) => {
                                     disabled={false}
                                     maxStars={5}
                                     rating={starCount}
-                                    selectedStar={(rating) => setStarCount(rating)}
+                                    onChange={(rating) => setStarCount(rating)}
                                     fullStarColor={'#FFCB45'}
                                     starSize={28}
                                     starStyle={{ marginHorizontal: responsiveWidth(1) }}

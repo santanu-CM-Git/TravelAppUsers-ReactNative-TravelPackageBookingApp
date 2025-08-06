@@ -119,7 +119,13 @@ const QuotesListScreen = ({ route }) => {
     const renderQuote = ({ item }) => {
         const documentArray = JSON.parse(item?.package.document);
         return (
-            <TouchableOpacity activeOpacity={0.5} onPress={() => navigation.navigate('PackageDetailsScreen', { packageId: item?.package?.id })}>
+            <TouchableOpacity activeOpacity={0.5}
+                onPress={() =>
+                    navigation.navigate('HOME', {
+                        screen: 'PackageDetailsScreen',
+                        params: { packageId: item?.package?.id },
+                    })
+                }>
                 <View style={styles.productSection}>
                     <View style={styles.topAstrologerSection}>
                         <View style={styles.totalValue4}>
@@ -228,18 +234,69 @@ const QuotesListScreen = ({ route }) => {
     useFocusEffect(
         useCallback(() => {
             const backAction = () => {
-               navigation.goBack()
-               return true
-              };
-          
-              const backHandler = BackHandler.addEventListener(
+                navigation.goBack()
+                return true
+            };
+
+            const backHandler = BackHandler.addEventListener(
                 'hardwareBackPress',
                 backAction,
-              );
-          
-              return () => backHandler.remove();
+            );
+
+            return () => backHandler.remove();
         }, [navigation])
     );
+
+    const submitForFilter = async () => {
+        let filteredData = [...originalQuoteList];
+
+        // Price filter
+        filteredData = filteredData.filter(item => {
+            const price = item?.package?.discounted_price || 0;
+            return price >= pricevalues[0] && price <= pricevalues[1];
+        });
+
+        // Rating filter
+        filteredData = filteredData.filter(item => {
+            const rating = item?.agent?.rating || 0;
+            return rating >= starCount;
+        });
+
+        // Package type filter
+        if (selectedPackageType === "2") {
+            // International packages - you might need to adjust this logic based on your data structure
+            filteredData = filteredData.filter(item => 
+                item?.package?.is_international === true || 
+                item?.package?.type === 'international'
+            );
+        } else if (selectedPackageType === "3") {
+            // Domestic packages
+            filteredData = filteredData.filter(item => 
+                item?.package?.is_international === false || 
+                item?.package?.type === 'domestic'
+            );
+        }
+
+        // Country filter (if specified)
+        if (countryName.trim() !== '') {
+            filteredData = filteredData.filter(item =>
+                item?.package?.country?.toLowerCase().includes(countryName.toLowerCase()) ||
+                item?.package?.location?.toLowerCase().includes(countryName.toLowerCase())
+            );
+        }
+
+        // Date filter (if you have date fields in your data)
+        // This depends on your data structure - adjust as needed
+        
+        setQuoteList(filteredData);
+        toggleFilterModal();
+        
+        Toast.show({
+            type: 'success',
+            text1: 'Filters Applied',
+            text2: `Found ${filteredData.length} matching quotes`,
+        });
+      };
 
     if (isLoading) {
         return (
@@ -332,7 +389,7 @@ const QuotesListScreen = ({ route }) => {
                                 disabled={false}
                                 maxStars={5}
                                 rating={starCount}
-                                selectedStar={(rating) => setStarCount(rating)}
+                                onChange={(rating) => setStarCount(rating)}
                                 fullStarColor={'#FFCB45'}
                                 starSize={28}
                                 starStyle={{ marginHorizontal: responsiveWidth(1) }}
@@ -454,7 +511,7 @@ const styles = StyleSheet.create({
         fontSize: responsiveFontSize(1.4),
     },
     rateingView: {
-        flex:1,
+        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-end'

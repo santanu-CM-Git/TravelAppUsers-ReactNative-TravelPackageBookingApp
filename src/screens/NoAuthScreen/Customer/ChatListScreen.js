@@ -40,7 +40,6 @@ import { API_URL } from '@env'
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import messaging from '@react-native-firebase/messaging';
 import LinearGradient from 'react-native-linear-gradient';
-import StarRating from 'react-native-star-rating-widget';
 import SwitchSelector from "react-native-switch-selector";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Icon from 'react-native-vector-icons/Entypo';
