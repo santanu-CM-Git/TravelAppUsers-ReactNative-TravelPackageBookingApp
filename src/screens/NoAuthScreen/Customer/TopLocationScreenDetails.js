@@ -59,7 +59,7 @@ export default function TopLocationScreenDetails({ route }) {
     const { logout } = useContext(AuthContext);
     // const { userInfo } = useContext(AuthContext)
     const [refreshing, setRefreshing] = useState(false);
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
     const [starCount, setStarCount] = useState(5)
     const [isFilterModalVisible, setFilterModalVisible] = useState(false);
 
@@ -73,24 +73,65 @@ export default function TopLocationScreenDetails({ route }) {
     const [showToDatePicker, setShowToDatePicker] = useState(false);
     const [searchText, setSearchText] = useState("");
     const [locationList, setLocationList] = useState([]);
+    const [locationData, setLocationData] = useState(null);
     const [filteredLocationList, setFilteredLocationList] = useState([]);
     const [userInfo, setUserInfo] = useState([]);
     const [perPage, setPerPage] = useState(10);
     const [pageno, setPageno] = useState(1);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
-    const [pricevalues, setPriceValues] = useState([5000, 25000]);
+    const [pricevalues, setPriceValues] = useState([0, 25000]);
+    const [minPrice, setMinPrice] = useState(0);
+    const [maxPrice, setMaxPrice] = useState(25000);
     const [loadingLikes, setLoadingLikes] = useState({});
 
+    // Add these new state variables to track which filters have been modified
+    const [initialFilters, setInitialFilters] = useState({
+        fromDate: new Date(),
+        toDate: (() => {
+            const date = new Date();
+            date.setDate(date.getDate() + 2);
+            return date;
+        })(),
+        priceValues: [0, 25000],
+        starCount: 5
+    });
+
+    const [modifiedFilters, setModifiedFilters] = useState({
+        dateModified: false,
+        priceModified: false,
+        ratingModified: false
+    });
+
+    // Update your existing state setters to track modifications
     const onChangeFromDate = (event, selectedDate) => {
-        setShowFromDatePicker(Platform.OS === "ios"); // Keep picker open on iOS
-        if (selectedDate) setFromDate(selectedDate);
+        setShowFromDatePicker(Platform.OS === "ios");
+        if (selectedDate) {
+            setFromDate(selectedDate);
+            setModifiedFilters(prev => ({ ...prev, dateModified: true }));
+        }
     };
 
     const onChangeToDate = (event, selectedDate) => {
-        setShowToDatePicker(Platform.OS === "ios"); // Keep picker open on iOS
-        if (selectedDate) setToDate(selectedDate);
+        setShowToDatePicker(Platform.OS === "ios");
+        if (selectedDate) {
+            setToDate(selectedDate);
+            setModifiedFilters(prev => ({ ...prev, dateModified: true }));
+        }
     };
+
+    // Update price change handler
+    const handlePriceChange = (values) => {
+        setPriceValues(values);
+        setModifiedFilters(prev => ({ ...prev, priceModified: true }));
+    };
+
+    // Update rating change handler
+    const handleRatingChange = (rating) => {
+        setStarCount(rating);
+        setModifiedFilters(prev => ({ ...prev, ratingModified: true }));
+    };
+
     const toggleFilterModal = () => {
         setFilterModalVisible(!isFilterModalVisible);
     };
@@ -98,16 +139,16 @@ export default function TopLocationScreenDetails({ route }) {
     useFocusEffect(
         useCallback(() => {
             const backAction = () => {
-               navigation.goBack()
-               return true
-              };
-          
-              const backHandler = BackHandler.addEventListener(
+                navigation.goBack()
+                return true
+            };
+
+            const backHandler = BackHandler.addEventListener(
                 'hardwareBackPress',
                 backAction,
-              );
-          
-              return () => backHandler.remove();
+            );
+
+            return () => backHandler.remove();
         }, [navigation])
     );
 
@@ -161,8 +202,27 @@ export default function TopLocationScreenDetails({ route }) {
                 }
             );
             const responseData = response.data.data.data;
-            console.log('Received data for page:', page, 'Data length:', responseData.length);
+            const locationdata = response.data.location;
+            setLocationData(locationdata)
+            // Calculate prices
+            const allPrices = responseData.map(pkg => {
+                const price = parseFloat(pkg.discounted_price || pkg.price || '0');
+                return isNaN(price) ? 0 : price;
+            });
 
+            const validPrices = allPrices.filter(price => price > 0);
+
+            if (validPrices.length > 0) {
+                const min = Math.min(...validPrices);
+                const max = Math.max(...validPrices);
+                setMinPrice(0); // or `min` if you want real minimum
+                setMaxPrice(max);
+                if (!modifiedFilters.priceModified) {
+                    setPriceValues([0, max]); // Only set if not modified by user
+                }
+            }
+            console.log('Received data for page:', page, 'Data length:', responseData.length);
+            console.log(JSON.stringify(responseData), 'dfdsfdsfdsfdsfdsf')
             if (page === 1) {
                 setLocationList(responseData);
             } else {
@@ -173,7 +233,7 @@ export default function TopLocationScreenDetails({ route }) {
                 setHasMore(false);
                 console.log('No more data available');
             }
-
+            setIsLoading(false)
         } catch (error) {
             console.log(`fetch Top Location error ${error}`);
             if (error.response && error.response.data && error.response.data.message) {
@@ -183,7 +243,7 @@ export default function TopLocationScreenDetails({ route }) {
             setLoading(false);
             setIsLoading(false)
         }
-    }, [perPage, route?.params?.location.location_name]);
+    }, [perPage, route?.params?.location.location_name, modifiedFilters.priceModified]);
 
 
     const handleLoadMore = () => {
@@ -291,8 +351,12 @@ export default function TopLocationScreenDetails({ route }) {
                                 </View>
                                 <Text style={styles.travelerText}>{item?.agent?.name}</Text>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', }}>
+                                {item?.date_type == 0 ?
                                     <Text style={styles.addressText}>Slots : {item?.seat_slots - item?.booked_slots}</Text>
-                                    <Text style={styles.priceText2}>₹{formatNumber(item?.discounted_price)}</Text>
+                                    :
+                                    null
+                                  }
+                                    <Text style={[styles.priceText2,{textAlign: 'right', flex: 1}]}>₹{formatNumber(item?.discounted_price)}</Text>
                                 </View>
                                 <View
                                     style={{
@@ -303,7 +367,7 @@ export default function TopLocationScreenDetails({ route }) {
                                 />
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
 
-                                    {item?.date_type === 0 ?
+                                    {item?.date_type == 0 ?
                                         <Text style={styles.packageAvlText}>
                                             {(() => {
                                                 const start = moment(item.start_date);
@@ -317,12 +381,12 @@ export default function TopLocationScreenDetails({ route }) {
                                             {item?.itinerary.length} Days {item?.itinerary.length - 1} Nights
                                         </Text>
                                     }
-                                    {item?.rating !== null && item?.rating !== undefined && item?.rating !== 0 && (
-                                    <View style={styles.rateingView}>
-                                        <Image
-                                            source={starImg}
-                                            style={[styles.staricon, { marginTop: -5 }]}
-                                        />
+                                    {item?.rating != null && item?.rating != undefined && item?.rating != 0 && (
+                                        <View style={styles.rateingView}>
+                                            <Image
+                                                source={starImg}
+                                                style={[styles.staricon, { marginTop: -5 }]}
+                                            />
                                             <Text style={styles.ratingText}>{item?.rating}</Text>
                                         </View>
                                     )}
@@ -346,7 +410,7 @@ export default function TopLocationScreenDetails({ route }) {
                                     />
                                 )}
                             </TouchableOpacity>
-                            {item?.date_type === 0 ?
+                            {item?.date_type == 0 ?
                                 <View style={styles.tagTextView4}>
                                     <View style={styles.dateContainer}>
                                         <Image source={calendarImg} tintColor={'#FFFFFF'} style={[styles.timeimage, { marginRight: 5 }]} />
@@ -368,23 +432,37 @@ export default function TopLocationScreenDetails({ route }) {
         )
     }
 
+    // Updated submitForFilter function
     const submitForFilter = async () => {
         try {
-            const filters = {
-                departute_date: moment(fromDate).format('YYYY-MM-DD'),
-                return_date: moment(toDate).format('YYYY-MM-DD'),
-                min_price: pricevalues[0],
-                max_price: pricevalues[1],
-                rating: starCount
-            };
+            const filters = {};
+
+            // Only add date filters if they were modified
+            if (modifiedFilters.dateModified) {
+                filters.departute_date = moment(fromDate).format('YYYY-MM-DD');
+                filters.return_date = moment(toDate).format('YYYY-MM-DD');
+            }
+
+            // Only add price filters if they were modified
+            if (modifiedFilters.priceModified) {
+                filters.min_price = pricevalues[0];
+                filters.max_price = pricevalues[1];
+            }
+
+            // Only add rating filter if it was modified
+            if (modifiedFilters.ratingModified) {
+                filters.rating = starCount;
+            }
+
+            console.log('Applied filters:', filters); // Debug log
 
             // Reset pagination when applying filters
             setPageno(1);
             setHasMore(true);
-            //setIsLoading(true)
-            
+
             // Close the filter modal
             toggleFilterModal();
+
             // Fetch filtered data
             await fetchTopLocationDetails(userInfo?.country, 1, filters);
         } catch (error) {
@@ -392,17 +470,25 @@ export default function TopLocationScreenDetails({ route }) {
         }
     };
 
+    // Updated resetFilters function
     const resetFilters = async () => {
         try {
             // Reset all filter states to initial values
-            setFromDate(new Date());
-            setToDate(() => {
-                const date = new Date();
-                date.setMonth(date.getMonth() + 1);
-                return date;
+            const newFromDate = new Date();
+            const newToDate = new Date();
+            newToDate.setDate(newToDate.getDate() + 2);
+            
+            setFromDate(newFromDate);
+            setToDate(newToDate);
+            setPriceValues([0, 25000]);
+            setStarCount(5);
+
+            // Reset modification tracking
+            setModifiedFilters({
+                dateModified: false,
+                priceModified: false,
+                ratingModified: false
             });
-            setPriceValues([5000, 25000]);
-            setStarCount(0);
 
             // Reset pagination
             setPageno(1);
@@ -416,6 +502,15 @@ export default function TopLocationScreenDetails({ route }) {
         } catch (error) {
             console.log('Error resetting filters:', error);
         }
+    };
+
+    // Add this function to get active filters count
+    const getActiveFiltersCount = () => {
+        let count = 0;
+        if (modifiedFilters.dateModified) count++;
+        if (modifiedFilters.priceModified) count++;
+        if (modifiedFilters.ratingModified) count++;
+        return count;
     };
 
     // Add this function for pull-to-refresh
@@ -438,7 +533,7 @@ export default function TopLocationScreenDetails({ route }) {
             <StatusBar translucent backgroundColor="transparent" />
             <View style={styles.mainContainer}>
                 <ImageBackground
-                    source={{ uri: route?.params?.location.image_url }}
+                    source={{ uri: locationData?.image_url }}
                     style={styles.background}
                     imageStyle={styles.imageStyle}
                 >
@@ -451,55 +546,31 @@ export default function TopLocationScreenDetails({ route }) {
                                     style={styles.filterIcon}
                                 />
                             </TouchableOpacity>
-                            <Text style={[styles.title, { marginLeft: responsiveWidth(2) }]}>{route?.params?.location.location_name}</Text>
+                            <Text style={[styles.title, { marginLeft: responsiveWidth(2) }]}>{locationData?.name}</Text>
                         </View>
 
-                        <TouchableOpacity style={styles.iconButton}>
+                        {/* <TouchableOpacity style={styles.iconButton}>
                             <Image
                                 source={shareImg}
                                 style={styles.filterIcon}
                             />
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
 
                     </View>
 
-                    {/* Bottom Like Button */}
-                    {/* <TouchableOpacity style={styles.likeButton}>
-                        <Image
-                            source={likefillImg}
-                            style={styles.likeIcon}
-                        />
-                    </TouchableOpacity> */}
+                    {/* Filter Button with Badge */}
                     <TouchableOpacity style={styles.filterButton} onPress={() => toggleFilterModal()}>
                         <Image
                             source={filterImg}
                             style={[styles.filterIcon]}
                         />
+                        {getActiveFiltersCount() > 0 && (
+                            <View style={styles.filterBadge}>
+                                <Text style={styles.filterBadgeText}>{getActiveFiltersCount()}</Text>
+                            </View>
+                        )}
                     </TouchableOpacity>
                 </ImageBackground>
-                {/* <View style={styles.searchSection}>
-                    <View style={styles.searchInput}>
-                        <View style={{ flexDirection: 'row', alignItems: "center", flex: 1 }}>
-                            <Image
-                                source={searchIconImg}
-                                style={styles.searchIcon}
-                            />
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Search"
-                                placeholderTextColor="#888"
-                                value={searchText}
-                                onChangeText={setSearchText}
-                            />
-                        </View>
-                        <TouchableWithoutFeedback onPress={() => toggleFilterModal()}>
-                            <Image
-                                source={filterImg}
-                                style={[styles.filterIcon, { marginRight: 5 }]}
-                            />
-                        </TouchableWithoutFeedback>
-                    </View>
-                </View> */}
                 <FlatList
                     data={locationList}
                     renderItem={renderItem}
@@ -523,12 +594,10 @@ export default function TopLocationScreenDetails({ route }) {
             </View>
             <Modal
                 isVisible={isFilterModalVisible}
-                // onBackdropPress={() => setIsFocus(false)} // modal off by clicking outside of the modal
                 style={{
-                    margin: 0, // Add this line to remove the default margin
+                    margin: 0,
                     justifyContent: 'flex-end',
                 }}>
-                {/* <TouchableWithoutFeedback onPress={() => setIsFocus(false)} style={{  }}> */}
                 <View style={{ height: '75%', backgroundColor: '#fff', position: 'absolute', bottom: 0, width: '100%', borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
                     <View style={{ padding: 0 }}>
                         <View style={{ paddingVertical: 5, paddingHorizontal: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: responsiveHeight(2), marginTop: responsiveHeight(2) }}>
@@ -604,9 +673,9 @@ export default function TopLocationScreenDetails({ route }) {
                                 <MultiSlider
                                     values={pricevalues}
                                     sliderLength={responsiveWidth(80)}
-                                    onValuesChange={setPriceValues}
-                                    min={5000}
-                                    max={25000}
+                                    onValuesChange={handlePriceChange}
+                                    min={minPrice}
+                                    max={maxPrice}
                                     step={100}
                                     selectedStyle={{ backgroundColor: "#FF455C" }}
                                     unselectedStyle={{ backgroundColor: "rgba(0, 0, 0, 0.15)" }}
@@ -623,7 +692,7 @@ export default function TopLocationScreenDetails({ route }) {
                                     disabled={false}
                                     maxStars={5}
                                     rating={starCount}
-                                    onChange={(rating) => setStarCount(rating)}
+                                    onChange={handleRatingChange}
                                     fullStarColor={'#FFCB45'}
                                     starSize={28}
                                     starStyle={{ marginHorizontal: responsiveWidth(1) }}
@@ -650,7 +719,6 @@ export default function TopLocationScreenDetails({ route }) {
                         </View>
                     </View>
                 </View>
-                {/* </TouchableWithoutFeedback> */}
             </Modal>
         </SafeAreaView>
     );
@@ -694,7 +762,6 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
-        //backgroundColor: 'rgba(0,0,0,0.5)',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -727,6 +794,22 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
         shadowRadius: 4,
+    },
+    filterBadge: {
+        position: 'absolute',
+        top: -5,
+        right: -5,
+        backgroundColor: '#FF455C',
+        borderRadius: 10,
+        minWidth: 20,
+        height: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    filterBadgeText: {
+        color: 'white',
+        fontSize: 12,
+        fontWeight: 'bold',
     },
     filterIcon: {
         height: 32,
@@ -775,14 +858,14 @@ const styles = StyleSheet.create({
         fontFamily: 'Poppins-Regular',
         fontSize: responsiveFontSize(1.7),
     },
-    filterIcon: {
-        height: 32,
-        width: 32,
-        resizeMode: 'contain'
+    input: {
+        flex: 1,
+        fontSize: responsiveFontSize(1.7),
+        color: '#000',
+        fontFamily: 'Poppins-Regular',
     },
     productSection: {
         marginTop: responsiveHeight(0),
-        //marginLeft: 20
     },
     //product section
     topAstrologerSection: {
@@ -794,9 +877,7 @@ const styles = StyleSheet.create({
     totalValue4: {
         width: responsiveWidth(45),
         height: responsiveHeight(35),
-        //alignItems: 'center',
         backgroundColor: '#fff',
-        //justifyContent: 'center',
         padding: 5,
         borderRadius: 15,
         elevation: 5,

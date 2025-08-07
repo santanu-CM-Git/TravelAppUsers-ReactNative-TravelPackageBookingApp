@@ -428,6 +428,10 @@ const getTabBarVisibility = route => {
     return 'none';
   } else if (routeName == 'MenuPackageDetailsScreen') {
     return 'none';
+  } else if (routeName == 'SearchScreen') {
+    return 'none';
+  } else if (routeName == 'Notification') {
+    return 'none';
   } else {
     return 'flex';
   }

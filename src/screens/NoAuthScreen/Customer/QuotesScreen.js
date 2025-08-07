@@ -3,7 +3,7 @@ import { View, Text, SafeAreaView, StyleSheet, ScrollView, RefreshControl, TextI
 import CustomHeader from '../../../components/CustomHeader'
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
 import { LongPressGestureHandler, State, TouchableWithoutFeedback } from 'react-native-gesture-handler'
-import { bookmarkedFill, bookmarkedNotFill, calendarImg, cameraColor, chatColor, checkedImg, filterImg, likefillImg, mappinImg, phoneColor, plusIconstickyImg, productImg, starImg, timeImg, tourImg, uncheckedImg, userImg } from '../../../utils/Images'
+import { bookmarkedFill, bookmarkedNotFill, calendarImg, cameraColor, chatColor, checkedImg, likefillImg, mappinImg, phoneColor, plusIconstickyImg, productImg, starImg, timeImg, tourImg, uncheckedImg, userImg } from '../../../utils/Images'
 import { API_URL } from '@env'
 import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";

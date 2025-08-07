@@ -169,8 +169,8 @@ const SearchScreen = ({ route }) => {
             );
 
             if (response.data.response === true) {
-                console.log(response.data.data,'dsddsfdsfdsf');
-                
+                console.log(response.data.data, 'dsddsfdsfdsf');
+
                 setSuggestions(response.data.data || []);
             } else {
                 Alert.alert('Error', response.data.message || 'Failed to fetch suggestions');
@@ -187,15 +187,15 @@ const SearchScreen = ({ route }) => {
 
     const debouncedFetchSuggestions = useCallback(debounce(fetchSuggestions, 400), []);
 
-    const storeSearch = async (locationid,locationName) => {
+    const storeSearch = async (locationid, locationName) => {
         try {
             const usertoken = await AsyncStorage.getItem('userToken');
             if (!usertoken) {
                 throw new Error('User token not found');
             }
             const option = {
-                "location" : locationid,
-                "location_name" : locationName,
+                "location": locationid,
+                "location_name": locationName,
                 "string": ""
             }
             const response = await axios.post(
@@ -209,7 +209,7 @@ const SearchScreen = ({ route }) => {
                 }
             );
 
-            if(response.data.response == true){
+            if (response.data.response == true) {
                 console.log('OK')
             }
 
@@ -242,7 +242,7 @@ const SearchScreen = ({ route }) => {
             );
 
             let history = response.data.data;
-
+            console.log(history, 'searchhistory')
             setSearchHistory(history);
         } catch (error) {
             console.log(`fetch Search History error ${error}`);
@@ -262,7 +262,7 @@ const SearchScreen = ({ route }) => {
             }
 
             const response = await axios.post(
-                `${API_URL}/customer/search-history`,
+                `${API_URL}/customer/most-popular-search`,
                 {},
                 {
                     headers: {
@@ -273,7 +273,7 @@ const SearchScreen = ({ route }) => {
             );
 
             let history = response.data.data;
-
+            console.log(history, 'historyhistory')
             setMostPopular(history);
         } catch (error) {
             console.log(`fetch Search History error ${error}`);
@@ -286,55 +286,72 @@ const SearchScreen = ({ route }) => {
     }
 
     const renderSearchHistory = ({ item }) => (
-        <View style={{ flexDirection: 'row', alignItems: 'center', borderBottomColor: '#8B8B8B', borderBottomWidth: 1, paddingBottom: responsiveHeight(2), paddingTop: responsiveHeight(2) }}>
-            <Image
-                source={timeIcon}
-                style={[styles.filterIcon, { marginRight: 5 }]}
-            />
-            <View style={{ flexDirection: 'column' }}>
-                <Text style={{ fontFamily: 'Poppins-SemiBold', fontSize: responsiveFontSize(1.7), color: '#FF455C' }}>Jammu-Kashmir</Text>
-                <Text style={{ fontFamily: 'Poppins-Regular', fontSize: responsiveFontSize(1.7), color: '#A9A8A8' }}>Jammu-Kashmir</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('TopLocationScreenDetails', {
+            location: { location_name: item?.location?.name            },
+            country: item?.location?.country
+        })}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', borderBottomColor: '#8B8B8B', borderBottomWidth: 1, paddingBottom: responsiveHeight(2), paddingTop: responsiveHeight(2) }}>
+                <Image
+                    source={timeIcon}
+                    style={[styles.filterIcon, { marginRight: 5 }]}
+                />
+                <View style={{ flexDirection: 'column' }}>
+                    <Text style={{ fontFamily: 'Poppins-SemiBold', fontSize: responsiveFontSize(1.7), color: '#FF455C' }}>{item?.location?.name}</Text>
+                    <Text style={{ fontFamily: 'Poppins-Regular', fontSize: responsiveFontSize(1.7), color: '#A9A8A8' }}>{item?.location?.country}</Text>
+                </View>
             </View>
-        </View>
+        </TouchableOpacity>
     );
 
     const renderMostPopular = ({ item }) => (
-        <View style={{ flexDirection: 'row', alignItems: 'center', borderBottomColor: '#8B8B8B', borderBottomWidth: 1, paddingBottom: responsiveHeight(2), paddingTop: responsiveHeight(2) }}>
-            <Image
-                source={timeIcon}
-                style={[styles.filterIcon, { marginRight: 5 }]}
-            />
-            <View style={{ flexDirection: 'column' }}>
-                <Text style={{ fontFamily: 'Poppins-SemiBold', fontSize: responsiveFontSize(1.7), color: '#FF455C' }}>Jammu-Kashmir</Text>
-                <Text style={{ fontFamily: 'Poppins-Regular', fontSize: responsiveFontSize(1.7), color: '#A9A8A8' }}>Jammu-Kashmir</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('TopLocationScreenDetails', {
+            location: { location_name: item?.location?.name },
+            country: item?.location?.country
+        })}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', borderBottomColor: '#8B8B8B', borderBottomWidth: 1, paddingBottom: responsiveHeight(2), paddingTop: responsiveHeight(2) }}>
+                <Image
+                    source={timeIcon}
+                    style={[styles.filterIcon, { marginRight: 5 }]}
+                />
+                <View style={{ flexDirection: 'column' }}>
+                    <Text style={{ fontFamily: 'Poppins-SemiBold', fontSize: responsiveFontSize(1.7), color: '#FF455C' }}>{item?.location?.name}</Text>
+                    <Text style={{ fontFamily: 'Poppins-Regular', fontSize: responsiveFontSize(1.7), color: '#A9A8A8' }}>{item?.location?.country}</Text>
+                </View>
             </View>
-        </View>
+        </TouchableOpacity>
     );
 
     const submitForFilter = async () => {
         try {
-          const filters = {
-            flag: selectedId2 == "1" ? "all_packages" : selectedId2 == "2" ? "international" : "domestic",
-            country: countryName,
-            departute_date: moment(fromDateModal).format('YYYY-MM-DD'),
-            return_date: moment(toDateModal).format('YYYY-MM-DD'),
-            min_price: pricevalues[0],
-            max_price: pricevalues[1],
-            rating: starCount
-          };
-          console.log(filters)
-          navigation.navigate('FilterPackageResult', { filters });
-          // Close the filter modal
-          toggleFilterModal();
+            const filters = {
+                flag: selectedId2 == "1" ? "all_packages" : selectedId2 == "2" ? "international" : "domestic",
+                country: countryName,
+                departute_date: moment(fromDateModal).format('YYYY-MM-DD'),
+                return_date: moment(toDateModal).format('YYYY-MM-DD'),
+                min_price: pricevalues[0],
+                max_price: pricevalues[1],
+                rating: starCount
+            };
+            console.log(filters)
+            navigation.navigate('FilterPackageResult', { filters });
+            // Close the filter modal
+            toggleFilterModal();
         } catch (error) {
-          console.log('Error applying filters:', error);
+            console.log('Error applying filters:', error);
         }
-      };
+    };
 
-    useEffect(()=>{
+    useEffect(() => {
         fetchSearchHistory();
         fetchMostPopular();
-    },[])
+    }, [])
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchSearchHistory();
+        fetchMostPopular();
+        }, [navigation])
+    );
 
     if (isLoading) {
         return (
@@ -345,16 +362,16 @@ const SearchScreen = ({ route }) => {
     useFocusEffect(
         useCallback(() => {
             const backAction = () => {
-               navigation.goBack()
-               return true
-              };
-          
-              const backHandler = BackHandler.addEventListener(
+                navigation.goBack()
+                return true
+            };
+
+            const backHandler = BackHandler.addEventListener(
                 'hardwareBackPress',
                 backAction,
-              );
-          
-              return () => backHandler.remove();
+            );
+
+            return () => backHandler.remove();
         }, [navigation])
     );
 
@@ -381,12 +398,12 @@ const SearchScreen = ({ route }) => {
                                 }}
                             />
                         </View>
-                        <TouchableWithoutFeedback onPress={() => toggleFilterModal()}>
+                        {/* <TouchableWithoutFeedback onPress={() => toggleFilterModal()}>
                             <Image
                                 source={filterImg}
                                 style={[styles.filterIcon, { marginRight: 5 }]}
                             />
-                        </TouchableWithoutFeedback>
+                        </TouchableWithoutFeedback> */}
                     </View>
                     {/* Suggestions List */}
                     {isSuggestionsLoading && <Text>Loading...</Text>}
@@ -409,11 +426,15 @@ const SearchScreen = ({ route }) => {
                                     onPress={() => {
                                         setSearchText(item);
                                         setSuggestions([]);
-                                        storeSearch(item?.id,item?.name)
+                                        storeSearch(item?.id, item?.name)
+                                        navigation.navigate('TopLocationScreenDetails', {
+                                            location: { location_name: item?.name },
+                                            country: "India"
+                                        })
                                     }}
                                     style={{ padding: 12, borderBottomWidth: idx === suggestions.length - 1 ? 0 : 1, borderBottomColor: '#eee' }}
                                 >
-                                    <Text style={{ color: '#333',fontFamily: 'Poppins-Regular',fontSize: responsiveFontSize(1.7) }}>{item?.name}</Text>
+                                    <Text style={{ color: '#333', fontFamily: 'Poppins-Regular', fontSize: responsiveFontSize(1.7) }}>{item?.name}</Text>
                                 </TouchableOpacity>
                             ))}
                         </View>
@@ -421,7 +442,7 @@ const SearchScreen = ({ route }) => {
                 </View>
                 <View style={{ paddingHorizontal: 15, }}>
                     <Text style={{ fontSize: responsiveFontSize(2.5), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Search history</Text>
-                   
+
                     <FlatList
                         data={searchHistory}
                         keyExtractor={(item) => item.id}
@@ -429,9 +450,9 @@ const SearchScreen = ({ route }) => {
                         showsVerticalScrollIndicator={false}
                         ListEmptyComponent={() => (
                             <View style={styles.emptyContainer}>
-                              <Text style={styles.emptyText}>No search history found.</Text>
+                                <Text style={styles.emptyText}>No search history found.</Text>
                             </View>
-                          )}
+                        )}
                     />
                 </View>
                 <View style={{ paddingHorizontal: 15, marginTop: responsiveHeight(2) }}>
@@ -443,9 +464,9 @@ const SearchScreen = ({ route }) => {
                         showsVerticalScrollIndicator={false}
                         ListEmptyComponent={() => (
                             <View style={styles.emptyContainer}>
-                              <Text style={styles.emptyText}>No popular location found.</Text>
+                                <Text style={styles.emptyText}>No popular location found.</Text>
                             </View>
-                          )}
+                        )}
                     />
                 </View>
             </ScrollView>
@@ -812,11 +833,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingVertical: 20,
         marginTop: responsiveHeight(10)
-      },
-      emptyText: {
+    },
+    emptyText: {
         fontSize: responsiveFontSize(2),
         color: '#666',
         fontFamily: 'Poppins-Medium',
         textAlign: 'center',
-      },
+    },
 });

@@ -128,8 +128,10 @@ export default function HomeScreen() {
   const [toDateModal, setToDateModal] = useState(new Date());
   const [showFromDatePickerModal, setShowFromDatePickerModal] = useState(false);
   const [showToDatePickerModal, setShowToDatePickerModal] = useState(false);
-  const [pricevalues, setPriceValues] = useState([5000, 25000]);
-  const [starCount, setStarCount] = useState(0)
+  const [pricevalues, setPriceValues] = useState([0, 25000]);
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(25000);
+  const [starCount, setStarCount] = useState(5)
   const [selectedId2, setSelectedId2] = useState('1');
   const radioButtons2 = useMemo(() => ([
     {
@@ -415,6 +417,11 @@ export default function HomeScreen() {
     })
       .then(res => {
         let userInfo = res.data.data;
+        let minPrice = res.data.min_price;
+        let maxPrice = res.data.max_price;
+        setMinPrice(minPrice)
+        setMaxPrice(maxPrice)
+        setPriceValues([0,maxPrice])
         const formattedData = userInfo.map(item => ({
           label: item.name,
           value: item.id
@@ -816,7 +823,7 @@ export default function HomeScreen() {
               <Text style={styles.travelerText}>{item?.agent?.name}</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View style={{ flex: 1 }}>
-                  {item?.date_type === 0 ?
+                  {item?.date_type == 0 ?
                     <Text style={styles.addressText}>Slots : {item?.seat_slots - item?.booked_slots}</Text>
                     :
                     null
@@ -832,7 +839,7 @@ export default function HomeScreen() {
                 }}
               />
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 5 }}>
-                {item?.date_type === 0 ?
+                {item?.date_type == 0 ?
                   <Text style={styles.packageAvlText}>
                     {(() => {
                       const start = moment(item.start_date);
@@ -846,7 +853,7 @@ export default function HomeScreen() {
                     {item?.itinerary.length} Days {item?.itinerary.length - 1} Nights
                   </Text>
                 }
-                {item?.rating !== null && item?.rating !== undefined && item?.rating !== 0 && (
+                {item?.rating != null && item?.rating != undefined && item?.rating != 0 && (
                   <View style={styles.rateingView}>
                     <Image
                       source={starImg}
@@ -896,7 +903,7 @@ export default function HomeScreen() {
               <Text style={styles.travelerText}>{item?.agent?.name}</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View style={{ flex: 1 }}>
-                  {item?.date_type === 0 ?
+                  {item?.date_type == 0 ?
                     <Text style={styles.addressText}>Slots : {item?.seat_slots}</Text>
                     :
                     null
@@ -912,7 +919,7 @@ export default function HomeScreen() {
                 }}
               />
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 5 }}>
-                {item?.date_type === 0 ?
+                {item?.date_type == 0 ?
                   <Text style={styles.packageAvlText}>
                     {(() => {
                       const start = moment(item.start_date);
@@ -1138,8 +1145,8 @@ export default function HomeScreen() {
       const filters = {
         flag: selectedId2 == "1" ? "all_packages" : selectedId2 == "2" ? "international" : "domestic",
         country: countryName,
-        departute_date: moment(fromDateModal).format('YYYY-MM-DD'),
-        return_date: moment(toDateModal).format('YYYY-MM-DD'),
+        //departute_date: moment(fromDateModal).format('YYYY-MM-DD'),
+        //return_date: moment(toDateModal).format('YYYY-MM-DD'),
         min_price: pricevalues[0],
         max_price: pricevalues[1],
         rating: starCount
@@ -1587,7 +1594,7 @@ export default function HomeScreen() {
           justifyContent: 'flex-end',
         }}>
         {/* <TouchableWithoutFeedback onPress={() => setIsFocus(false)} style={{  }}> */}
-        <View style={{ height: '75%', backgroundColor: '#fff', position: 'absolute', bottom: 0, width: '100%', borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
+        <View style={{ height: '60%', backgroundColor: '#fff', position: 'absolute', bottom: 0, width: '100%', borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
           <View style={{ padding: 0 }}>
             <View style={{ paddingVertical: 5, paddingHorizontal: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: responsiveHeight(2), marginTop: responsiveHeight(2) }}>
               <Text style={{ fontSize: responsiveFontSize(2.5), color: '#2D2D2D', fontFamily: 'Poppins-Bold', }}>Filter</Text>
@@ -1598,10 +1605,9 @@ export default function HomeScreen() {
           </View>
           <ScrollView style={{ marginBottom: responsiveHeight(0) }}>
             <View style={{ borderTopColor: '#E3E3E3', borderTopWidth: 0, paddingHorizontal: 15, marginBottom: 5 }}>
-              <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Days</Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: responsiveHeight(2) }}>
+              {/* <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Days</Text> */}
+              {/* <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: responsiveHeight(2) }}>
                 <View style={{ flexDirection: 'column' }}>
-                  {/* From Date */}
                   <Text style={styles.textinputHeader}>Departure Date</Text>
                   <TouchableOpacity
                     onPress={() => setShowFromDatePickerModal(true)}
@@ -1629,7 +1635,6 @@ export default function HomeScreen() {
                   )}
                 </View>
                 <View style={{ flexDirection: 'column' }}>
-                  {/* To Date */}
                   <Text style={styles.textinputHeader}>Return Date</Text>
                   <TouchableOpacity
                     onPress={() => setShowToDatePickerModal(true)}
@@ -1657,7 +1662,7 @@ export default function HomeScreen() {
                     />
                   )}
                 </View>
-              </View>
+              </View> */}
               <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Type</Text>
               <View style={{ marginTop: responsiveHeight(2), marginBottom: responsiveHeight(2), marginLeft: -responsiveWidth(2.5) }}>
                 <RadioGroup
@@ -1674,9 +1679,9 @@ export default function HomeScreen() {
                   values={pricevalues}
                   sliderLength={responsiveWidth(80)}
                   onValuesChange={setPriceValues}
-                  min={5000}
-                  max={25000}
-                  step={100}
+                  min={minPrice}
+                  max={maxPrice}
+                  step={500}
                   selectedStyle={{ backgroundColor: "#FF455C" }}
                   unselectedStyle={{ backgroundColor: "rgba(0, 0, 0, 0.15)" }}
                   markerStyle={{ backgroundColor: "#FF455C" }}

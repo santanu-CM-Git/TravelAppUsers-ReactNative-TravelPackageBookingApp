@@ -28,7 +28,7 @@ import CustomButton from '../../../components/CustomButton'
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { add } from '../../../store/cartSlice';
-import { dateIcon, timeIcon, yellowStarImg, qouteImg, bannerPlaceHolder, freebannerPlaceHolder, notificationImg, markerImg, searchIconImg, filterImg, productImg, travelImg, likefillImg, mappinImg, starImg, arrowBackImg, shareImg, calendarImg } from '../../../utils/Images';
+import { dateIcon, timeIcon, yellowStarImg, qouteImg, bannerPlaceHolder, freebannerPlaceHolder, notificationImg, markerImg, searchIconImg, productImg, travelImg, likefillImg, mappinImg, starImg, arrowBackImg, shareImg, calendarImg } from '../../../utils/Images';
 import Loader from '../../../utils/Loader';
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
 import CustomHeader from '../../../components/CustomHeader';
@@ -181,16 +181,16 @@ export default function TravelAgencyDetails({ route }) {
     useFocusEffect(
         useCallback(() => {
             const backAction = () => {
-               navigation.goBack()
-               return true
-              };
-          
-              const backHandler = BackHandler.addEventListener(
+                navigation.goBack()
+                return true
+            };
+
+            const backHandler = BackHandler.addEventListener(
                 'hardwareBackPress',
                 backAction,
-              );
-          
-              return () => backHandler.remove();
+            );
+
+            return () => backHandler.remove();
         }, [navigation])
     );
 
@@ -391,7 +391,11 @@ export default function TravelAgencyDetails({ route }) {
                                                 </View>
                                                 <Text style={styles.travelerText}>{item.agent?.name}</Text>
                                                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', }}>
-                                                    <Text style={styles.addressText}>Slots : {item.available_slots}</Text>
+                                                    {item?.date_type == 0 ?
+                                                        <Text style={styles.addressText}>Slots : {item.available_slots}</Text>
+                                                        :
+                                                        null
+                                                    }
                                                     <Text style={styles.priceText2}>₹{formatNumber(item?.discounted_price)}</Text>
                                                 </View>
                                                 <View
@@ -402,7 +406,7 @@ export default function TravelAgencyDetails({ route }) {
                                                     }}
                                                 />
                                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                    {item?.date_type === 0 ?
+                                                    {item?.date_type == 0 ?
                                                         <Text style={styles.packageAvlText}>
                                                             {(() => {
                                                                 const start = moment(item.start_date);
@@ -443,7 +447,7 @@ export default function TravelAgencyDetails({ route }) {
                                                     />
                                                 )}
                                             </TouchableOpacity>
-                                            {item?.date_type === 0 ? (
+                                            {item?.date_type == 0 ? (
                                                 <View style={styles.tagTextView4}>
                                                     <View style={styles.dateContainer}>
                                                         <Image source={calendarImg} tintColor={'#FFFFFF'} style={[styles.timeimage, { marginRight: 5 }]} />

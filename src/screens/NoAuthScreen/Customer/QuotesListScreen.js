@@ -22,8 +22,6 @@ import Toast from 'react-native-toast-message';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import { AuthContext } from '../../../context/AuthContext';
 
-
-
 const QuotesListScreen = ({ route }) => {
 
     const navigation = useNavigation();
@@ -35,18 +33,53 @@ const QuotesListScreen = ({ route }) => {
     const [hasMore, setHasMore] = useState(true);
     const [loading, setLoading] = useState(false);
     const [quoteList, setQuoteList] = useState([])
-
+    const [filteredQuoteList, setFilteredQuoteList] = useState([])
+    const [searchText, setSearchText] = useState("");
+    const { logout } = useContext(AuthContext);
 
     const toggleFilterModal = () => {
         setFilterModalVisible(!isFilterModalVisible);
     };
 
-    const [pricevalues, setPriceValues] = useState([5000, 25000]);
-    const [distancevalues, setDistanceValues] = useState([0, 25000]);
+    const [pricevalues, setPriceValues] = useState([0, 25000]);
+    const [minPrice, setMinPrice] = useState(0);
+    const [maxPrice, setMaxPrice] = useState(25000);
+    const [distancevalues, setDistanceValues] = useState([0, 2000]);
 
-    const fetchMyQuoteRequest = useCallback(async (page = 1) => {
+    // Add these new state variables to track which filters have been modified
+    const [initialFilters, setInitialFilters] = useState({
+        priceValues: [0, 25000],
+        starCount: 5,
+        distanceValues: [0, 2000]
+    });
+
+    const [modifiedFilters, setModifiedFilters] = useState({
+        priceModified: false,
+        ratingModified: false,
+        distanceModified: false
+    });
+
+    // Update price change handler
+    const handlePriceChange = (values) => {
+        setPriceValues(values);
+        setModifiedFilters(prev => ({ ...prev, priceModified: true }));
+    };
+
+    // Update rating change handler
+    const handleRatingChange = (rating) => {
+        setStarCount(rating);
+        setModifiedFilters(prev => ({ ...prev, ratingModified: true }));
+    };
+
+    // Update distance change handler
+    const handleDistanceChange = (values) => {
+        setDistanceValues(values);
+        setModifiedFilters(prev => ({ ...prev, distanceModified: true }));
+    };
+
+    const fetchMyQuoteRequest = useCallback(async (page = 1, filters = {}) => {
         console.log(route?.params?.quoteId);
-
+    
         try {
             setLoading(true);
             const userToken = await AsyncStorage.getItem('userToken');
@@ -55,28 +88,50 @@ const QuotesListScreen = ({ route }) => {
                 setIsLoading(false);
                 return;
             }
-            const response = await axios.post(`${API_URL}/customer/suggested-quotes`, { request_quotes_id: route?.params?.quoteId }, {
+
+            const requestData = {
+                request_quotes_id: route?.params?.quoteId,
+                ...filters
+            };
+
+            console.log('Fetching quotes with filters:', requestData);
+
+            const response = await axios.post(`${API_URL}/customer/suggested-quotes`, requestData, {
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${userToken}`,
                 },
             });
-
+    
             const responseData = response.data.data.request_quotes_lead;
-            console.log(responseData, 'Quotes suggetion list')
+            console.log(JSON.stringify(responseData), 'Quotes suggestion list');
             setQuoteList(responseData);
-
+            setFilteredQuoteList(responseData);
+    
+            // Extract only valid numeric prices
+            const prices = responseData.map(item => parseFloat(item.package?.discounted_price || item.package?.price || 0));
+    
+            if (prices.length > 0) {
+                const max = Math.max(...prices);
+                setMinPrice(0);
+                setMaxPrice(max);
+                if (!modifiedFilters.priceModified) {
+                    setPriceValues([0, max]);
+                }
+            }
+    
         } catch (error) {
             console.log(`Fetch session history error: ${error}`);
             let myerror = error.response?.data?.message;
             Alert.alert('Oops..', error.response?.data?.message || 'Something went wrong', [
-                { text: 'OK', onPress: () => myerror == 'Unauthorized' ? logout() : console.log('OK Pressed') },
+                { text: 'OK', onPress: () => myerror === 'Unauthorized' ? logout() : console.log('OK Pressed') },
             ]);
         } finally {
             setIsLoading(false);
             setLoading(false);
         }
-    }, []);
+    }, [route?.params?.quoteId, modifiedFilters.priceModified]);
+
     useEffect(() => {
         fetchMyQuoteRequest();
     }, []);
@@ -90,24 +145,26 @@ const QuotesListScreen = ({ route }) => {
     const onRefresh = useCallback(async () => {
         setRefreshing(true);
         setQuoteList([]);
+        setFilteredQuoteList([]);
         await fetchMyQuoteRequest();
         setRefreshing(false);
     }, [fetchMyQuoteRequest]);
 
-    // const handleLoadMore = () => {
-    //     if (!loading && hasMore) {
-    //         setPageno(prevPage => prevPage + 1);
-    //     }
-    // };
+    // Handle search functionality
+    const handleSearch = (text) => {
+        setSearchText(text);
+        if (text.trim() === '') {
+            setFilteredQuoteList(quoteList);
+        } else {
+            const filtered = quoteList.filter(item =>
+                item.package?.name.toLowerCase().includes(text.toLowerCase()) ||
+                item.package?.location.toLowerCase().includes(text.toLowerCase()) ||
+                item.agent?.name.toLowerCase().includes(text.toLowerCase())
+            );
+            setFilteredQuoteList(filtered);
+        }
+    };
 
-    // const renderFooter = () => {
-    //     if (!loading) return null;
-    //     return (
-    //         <View style={styles.loaderContainer}>
-    //             <Loader />
-    //         </View>
-    //     );
-    // };
     const formatNumber = (num) => {
         if (num >= 100000) {
             return (num / 100000).toFixed(1).replace(/\.0$/, '') + 'L'; // Lakhs
@@ -116,6 +173,7 @@ const QuotesListScreen = ({ route }) => {
         }
         return num.toString(); // Less than 1000
     };
+
     const renderQuote = ({ item }) => {
         const documentArray = JSON.parse(item?.package.document);
         return (
@@ -208,13 +266,6 @@ const QuotesListScreen = ({ route }) => {
                                     ))}
                                 </View>
                             </View>
-                            {/* <View style={styles.tagTextView3}>
-                            <Image
-                                source={likefillImg}
-                                style={styles.likeImg}
-                                tintColor={"#FFFFFF"}
-                            />
-                        </View> */}
                             {item?.package?.date_type === 0 ? (
                                 <View style={styles.tagTextView4}>
                                     <View style={styles.dateContainer}>
@@ -231,6 +282,7 @@ const QuotesListScreen = ({ route }) => {
             </TouchableOpacity>
         )
     };
+
     useFocusEffect(
         useCallback(() => {
             const backAction = () => {
@@ -247,56 +299,73 @@ const QuotesListScreen = ({ route }) => {
         }, [navigation])
     );
 
+    // Updated submitForFilter function
     const submitForFilter = async () => {
-        let filteredData = [...originalQuoteList];
+        try {
+            const filters = {};
 
-        // Price filter
-        filteredData = filteredData.filter(item => {
-            const price = item?.package?.discounted_price || 0;
-            return price >= pricevalues[0] && price <= pricevalues[1];
-        });
+            // Only add price filters if they were modified
+            if (modifiedFilters.priceModified) {
+                filters.min_price = pricevalues[0];
+                filters.max_price = pricevalues[1];
+            }
 
-        // Rating filter
-        filteredData = filteredData.filter(item => {
-            const rating = item?.agent?.rating || 0;
-            return rating >= starCount;
-        });
+            // Only add rating filter if it was modified
+            if (modifiedFilters.ratingModified) {
+                filters.rating = starCount;
+            }
 
-        // Package type filter
-        if (selectedPackageType === "2") {
-            // International packages - you might need to adjust this logic based on your data structure
-            filteredData = filteredData.filter(item => 
-                item?.package?.is_international === true || 
-                item?.package?.type === 'international'
-            );
-        } else if (selectedPackageType === "3") {
-            // Domestic packages
-            filteredData = filteredData.filter(item => 
-                item?.package?.is_international === false || 
-                item?.package?.type === 'domestic'
-            );
+            // Only add distance filter if it was modified
+            if (modifiedFilters.distanceModified) {
+                filters.min_distance = distancevalues[0];
+                filters.max_distance = distancevalues[1];
+            }
+
+            console.log('Applied filters:', filters);
+
+            // Close the filter modal
+            toggleFilterModal();
+
+            // Fetch filtered data
+            await fetchMyQuoteRequest(1, filters);
+        } catch (error) {
+            console.log('Error applying filters:', error);
         }
+    };
 
-        // Country filter (if specified)
-        if (countryName.trim() !== '') {
-            filteredData = filteredData.filter(item =>
-                item?.package?.country?.toLowerCase().includes(countryName.toLowerCase()) ||
-                item?.package?.location?.toLowerCase().includes(countryName.toLowerCase())
-            );
+    // Updated resetFilters function
+    const resetFilters = async () => {
+        try {
+            // Reset all filter states to initial values
+            setPriceValues([0, 25000]);
+            setStarCount(5);
+            setDistanceValues([0, 2000]);
+
+            // Reset modification tracking
+            setModifiedFilters({
+                priceModified: false,
+                ratingModified: false,
+                distanceModified: false
+            });
+
+            // Fetch initial data without filters
+            await fetchMyQuoteRequest(1);
+
+            // Close the filter modal
+            toggleFilterModal();
+        } catch (error) {
+            console.log('Error resetting filters:', error);
         }
+    };
 
-        // Date filter (if you have date fields in your data)
-        // This depends on your data structure - adjust as needed
-        
-        setQuoteList(filteredData);
-        toggleFilterModal();
-        
-        Toast.show({
-            type: 'success',
-            text1: 'Filters Applied',
-            text2: `Found ${filteredData.length} matching quotes`,
-        });
-      };
+    // Add this function to get active filters count
+    const getActiveFiltersCount = () => {
+        let count = 0;
+        if (modifiedFilters.priceModified) count++;
+        if (modifiedFilters.ratingModified) count++;
+        if (modifiedFilters.distanceModified) count++;
+        return count;
+    };
 
     if (isLoading) {
         return (
@@ -311,33 +380,43 @@ const QuotesListScreen = ({ route }) => {
             <ScrollView showsHorizontalScrollIndicator={false}>
                 <View style={styles.searchSection}>
                     <View style={styles.searchInput}>
-                        <View style={{ flexDirection: 'row' }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
                             <Image
                                 source={searchIconImg}
                                 style={styles.searchIcon}
                             />
-                            <Text style={styles.placeholderText}>Search</Text>
-                        </View>
-                        <TouchableWithoutFeedback onPress={() => toggleFilterModal()}>
-                            <Image
-                                source={filterImg}
-                                style={[styles.filterIcon, { marginRight: 5 }]}
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Search"
+                                placeholderTextColor="#888"
+                                value={searchText}
+                                onChangeText={handleSearch}
                             />
-                        </TouchableWithoutFeedback>
+                        </View>
+                        {/* <TouchableWithoutFeedback onPress={() => toggleFilterModal()}>
+                            <View style={styles.filterContainer}>
+                                <Image
+                                    source={filterImg}
+                                    style={[styles.filterIcon, { marginRight: 5 }]}
+                                />
+                                {getActiveFiltersCount() > 0 && (
+                                    <View style={styles.filterBadge}>
+                                        <Text style={styles.filterBadgeText}>{getActiveFiltersCount()}</Text>
+                                    </View>
+                                )}
+                            </View>
+                        </TouchableWithoutFeedback> */}
                     </View>
                 </View>
                 <View style={{ alignSelf: 'center' }}>
                     <FlatList
-                        data={quoteList}
+                        data={filteredQuoteList}
                         renderItem={renderQuote}
                         keyExtractor={(item) => item.id.toString()}
                         maxToRenderPerBatch={10}
                         windowSize={5}
                         initialNumToRender={10}
                         showsVerticalScrollIndicator={false}
-                        // onEndReached={handleLoadMore}
-                        // onEndReachedThreshold={0.5}
-                        // ListFooterComponent={renderFooter}
                         refreshing={refreshing}
                         onRefresh={onRefresh}
                         ListEmptyComponent={
@@ -348,12 +427,10 @@ const QuotesListScreen = ({ route }) => {
             </ScrollView>
             <Modal
                 isVisible={isFilterModalVisible}
-                // onBackdropPress={() => setIsFocus(false)} // modal off by clicking outside of the modal
                 style={{
-                    margin: 0, // Add this line to remove the default margin
+                    margin: 0,
                     justifyContent: 'flex-end',
                 }}>
-                {/* <TouchableWithoutFeedback onPress={() => setIsFocus(false)} style={{  }}> */}
                 <View style={{ height: '60%', backgroundColor: '#fff', position: 'absolute', bottom: 0, width: '100%', borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
                     <View style={{ padding: 0 }}>
                         <View style={{ paddingVertical: 5, paddingHorizontal: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: responsiveHeight(2), marginTop: responsiveHeight(2) }}>
@@ -363,67 +440,78 @@ const QuotesListScreen = ({ route }) => {
                             </View>
                         </View>
                     </View>
-                    {/* <ScrollView style={{ marginBottom: responsiveHeight(0) }} > */}
-                    <View style={{ borderTopColor: '#E3E3E3', borderTopWidth: 0, paddingHorizontal: 15, marginBottom: 5 }}>
-                        <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Price</Text>
-                        <View style={styles.slidercontainer}>
-                            <MultiSlider
-                                values={pricevalues}
-                                sliderLength={responsiveWidth(80)}
-                                onValuesChange={setPriceValues}
-                                min={5000}
-                                max={25000}
-                                step={100}
-                                selectedStyle={{ backgroundColor: "#FF455C" }}
-                                unselectedStyle={{ backgroundColor: "rgba(0, 0, 0, 0.15)" }}
-                                markerStyle={{ backgroundColor: "#FF455C" }}
-                            />
-                            <View style={styles.valueContainer}>
-                                <Text style={styles.valueText}>₹{pricevalues[0]}</Text>
-                                <Text style={styles.valueText}>₹{pricevalues[1]}</Text>
+                    <ScrollView style={{ marginBottom: responsiveHeight(0) }}>
+                        <View style={{ borderTopColor: '#E3E3E3', borderTopWidth: 0, paddingHorizontal: 15, marginBottom: 5 }}>
+                            <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Price</Text>
+                            <View style={styles.slidercontainer}>
+                                <MultiSlider
+                                    values={pricevalues}
+                                    sliderLength={responsiveWidth(80)}
+                                    onValuesChange={handlePriceChange}
+                                    min={minPrice}
+                                    max={maxPrice}
+                                    step={500}
+                                    selectedStyle={{ backgroundColor: "#FF455C" }}
+                                    unselectedStyle={{ backgroundColor: "rgba(0, 0, 0, 0.15)" }}
+                                    markerStyle={{ backgroundColor: "#FF455C" }}
+                                />
+                                <View style={styles.valueContainer}>
+                                    <Text style={styles.valueText}>₹{pricevalues[0]}</Text>
+                                    <Text style={styles.valueText}>₹{pricevalues[1]}</Text>
+                                </View>
+                            </View>
+                            <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Rating</Text>
+                            <View style={{ width: responsiveWidth(50), marginTop: responsiveHeight(2), marginBottom: responsiveHeight(2) }}>
+                                <StarRating
+                                    disabled={false}
+                                    maxStars={5}
+                                    rating={starCount}
+                                    onChange={handleRatingChange}
+                                    fullStarColor={'#FFCB45'}
+                                    starSize={28}
+                                    starStyle={{ marginHorizontal: responsiveWidth(1) }}
+                                />
+                            </View>
+                            <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Distance</Text>
+                            <View style={styles.slidercontainer}>
+                                <MultiSlider
+                                    values={distancevalues}
+                                    sliderLength={responsiveWidth(80)}
+                                    onValuesChange={handleDistanceChange}
+                                    min={0}
+                                    max={2000}
+                                    step={100}
+                                    selectedStyle={{ backgroundColor: "#FF455C" }}
+                                    unselectedStyle={{ backgroundColor: "rgba(0, 0, 0, 0.15)" }}
+                                    markerStyle={{ backgroundColor: "#FF455C" }}
+                                />
+                                <View style={styles.valueContainer}>
+                                    <Text style={styles.valueText}>{distancevalues[0]} KM</Text>
+                                    <Text style={styles.valueText}>{distancevalues[1]} KM</Text>
+                                </View>
                             </View>
                         </View>
-                        <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Rating</Text>
-                        <View style={{ width: responsiveWidth(50), marginTop: responsiveHeight(2), marginBottom: responsiveHeight(2) }}>
-                            <StarRating
-                                disabled={false}
-                                maxStars={5}
-                                rating={starCount}
-                                onChange={(rating) => setStarCount(rating)}
-                                fullStarColor={'#FFCB45'}
-                                starSize={28}
-                                starStyle={{ marginHorizontal: responsiveWidth(1) }}
-                            />
-                        </View>
-                        <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Distance</Text>
-                        <View style={styles.slidercontainer}>
-                            <MultiSlider
-                                values={distancevalues}
-                                sliderLength={responsiveWidth(80)}
-                                onValuesChange={setPriceValues}
-                                min={5000}
-                                max={25000}
-                                step={100}
-                                selectedStyle={{ backgroundColor: "#FF455C" }}
-                                unselectedStyle={{ backgroundColor: "rgba(0, 0, 0, 0.15)" }}
-                                markerStyle={{ backgroundColor: "#FF455C" }}
-                            />
-                            <View style={styles.valueContainer}>
-                                <Text style={styles.valueText}>{distancevalues[0]} KM</Text>
-                                <Text style={styles.valueText}>{distancevalues[1]} KM</Text>
+                    </ScrollView>
+
+                    <View style={{ bottom: 0, paddingHorizontal: 10, borderTopColor: '#E3E3E3', borderTopWidth: 1 }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <View style={{ width: responsiveWidth(40), marginTop: responsiveHeight(2), alignSelf: 'center' }}>
+                                <CustomButton
+                                    label={"Reset"}
+                                    onPress={resetFilters}
+                                    buttonStyle={{ backgroundColor: '#E3E3E3' }}
+                                    textStyle={{ color: '#000' }}
+                                />
                             </View>
-                        </View>
-                    </View>
-                    {/* </ScrollView> */}
-                    <View style={{ bottom: 0, width: responsiveWidth(100), paddingHorizontal: 10, borderTopColor: '#E3E3E3', borderTopWidth: 1 }}>
-                        <View style={{ width: responsiveWidth(90), marginTop: responsiveHeight(2), alignSelf: 'center' }}>
-                            <CustomButton label={"Apply"}
-                                onPress={() => submitForFilter()}
-                            />
+
+                            <View style={{ width: responsiveWidth(40), marginTop: responsiveHeight(2), alignSelf: 'center' }}>
+                                <CustomButton label={"Apply"}
+                                    onPress={submitForFilter}
+                                />
+                            </View>
                         </View>
                     </View>
                 </View>
-                {/* </TouchableWithoutFeedback> */}
             </Modal>
         </SafeAreaView>
     )
@@ -438,7 +526,6 @@ const styles = StyleSheet.create({
     },
     productSection: {
         marginTop: responsiveHeight(0),
-        //marginLeft: 20
     },
     topAstrologerSection: {
         flexDirection: 'row',
@@ -447,11 +534,7 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap'
     },
     totalValue4: {
-        //width: responsiveWidth(90),
-        //height: responsiveHeight(45),
-        //alignItems: 'center',
         backgroundColor: '#fff',
-        //justifyContent: 'center',
         padding: 5,
         borderRadius: 15,
         elevation: 5,
@@ -579,7 +662,12 @@ const styles = StyleSheet.create({
                 shadowRadius: 5,
             },
         }),
-
+    },
+    input: {
+        flex: 1,
+        fontSize: responsiveFontSize(1.7),
+        color: '#1B2234',
+        fontFamily: 'Poppins-Regular',
     },
     searchIcon: {
         height: 20,
@@ -592,10 +680,29 @@ const styles = StyleSheet.create({
         fontFamily: 'Poppins-Regular',
         fontSize: responsiveFontSize(1.7),
     },
+    filterContainer: {
+        position: 'relative',
+    },
     filterIcon: {
         height: 32,
         width: 32,
         resizeMode: 'contain'
+    },
+    filterBadge: {
+        position: 'absolute',
+        top: -5,
+        right: 0,
+        backgroundColor: '#FF455C',
+        borderRadius: 10,
+        minWidth: 20,
+        height: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    filterBadgeText: {
+        color: 'white',
+        fontSize: 12,
+        fontWeight: 'bold',
     },
     dateContainer: {
         backgroundColor: 'rgba(0, 0, 0, 0.70)',

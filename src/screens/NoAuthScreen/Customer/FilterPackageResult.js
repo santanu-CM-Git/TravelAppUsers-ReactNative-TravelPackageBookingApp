@@ -92,16 +92,16 @@ export default function FilterPackageResult({ route }) {
     useFocusEffect(
         useCallback(() => {
             const backAction = () => {
-               navigation.goBack()
-               return true
-              };
-          
-              const backHandler = BackHandler.addEventListener(
+                navigation.goBack()
+                return true
+            };
+
+            const backHandler = BackHandler.addEventListener(
                 'hardwareBackPress',
                 backAction,
-              );
-          
-              return () => backHandler.remove();
+            );
+
+            return () => backHandler.remove();
         }, [navigation])
     );
 
@@ -153,13 +153,13 @@ export default function FilterPackageResult({ route }) {
             );
             const responseData = response.data.data.data;
             console.log('Received data for page:', page, 'Data length:', responseData.length);
-            
+
             if (page === 1) {
                 setLocationList(responseData);
             } else {
                 setLocationList(prevData => [...prevData, ...responseData]);
             }
-            
+
             if (responseData.length < perPage) {
                 setHasMore(false);
                 console.log('No more data available');
@@ -252,10 +252,10 @@ export default function FilterPackageResult({ route }) {
             );
 
             if (response.data.response == true) {
-                setLocationList(prevList => 
-                    prevList.map(item => 
-                        item.id === packageId 
-                            ? { ...item, wishlist: !item.wishlist } 
+                setLocationList(prevList =>
+                    prevList.map(item =>
+                        item.id === packageId
+                            ? { ...item, wishlist: !item.wishlist }
                             : item
                     )
                 );
@@ -289,8 +289,10 @@ export default function FilterPackageResult({ route }) {
                                 </View>
                                 <Text style={styles.travelerText}>{item?.agent?.name}</Text>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', }}>
-                                    <Text style={styles.addressText}>Slots : {item?.seat_slots - item?.booked_slots}</Text>
-                                    <Text style={styles.priceText2}>₹{formatNumber(item?.discounted_price)}</Text>
+                                    {item?.date_type == 0 ?
+                                        <Text style={styles.addressText}>Slots : {item?.seat_slots - item?.booked_slots}</Text>
+                                        : null}
+                                    <Text style={[styles.priceText2,{textAlign: 'right', flex: 1 }]}>₹{formatNumber(item?.discounted_price)}</Text>
                                 </View>
                                 <View
                                     style={{
@@ -300,25 +302,32 @@ export default function FilterPackageResult({ route }) {
                                     }}
                                 />
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Text style={styles.packageAvlText}>
-                                        {(() => {
-                                            const start = moment(item.start_date);
-                                            const end = moment(item.end_date);
-                                            const days = end.diff(start, 'days');
-                                            const nights = days > 0 ? days - 1 : 0;
-                                            return `${days} Days ${nights} Nights`;
-                                        })()}
-                                    </Text>
-                                    <View style={styles.rateingView}>
-                                        <Image
-                                            source={starImg}
-                                            style={[styles.staricon, { marginTop: -5 }]}
-                                        />
-                                        <Text style={styles.ratingText}>{item?.rating}</Text>
-                                    </View>
+                                    {item?.date_type == 0 ?
+                                        <Text style={styles.packageAvlText}>
+                                            {(() => {
+                                                const start = moment(item.start_date);
+                                                const end = moment(item.end_date);
+                                                const days = end.diff(start, 'days');
+                                                const nights = days > 0 ? days - 1 : 0;
+                                                return `${days} Days ${nights} Nights`;
+                                            })()}
+                                        </Text> :
+                                        <Text style={styles.packageAvlText}>
+                                            {item?.itinerary.length} Days {item?.itinerary.length - 1} Nights
+                                        </Text>
+                                    }
+                                    {item?.rating !== null && item?.rating !== undefined && item?.rating !== 0 && (
+                                        <View style={styles.rateingView}>
+                                            <Image
+                                                source={starImg}
+                                                style={[styles.staricon, { marginTop: -5 }]}
+                                            />
+                                            <Text style={styles.ratingText}>{item?.rating}</Text>
+                                        </View>
+                                    )}
                                 </View>
                             </View>
-                            <TouchableOpacity 
+                            <TouchableOpacity
                                 style={styles.tagTextView3}
                                 onPress={(e) => {
                                     e.stopPropagation();
@@ -336,12 +345,13 @@ export default function FilterPackageResult({ route }) {
                                     />
                                 )}
                             </TouchableOpacity>
-                            <View style={styles.tagTextView4}>
-                                <View style={styles.dateContainer}>
-                                    <Image source={calendarImg} tintColor={'#FFFFFF'} style={[styles.timeimage, { marginRight: 5 }]} />
-                                    <Text style={styles.dateText}>{moment(item?.start_date).format('DD MMM YYYY')}</Text>
-                                </View>
-                            </View>
+                            {item?.date_type == 0 ?
+                                <View style={styles.tagTextView4}>
+                                    <View style={styles.dateContainer}>
+                                        <Image source={calendarImg} tintColor={'#FFFFFF'} style={[styles.timeimage, { marginRight: 5 }]} />
+                                        <Text style={styles.dateText}>{moment(item?.start_date).format('DD MMM YYYY')}</Text>
+                                    </View>
+                                </View> : null}
                         </View>
                     </View>
                 </View>
@@ -398,7 +408,7 @@ export default function FilterPackageResult({ route }) {
                     onEndReachedThreshold={0.1}
                     ListFooterComponent={renderFooter}
                     ListEmptyComponent={renderEmptyComponent}
-                    contentContainerStyle={{ margin: 13,paddingBottom: responsiveHeight(5) }}
+                    contentContainerStyle={{ margin: 13, paddingBottom: responsiveHeight(5) }}
                     numColumns={2}
                     removeClippedSubviews={true}
                     showsVerticalScrollIndicator={false}
@@ -693,11 +703,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingVertical: 20,
         marginTop: responsiveHeight(10)
-      },
-      emptyText: {
+    },
+    emptyText: {
         fontSize: responsiveFontSize(2),
         color: '#666',
         fontFamily: 'Poppins-Medium',
         textAlign: 'center',
-      },
+    },
 });
