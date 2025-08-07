@@ -753,7 +753,7 @@ export default function HomeScreen() {
         </View>
       </View>
     </TouchableWithoutFeedback>
-  );
+  ); 
 
   const renderNearbyTourPlanner = ({ item }) => (
     <TouchableWithoutFeedback onPress={() => navigation.navigate('TravelAgencyDetails', { item: item, countryName: countryName })}>

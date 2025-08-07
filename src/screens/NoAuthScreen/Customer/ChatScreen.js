@@ -717,7 +717,7 @@ const ChatScreen = ({ route }) => {
       });
       setIsVideLoading(false)
       setCameraOn(true);
-      //console.log('Successfully joined the channel: ' + channelName);
+      console.log('Successfully joined the channel: ' + channelName);
     } catch (error) {
       console.log('Error joining channel:', error);
       console.log('Failed to join the channel. Please try again.');
