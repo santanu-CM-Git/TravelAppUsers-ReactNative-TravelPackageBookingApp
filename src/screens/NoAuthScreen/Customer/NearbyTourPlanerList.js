@@ -174,11 +174,11 @@ export default function NearbyTourPlanerList({  }) {
     useEffect(() => {
         setFilteredData(nearbyTourAgent);
     }, [nearbyTourAgent]);
-
+ 
     const renderNearbyTourPlanner = ({ item }) => (
         <TouchableWithoutFeedback onPress={() => navigation.navigate('TravelAgencyDetails', { item:item,countryName:countryName })}>
             <View style={styles.productSection}>
-                <View style={styles.topAstrologerSection}>
+                <View style={styles.topAstrologerSection}> 
                     <View style={styles.totalValue3}>
                         <Image source={{ uri: item?.profile_photo_url }} style={styles.productImg3} />
                         <View style={{ margin: 5 }}>

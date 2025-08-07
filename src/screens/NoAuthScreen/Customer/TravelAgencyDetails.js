@@ -276,12 +276,12 @@ export default function TravelAgencyDetails({ route }) {
                             </TouchableOpacity>
                             <Text style={[styles.title, { marginLeft: responsiveWidth(2) }]}>{travelAgencyData?.name}</Text>
                         </View>
-                        <TouchableOpacity style={styles.iconButton}>
+                        {/* <TouchableOpacity style={styles.iconButton}>
                             <Image
                                 source={shareImg}
                                 style={styles.filterIcon}
                             />
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                     </View>
 
                     {/* Bottom Like Button */}
@@ -492,19 +492,19 @@ export default function TravelAgencyDetails({ route }) {
                                     <View style={styles.card}>
                                         <View style={styles.header2}>
                                             <Image
-                                                source={item.user?.profile_image ? { uri: item.user.profile_image } : productImg}
+                                                source={item.customer?.profile_image ? { uri: item.customer.profile_image } : productImg}
                                                 style={styles.profileImage}
                                             />
                                             <View style={styles.userInfo}>
-                                                <Text style={styles.name}>{item.user?.name || 'Anonymous'}</Text>
+                                                <Text style={styles.name}>{item.customer?.first_name  || 'Anonymous'} {item.customer?.last_name}</Text>
                                                 <Text style={styles.date}>{moment(item.created_at).format('DD MMM YYYY')}</Text>
                                             </View>
-                                            <View style={{ marginBottom: 5, width: responsiveWidth(25) }}>
+                                            <View style={{ marginBottom: 5, width: responsiveWidth(20),marginRight: responsiveWidth(10) }}>
                                                 <StarRating
                                                     disabled={true}
                                                     maxStars={5}
-                                                    rating={item.rating}
-                                                    fullStarColor={'#FFCB45'}
+                                                    rating={item?.star}
+                                                    fullStarColor={'#FFCB45'} 
                                                     starSize={15}
                                                 />
                                             </View>
