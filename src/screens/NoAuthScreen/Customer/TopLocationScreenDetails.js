@@ -180,13 +180,15 @@ export default function TopLocationScreenDetails({ route }) {
             if (!usertoken) {
                 throw new Error('User token not found');
             }
-
+    
             const option = {
                 "location": route?.params?.location.location_name,
                 "country": country,
                 ...filters
             }
+    
             console.log('Fetching data for page:', page, 'with options:', option);
+    
             const response = await axios.post(
                 `${API_URL}/customer/location-wise-packages`,
                 option,
@@ -201,47 +203,44 @@ export default function TopLocationScreenDetails({ route }) {
                     },
                 }
             );
+    
             const responseData = response.data.data.data;
             const locationdata = response.data.location;
-            setLocationData(locationdata)
-            // Calculate prices
-            const allPrices = responseData.map(pkg => {
-                const price = parseFloat(pkg.discounted_price || pkg.price || '0');
-                return isNaN(price) ? 0 : price;
-            });
-
-            const validPrices = allPrices.filter(price => price > 0);
-
-            if (validPrices.length > 0) {
-                const min = Math.min(...validPrices);
-                const max = Math.max(...validPrices);
-                setMinPrice(0); // or `min` if you want real minimum
-                setMaxPrice(max);
-                if (!modifiedFilters.priceModified) {
-                    setPriceValues([0, max]); // Only set if not modified by user
-                }
+            const minPriceFromApi = parseFloat(response.data.min_price || '0');
+            const maxPriceFromApi = parseFloat(response.data.max_price || '0');
+    
+            setLocationData(locationdata);
+    
+            // ✅ Set price directly from API
+            setMinPrice(minPriceFromApi);
+            setMaxPrice(maxPriceFromApi);
+            if (!modifiedFilters.priceModified) {
+                setPriceValues([0, maxPriceFromApi]); // Or [minPriceFromApi, maxPriceFromApi] if needed
             }
+    
             console.log('Received data for page:', page, 'Data length:', responseData.length);
-            console.log(JSON.stringify(responseData), 'dfdsfdsfdsfdsfdsf')
+            console.log(JSON.stringify(responseData), 'dfdsfdsfdsfdsfdsf');
+    
             if (page === 1) {
                 setLocationList(responseData);
             } else {
                 setLocationList(prevData => [...prevData, ...responseData]);
             }
-
+    
             if (responseData.length < perPage) {
                 setHasMore(false);
                 console.log('No more data available');
             }
-            setIsLoading(false)
+    
+            setIsLoading(false);
         } catch (error) {
             console.log(`fetch Top Location error ${error}`);
-            if (error.response && error.response.data && error.response.data.message) {
+            if (error.response?.data?.message) {
                 console.log(error.response.data.message);
             }
         } finally {
             setLoading(false);
-            setIsLoading(false)
+            setIsLoading(false);
         }
     }, [perPage, route?.params?.location.location_name, modifiedFilters.priceModified]);
 
@@ -480,7 +479,7 @@ export default function TopLocationScreenDetails({ route }) {
             
             setFromDate(newFromDate);
             setToDate(newToDate);
-            setPriceValues([0, 25000]);
+            setPriceValues([0, maxPrice]);
             setStarCount(5);
 
             // Reset modification tracking
