@@ -430,7 +430,41 @@ const getTabBarVisibility = route => {
     return 'none';
   } else if (routeName == 'SearchScreen') {
     return 'none';
+  } else if (routeName == 'TopLocationScreen') {
+    return 'none';
+  } else if (routeName == 'TopLocationScreenDetails') {
+    return 'none';
+  } else if (routeName == 'TravelAgencyDetails') {
+    return 'none';
   } else if (routeName == 'Notification') {
+    return 'none';
+  } else if (routeName == 'PackageDetailsScreen') {
+    return 'none';
+  } else if (routeName == 'RefundScreen') {
+    return 'none';
+  } else if (routeName == 'PaymentSuccessScreen') {
+    return 'none';
+  } else if (routeName == 'MyBookingDetails') {
+    return 'none';
+  } else if (routeName == 'NearbyTourPlanerList') {
+    return 'none';
+  } else if (routeName == 'FilterPackageResult') {
+    return 'none';
+  } else if (routeName == 'QuotesListScreen') {
+    return 'none';
+  } else if (routeName == 'ProfileEditScreen') {
+    return 'none';
+  } else if (routeName == 'MyBookingList') {
+    return 'none';
+  } else if (routeName == 'CompletedBookingDetails') {
+    return 'none';
+  } else if (routeName == 'UpcommingBookingDetails') {
+    return 'none';
+  }else if (routeName == 'CustomerSupport') {
+    return 'none';
+  }else if (routeName == 'WishlistPackage') {
+    return 'none';
+  }else if (routeName == 'TransactionScreen') {
     return 'none';
   } else {
     return 'flex';
