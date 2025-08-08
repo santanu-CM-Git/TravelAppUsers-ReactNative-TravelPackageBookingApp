@@ -1131,8 +1131,10 @@ export default function HomeScreen() {
       // Reset all filter states to initial values
       setFromDateModal(new Date());
       setToDateModal(new Date());
-      setPriceValues([5000, 25000]);
-      setStarCount(0);
+      setPriceValues([0, maxPrice]);
+      setStarCount(5);
+      setActiveTab('all_packages')
+      setSelectedId2('1')
       // Close the filter modal
       toggleFilterModal();
     } catch (error) {

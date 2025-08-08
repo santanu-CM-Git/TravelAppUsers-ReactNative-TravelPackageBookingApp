@@ -169,6 +169,7 @@ export default function TravelAgencyDetails({ route }) {
     }, [travelAgencyData?.id]);
 
     useEffect(() => {
+        console.log(JSON.stringify(travelAgencyData), 'travelAgencyDatatravelAgencyData')
         fetchAgentPackages(1);
     }, [fetchAgentPackages]);
 
@@ -337,7 +338,9 @@ export default function TravelAgencyDetails({ route }) {
                     </View>
                     {/* <Text style={styles.travelerText}>Omega Tours</Text> */}
                     {/* <Text style={styles.packageAvlText}>04 September 2024</Text> */}
-                    <Text style={styles.packageAvlText}>available package : {travelAgencyData?.no_of_active_packages}</Text>
+                    {travelAgencyData?.no_of_active_packages ?
+                        <Text style={styles.packageAvlText}>available package : {travelAgencyData?.no_of_active_packages}</Text>
+                        : null}
                     <Text style={styles.productText3}>About</Text>
                     <Text style={styles.addressText}>{travelAgencyData?.tag_line}</Text>
 
@@ -496,15 +499,15 @@ export default function TravelAgencyDetails({ route }) {
                                                 style={styles.profileImage}
                                             />
                                             <View style={styles.userInfo}>
-                                                <Text style={styles.name}>{item.customer?.first_name  || 'Anonymous'} {item.customer?.last_name}</Text>
+                                                <Text style={styles.name}>{item.customer?.first_name || 'Anonymous'} {item.customer?.last_name}</Text>
                                                 <Text style={styles.date}>{moment(item.created_at).format('DD MMM YYYY')}</Text>
                                             </View>
-                                            <View style={{ marginBottom: 5, width: responsiveWidth(20),marginRight: responsiveWidth(10) }}>
+                                            <View style={{ marginBottom: 5, width: responsiveWidth(20), marginRight: responsiveWidth(10) }}>
                                                 <StarRating
                                                     disabled={true}
                                                     maxStars={5}
                                                     rating={item?.star}
-                                                    fullStarColor={'#FFCB45'} 
+                                                    fullStarColor={'#FFCB45'}
                                                     starSize={15}
                                                 />
                                             </View>
