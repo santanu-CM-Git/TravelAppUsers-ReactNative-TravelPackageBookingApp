@@ -361,7 +361,7 @@ export default function MyBookingDetails({ route }) {
                 refund_condition: refund_condition,
                 refund_amount: refund_amount
             };
-            console.log(option,'optionoption')
+            console.log(option, 'optionoption')
             const token = await AsyncStorage.getItem('userToken');
             console.log(token)
             const response = await axios.post(
@@ -401,16 +401,16 @@ export default function MyBookingDetails({ route }) {
     useFocusEffect(
         useCallback(() => {
             const backAction = () => {
-               navigation.goBack()
-               return true
-              };
-          
-              const backHandler = BackHandler.addEventListener(
+                navigation.goBack()
+                return true
+            };
+
+            const backHandler = BackHandler.addEventListener(
                 'hardwareBackPress',
                 backAction,
-              );
-          
-              return () => backHandler.remove();
+            );
+
+            return () => backHandler.remove();
         }, [navigation])
     );
     if (isLoading) {
@@ -508,11 +508,12 @@ export default function MyBookingDetails({ route }) {
                             <Text style={styles.value}>{bookingData?.customer?.full_name}</Text>
                         </View>
 
-                        <View style={styles.row}>
-                            <Text style={styles.label}>Transaction id :</Text>
-                            <Text style={styles.value}>{bookingData?.transaction_no}</Text>
-                        </View>
-
+                        {bookingData?.transaction_no ?
+                            <View style={styles.row}>
+                                <Text style={styles.label}>Transaction id :</Text>
+                                <Text style={styles.value}>{bookingData?.transaction_no}</Text>
+                            </View>
+                            : null}
                         <View style={styles.amountRow}>
                             <Text style={styles.amountLabel}>Amount Paid :</Text>
                             <Text style={styles.amountValue}>₹{bookingData?.final_amount}</Text>
@@ -559,11 +560,13 @@ export default function MyBookingDetails({ route }) {
                             />
                         </TouchableOpacity>
                     </View>
+                    {bookingData?.transaction_no ?
                     <View style={styles.buttoncontainer}>
                         <TouchableOpacity style={styles.talkToAgentButton} onPress={() => toggleFilterModal2()}>
                             <Text style={styles.talkToAgentText}>Cancel Package</Text>
                         </TouchableOpacity>
                     </View>
+                    :null}
                 </View>
             </ScrollView>
             {/* add new cotraveler modal */}
@@ -657,14 +660,14 @@ export default function MyBookingDetails({ route }) {
                             </View>
                         </View>
                         <View style={{ bottom: 0, width: responsiveWidth(100), paddingHorizontal: 10, borderTopColor: '#E3E3E3', borderTopWidth: 1 }}>
-                        <View style={{ width: responsiveWidth(90), marginTop: responsiveHeight(2), alignSelf: 'center' }}>
-                            <CustomButton label={"Save"}
-                                onPress={() => submitForFilter()}
-                            />
+                            <View style={{ width: responsiveWidth(90), marginTop: responsiveHeight(2), alignSelf: 'center' }}>
+                                <CustomButton label={"Save"}
+                                    onPress={() => submitForFilter()}
+                                />
+                            </View>
                         </View>
-                    </View>
                     </ScrollView>
-                    
+
                 </View>
                 {/* </TouchableWithoutFeedback> */}
             </Modal>
@@ -710,7 +713,7 @@ export default function MyBookingDetails({ route }) {
                     justifyContent: 'flex-end',
                 }}>
                 <View style={{ height: '40%', backgroundColor: '#fff', position: 'absolute', bottom: 0, width: '100%', borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
-                <View style={{ padding: 0 }}>
+                    <View style={{ padding: 0 }}>
                         <View style={{ paddingVertical: 5, paddingHorizontal: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: responsiveHeight(0), marginTop: responsiveHeight(2) }}>
                             <Text style={{ fontSize: responsiveFontSize(2.5), color: '#2D2D2D', fontFamily: 'Poppins-Bold', }}>Cancel Tour</Text>
                             <View style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: '#B0B0B0', height: 30, width: 30, borderRadius: 25, }}>
@@ -736,7 +739,7 @@ export default function MyBookingDetails({ route }) {
                                     marginVertical: 5
                                 }}
                             />
-                            
+
                         </View>
                     </ScrollView>
                     <View style={{ bottom: 0, width: responsiveWidth(100), paddingHorizontal: 10, borderTopColor: '#E3E3E3', borderTopWidth: 1 }}>
