@@ -102,6 +102,11 @@ const MyBookingList = ({ route }) => {
               return () => backHandler.remove();
         }, [navigation])
     );
+    useFocusEffect(
+        useCallback(() => {
+            fetchBookings(activeTab);
+        }, [navigation])
+    );
 
     const formatNumber = (num) => {
         if (num >= 100000) {
@@ -170,7 +175,11 @@ const MyBookingList = ({ route }) => {
                                         style={[styles.buttonView, { backgroundColor: '#FF455C', marginRight: 8, elevation: 10 }]}
                                         onPress={(e) => {
                                             e.stopPropagation();
-                                            navigation.navigate('ChatScreen', { agentId: item?.agent?.id });
+                                            //navigation.navigate('ChatScreen', { agentId: item?.agent?.id });
+                                            navigation.navigate('Menu', {
+                                                screen: 'ChatScreen',
+                                                params: { agentId: item?.agent?.id },
+                                              })
                                         }}
                                     >
                                         <Text style={styles.buttonText}>Messages</Text>

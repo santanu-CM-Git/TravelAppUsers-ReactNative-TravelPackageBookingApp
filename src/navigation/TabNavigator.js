@@ -256,6 +256,16 @@ const MenuStack = ({ route }) => {
         component={BookingSummary}
         options={{ headerShown: false }}
       />
+       <Stack.Screen
+        name='ChatScreen'
+        component={ChatScreen}
+        options={{ headerShown: false }}
+      />
+        <Stack.Screen
+        name="RefundScreen"
+        component={RefundScreen}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   )
 

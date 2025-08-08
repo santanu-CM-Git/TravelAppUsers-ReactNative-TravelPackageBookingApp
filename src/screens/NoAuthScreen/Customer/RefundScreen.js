@@ -199,7 +199,12 @@ const RefundScreen = ({ route }) => {
                 <View style={{ bottom: 0, width: responsiveWidth(100), paddingHorizontal: 10, borderTopColor: '#E3E3E3', borderTopWidth: 1 }}>
                     <View style={{ width: responsiveWidth(90), marginTop: responsiveHeight(2), alignSelf: 'center' }}>
                         <CustomButton label={"Proceed to Home"}
-                            onPress={() => navigation.navigate('Home')}
+                            //onPress={() => navigation.navigate('Home')}
+                            onPress={() =>
+                                navigation.navigate('HOME', {
+                                  screen: 'Home',
+                                })
+                              }
                         />
                     </View>
                 </View>

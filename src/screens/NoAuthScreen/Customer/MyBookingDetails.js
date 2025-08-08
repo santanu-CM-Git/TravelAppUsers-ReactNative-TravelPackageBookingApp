@@ -356,14 +356,17 @@ export default function MyBookingDetails({ route }) {
             console.log(refundData)
             console.log(refund_condition)
             console.log(refund_amount)
+            const option = {
+                booking_id: bookingData.id,
+                refund_condition: refund_condition,
+                refund_amount: refund_amount
+            };
+            console.log(option,'optionoption')
             const token = await AsyncStorage.getItem('userToken');
+            console.log(token)
             const response = await axios.post(
                 `${API_URL}/customer/refund`,
-                {
-                    booking_id: bookingData.id,
-                    refund_condition: refund_condition,
-                    refund_amount: refund_amount
-                },
+                option,
                 {
                     headers: {
                         'Accept': 'application/json',
@@ -381,6 +384,7 @@ export default function MyBookingDetails({ route }) {
                     text1: 'Error',
                     text2: response.data.message || 'Failed to process cancellation'
                 });
+                console.log(response.data.message)
             }
         } catch (error) {
             Toast.show({
@@ -388,6 +392,7 @@ export default function MyBookingDetails({ route }) {
                 text1: 'Error',
                 text2: error.response?.data?.message || 'Failed to process cancellation'
             });
+            console.log(response.data.message)
         } finally {
             setIsLoading(false);
         }
