@@ -35,7 +35,6 @@
     "@reduxjs/toolkit": "^2.8.2",
     "@twotalltotems/react-native-otp-input": "^1.3.11",
     "@types/react-native-snap-carousel": "^3.8.11",
-    "agora-react-native-rtm": "^1.5.1",
     "agora-rn-uikit": "^5.0.2",
     "axios": "^1.10.0",
     "firebase": "^11.10.0",
