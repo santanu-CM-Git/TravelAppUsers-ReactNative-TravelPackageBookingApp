@@ -8,7 +8,8 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "clean": "cd android && ./gradlew clean && cd .. ",
+    "clean": "cd android && ./gradlew clean && cd ..",
+    "clean:all": "cd android && ./gradlew clean && cd .. && rm -rf node_modules && npm install",
     "postinstall": "patch-package"
   },
   "dependencies": {
