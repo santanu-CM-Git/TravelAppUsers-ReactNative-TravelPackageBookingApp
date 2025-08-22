@@ -419,7 +419,7 @@ export default function HomeScreen() {
         let userInfo = res.data.data;
         let minPrice = res.data.min_price;
         let maxPrice = res.data.max_price;
-        setMinPrice(minPrice)
+        setMinPrice(0)
         setMaxPrice(maxPrice)
         setPriceValues([0,maxPrice])
         const formattedData = userInfo.map(item => ({
@@ -1129,6 +1129,11 @@ export default function HomeScreen() {
   const toggleFilterModal = () => {
     setFilterModalVisible(!isFilterModalVisible);
   };
+
+  const handlePriceChange = (values) => {
+    console.log(values,'values')
+    setPriceValues(values);
+};
   const resetFilters = async () => {
     try {
       // Reset all filter states to initial values
@@ -1683,7 +1688,7 @@ export default function HomeScreen() {
                 <MultiSlider
                   values={pricevalues}
                   sliderLength={responsiveWidth(80)}
-                  onValuesChange={setPriceValues}
+                  onValuesChange={handlePriceChange}
                   min={minPrice}
                   max={maxPrice}
                   step={500}

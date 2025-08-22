@@ -153,7 +153,7 @@ export default function FilterPackageResult({ route }) {
             );
             const responseData = response.data.data.data;
             console.log('Received data for page:', page, 'Data length:', responseData.length);
-
+            console.log(JSON.stringify(responseData),'responseData')
             if (page === 1) {
                 setLocationList(responseData);
             } else {
@@ -200,6 +200,7 @@ export default function FilterPackageResult({ route }) {
     };
 
     useEffect(() => {
+        console.log(route?.params.filters,'route?.params.filters')
         fetchProfileDetails();
     }, []);
 
