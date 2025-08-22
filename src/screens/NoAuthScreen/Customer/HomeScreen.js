@@ -1057,6 +1057,9 @@ export default function HomeScreen() {
         setToDate(new Date());
         setAdultPassengers("");
         setKidsPassengers("");
+        navigation.navigate('Talk', {
+          screen: 'QuotesScreen',
+      });
       } else {
         Alert.alert('Error', response.data.message || 'Failed to submit quote request');
       }
@@ -1468,7 +1471,7 @@ export default function HomeScreen() {
                   borderWidth: 1,
                   borderColor: "#ddd",
                   paddingHorizontal: 10,
-                  paddingVertical: 0,
+                  paddingVertical: 5,
                   borderRadius: 5,
                   marginTop: 5,
                 }}
@@ -1493,7 +1496,7 @@ export default function HomeScreen() {
                   borderWidth: 1,
                   borderColor: "#ddd",
                   paddingHorizontal: 10,
-                  paddingVertical: 0,
+                  paddingVertical: 5,
                   borderRadius: 5,
                   marginTop: 5,
                 }}

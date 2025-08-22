@@ -172,7 +172,7 @@ const LoginScreen = ({  }) => {
 
            <Image
             source={gtIconImg}
-            style={{height:60,width:55,resizeMode:'contain',position:'absolute',top:30,right:20,borderRadius:10}}
+            style={{height:60,width:55,resizeMode:'cover',position:'absolute',top:30,right:20,borderRadius:10}}
           />
         </View>
          
