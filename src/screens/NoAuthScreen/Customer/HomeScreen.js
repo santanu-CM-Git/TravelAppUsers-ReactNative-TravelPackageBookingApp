@@ -1155,8 +1155,8 @@ export default function HomeScreen() {
       const filters = {
         flag: selectedId2 == "1" ? "all_packages" : selectedId2 == "2" ? "international" : "domestic",
         country: countryName,
-        //departute_date: moment(fromDateModal).format('YYYY-MM-DD'),
-        //return_date: moment(toDateModal).format('YYYY-MM-DD'),
+        departute_date: moment(fromDateModal).format('YYYY-MM-DD'),
+        return_date: moment(toDateModal).format('YYYY-MM-DD'),
         min_price: pricevalues[0],
         max_price: pricevalues[1],
         rating: starCount
@@ -1604,7 +1604,7 @@ export default function HomeScreen() {
           justifyContent: 'flex-end',
         }}>
         {/* <TouchableWithoutFeedback onPress={() => setIsFocus(false)} style={{  }}> */}
-        <View style={{ height: '60%', backgroundColor: '#fff', position: 'absolute', bottom: 0, width: '100%', borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
+        <View style={{ height: '70%', backgroundColor: '#fff', position: 'absolute', bottom: 0, width: '100%', borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
           <View style={{ padding: 0 }}>
             <View style={{ paddingVertical: 5, paddingHorizontal: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: responsiveHeight(2), marginTop: responsiveHeight(2) }}>
               <Text style={{ fontSize: responsiveFontSize(2.5), color: '#2D2D2D', fontFamily: 'Poppins-Bold', }}>Filter</Text>
@@ -1615,8 +1615,8 @@ export default function HomeScreen() {
           </View>
           <ScrollView style={{ marginBottom: responsiveHeight(0) }}>
             <View style={{ borderTopColor: '#E3E3E3', borderTopWidth: 0, paddingHorizontal: 15, marginBottom: 5 }}>
-              {/* <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Days</Text> */}
-              {/* <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: responsiveHeight(2) }}>
+              <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Days</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: responsiveHeight(2) }}>
                 <View style={{ flexDirection: 'column' }}>
                   <Text style={styles.textinputHeader}>Departure Date</Text>
                   <TouchableOpacity
@@ -1672,7 +1672,7 @@ export default function HomeScreen() {
                     />
                   )}
                 </View>
-              </View> */}
+              </View>
               <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Type</Text>
               <View style={{ marginTop: responsiveHeight(2), marginBottom: responsiveHeight(2), marginLeft: -responsiveWidth(2.5) }}>
                 <RadioGroup
