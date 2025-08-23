@@ -111,7 +111,7 @@ const QuotesScreen = ({ route }) => {
                 <View style={styles.cardContainer}>
                     <Image source={{ uri: item?.location_data?.image_url }} style={styles.image} />
                     <View style={styles.detailsContainer}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',width:'58%'}}>
                             <Text style={styles.title}>{item?.location}</Text>
 
                         </View>
