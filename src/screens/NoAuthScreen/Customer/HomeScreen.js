@@ -17,7 +17,8 @@ import {
   TextInput,
   StatusBar,
   PermissionsAndroid,
-  ActivityIndicator
+  ActivityIndicator,
+  Linking
 } from 'react-native';
 import Modal from "react-native-modal";
 import { AuthContext } from '../../../context/AuthContext';
@@ -49,6 +50,7 @@ import ShimmerPlaceholder from "react-native-shimmer-placeholder";
 import LinearGradient from 'react-native-linear-gradient';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import { ensureNotificationPermission } from '../../../utils/NotificationPermission';
 
 const { width } = Dimensions.get('window');
 const itemWidth = width * 0.8; // 80% of screen width
@@ -120,8 +122,9 @@ export default function HomeScreen() {
   const [countryName, setCountryName] = useState('');
   const [userInfo, setUserInfo] = useState([]);
   const [isLocationDataReady, setIsLocationDataReady] = useState(false);
-  const [locationList, setLocationList] = useState([])
+  const [locationList, setLocationList] = useState([]);
   const [isPackageFocus, setYearIsFocus] = useState(false);
+
   const [packagevalue, setPackageValue] = useState(null);
   const [location, setlocation] = useState('');
   const [locationId, setLocationId] = useState('');
@@ -267,6 +270,8 @@ export default function HomeScreen() {
         );
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           getCurrentLocation();
+          // Check notification permission after location permission is granted
+          checkNotificationPermission();
         } else {
           Alert.alert('Permission Denied', 'Location permission is required');
         }
@@ -274,10 +279,14 @@ export default function HomeScreen() {
         const status = await check(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
         if (status === RESULTS.GRANTED) {
           getCurrentLocation();
+          // Check notification permission after location permission is granted
+          checkNotificationPermission();
         } else if (status === RESULTS.DENIED) {
           const result = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
           if (result === RESULTS.GRANTED) {
             getCurrentLocation();
+            // Check notification permission after location permission is granted
+            checkNotificationPermission();
           } else {
             Alert.alert('Permission Denied', 'Location permission is required');
           }
@@ -292,6 +301,18 @@ export default function HomeScreen() {
       console.log('Location Permission Error:', error);
     }
   }, []);
+
+  const checkNotificationPermission = useCallback(async () => {
+    try {
+      await ensureNotificationPermission();
+    } catch (error) {
+      console.log('Notification Permission Error:', error);
+    }
+  }, []);
+
+
+
+
 
   const getCurrentLocation = useCallback(() => {
     Geolocation.getCurrentPosition(
@@ -375,6 +396,29 @@ export default function HomeScreen() {
     fetchBanner();
     fetchRecentViewed();
     requestLocationPermission();
+    
+    // Check notification permission on app start
+    const checkInitialNotificationPermission = async () => {
+      try {
+        if (Platform.OS === 'android') {
+          const granted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+          if (!granted) {
+            // Don't show modal immediately, wait for location permission
+            console.log('Notification permission not granted');
+          }
+        } else {
+          const authStatus = await messaging().hasPermission();
+          if (authStatus === messaging.AuthorizationStatus.DENIED) {
+            // Don't show modal immediately, wait for location permission
+            console.log('Notification permission denied');
+          }
+        }
+      } catch (error) {
+        console.log('Initial notification permission check error:', error);
+      }
+    };
+    
+    checkInitialNotificationPermission();
   }, [])
 
   useEffect(() => {
@@ -1739,6 +1783,8 @@ export default function HomeScreen() {
         </View>
         {/* </TouchableWithoutFeedback> */}
       </Modal>
+
+
     </SafeAreaView>
   );
 }

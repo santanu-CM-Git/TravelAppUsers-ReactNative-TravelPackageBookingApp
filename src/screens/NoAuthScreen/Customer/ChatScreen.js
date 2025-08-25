@@ -29,6 +29,7 @@ import DocumentPicker from 'react-native-document-picker';
 import FileViewer from 'react-native-file-viewer';
 import RNFS from 'react-native-fs';
 import { PERMISSIONS, request, check, RESULTS } from 'react-native-permissions';
+import { ensureNotificationPermission } from '../../../utils/NotificationPermission';
 
 const ChatScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -92,6 +93,9 @@ const ChatScreen = ({ route }) => {
         if (!route?.params?.agentId) {
           throw new Error('User ID is missing');
         }
+
+        // Check notification permission for chat functionality
+        await ensureNotificationPermission();
 
         // Set userId from route params
         setAgentId(route.params.agentId);
