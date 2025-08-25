@@ -321,7 +321,7 @@ export default function TravelAgencyDetails({ route }) {
 
                             {/* Masking the Circles */}
                             <Mask id="circleMask">
-                                <Rect x="0" y="90" width="250" height="160" fill="url(#fadeGradient)" />
+                                <Rect x="0" y="125" width="250" height="125" fill="url(#fadeGradient)" />
                             </Mask>
                         </Defs>
 
