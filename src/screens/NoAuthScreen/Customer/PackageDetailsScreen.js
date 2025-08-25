@@ -736,7 +736,7 @@ const styles = StyleSheet.create({
     },
     header: {
         position: 'absolute',
-        top: 30,
+        top: 25,
         left: 0,
         right: 0,
         flexDirection: 'row',

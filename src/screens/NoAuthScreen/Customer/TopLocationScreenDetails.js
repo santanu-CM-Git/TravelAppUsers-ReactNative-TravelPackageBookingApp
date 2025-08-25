@@ -545,16 +545,29 @@ export default function TopLocationScreenDetails({ route }) {
                                     style={styles.filterIcon}
                                 />
                             </TouchableOpacity>
-                            <Text style={[styles.title, { marginLeft: responsiveWidth(2) }]}>{locationData?.name}</Text>
+                            
+                            <View style={{ marginLeft: responsiveWidth(1) }}>
+                                {/* Text with background overlay */}
+                                <View style={{
+                                    backgroundColor: 'rgba(11, 10, 10, 0.5)', // light gray, semi-transparent
+                                    borderRadius: 8,
+                                    paddingHorizontal: responsiveWidth(2),
+                                    paddingVertical: responsiveHeight(0.5),
+                                    maxWidth: responsiveWidth(70),
+                                }}>
+                                    <Text
+                                        style={[
+                                            styles.title,
+                                            { zIndex: 2 }
+                                        ]}
+                                        numberOfLines={1}
+                                        ellipsizeMode="tail"
+                                    >
+                                        {locationData?.name || 'Location Details'}
+                                    </Text>
+                                </View>
+                            </View>
                         </View>
-
-                        {/* <TouchableOpacity style={styles.iconButton}>
-                            <Image
-                                source={shareImg}
-                                style={styles.filterIcon}
-                            />
-                        </TouchableOpacity> */}
-
                     </View>
 
                     {/* Filter Button with Badge */}
@@ -745,12 +758,13 @@ const styles = StyleSheet.create({
     },
     header: {
         position: 'absolute',
-        top: 35,
-        left: 20,
-        right: 20,
+        top: 25,
+        left: 0,
+        right: 0,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
+        marginHorizontal: responsiveWidth(5),
     },
     title: {
         fontFamily: 'Poppins-Bold',
