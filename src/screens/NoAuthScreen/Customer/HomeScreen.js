@@ -1674,13 +1674,14 @@ export default function HomeScreen() {
                 </View>
               </View>
               <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Type</Text>
-              <View style={{ marginTop: responsiveHeight(2), marginBottom: responsiveHeight(2), marginLeft: -responsiveWidth(2.5) }}>
+              <View style={{ marginTop: responsiveHeight(2), marginBottom: responsiveHeight(2), marginLeft: -responsiveWidth(2.5)}}>
                 <RadioGroup
                   radioButtons={radioButtons2}
                   onPress={setSelectedId2}
                   selectedId={selectedId2}
                   layout='row'
-                  containerStyle={{}}
+                  containerStyle={{ flexWrap: 'wrap' }}
+                  labelStyle={{ flexShrink: 1, flexWrap: 'wrap', maxWidth: responsiveWidth(40), }}
                 />
               </View>
               <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Price</Text>

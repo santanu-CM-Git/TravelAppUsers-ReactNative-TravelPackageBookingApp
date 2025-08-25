@@ -43,7 +43,6 @@ import LinearGradient from 'react-native-linear-gradient';
 import SwitchSelector from "react-native-switch-selector";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Icon from 'react-native-vector-icons/Entypo';
-import RadioGroup from 'react-native-radio-buttons-group';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 
 

@@ -556,6 +556,7 @@ const SearchScreen = ({ route }) => {
                                     selectedId={selectedId}
                                     layout='row'
                                     containerStyle={{ flexWrap: 'wrap' }}
+                                    labelStyle={{ flexShrink: 1, flexWrap: 'wrap', maxWidth: responsiveWidth(40), }}
                                 />
                             </View>
                             <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Price</Text>
@@ -596,6 +597,7 @@ const SearchScreen = ({ route }) => {
                                     selectedId={selectedId2}
                                     layout='row'
                                     containerStyle={{ flexWrap: 'wrap' }}
+                                    labelStyle={{ flexShrink: 1, flexWrap: 'wrap', maxWidth: responsiveWidth(40), }}
                                 />
                             </View>
                         </View>
