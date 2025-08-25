@@ -360,7 +360,8 @@ export default function PackageDetailsScreen({ route }) {
     return (
         <SafeAreaView style={styles.Container}>
             {/* <CustomHeader commingFrom={'Top location'} onPressProfile={() => navigation.navigate('Profile')} title={'Top location'} /> */}
-            <StatusBar translucent backgroundColor="transparent" />
+            {/* <StatusBar translucent backgroundColor="transparent" /> */}
+            <StatusBar translucent={false} backgroundColor="black" barStyle="light-content" />
             <ScrollView>
                 <ImageBackground
                     source={packageInfo?.cover_photo_url ? { uri: packageInfo.cover_photo_url } : productImg}
@@ -735,7 +736,7 @@ const styles = StyleSheet.create({
     },
     header: {
         position: 'absolute',
-        top: 35,
+        top: 30,
         left: 0,
         right: 0,
         flexDirection: 'row',
