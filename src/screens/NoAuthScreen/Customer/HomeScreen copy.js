@@ -35,7 +35,6 @@ import CustomHeader from '../../../components/CustomHeader';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_URL, GOOGLE_MAP_KEY } from '@env'
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Dropdown } from 'react-native-element-dropdown';
 import messaging from '@react-native-firebase/messaging';
 import StarRating from 'react-native-star-rating-widget';
@@ -49,6 +48,8 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import RadioGroup from 'react-native-radio-buttons-group';
 import ShimmerPlaceholder from "react-native-shimmer-placeholder";
 import LinearGradient from 'react-native-linear-gradient';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 const { width } = Dimensions.get('window');
 const itemWidth = width * 0.8; // 80% of screen width
@@ -61,7 +62,7 @@ const imageHeight = itemWidth * 0.5; // Maintain a 4:3 aspect ratio
 // ];
 
 
-export default function HomeScreen({  }) {
+export default function HomeScreen() {
   const navigation = useNavigation();
   const carouselRef = useRef(null);
   const dispatch = useDispatch();
@@ -127,8 +128,10 @@ export default function HomeScreen({  }) {
   const [toDateModal, setToDateModal] = useState(new Date());
   const [showFromDatePickerModal, setShowFromDatePickerModal] = useState(false);
   const [showToDatePickerModal, setShowToDatePickerModal] = useState(false);
-  const [pricevalues, setPriceValues] = useState([5000, 25000]);
-  const [starCount, setStarCount] = useState(0)
+  const [pricevalues, setPriceValues] = useState([0, 25000]);
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(25000);
+  const [starCount, setStarCount] = useState(5)
   const [selectedId2, setSelectedId2] = useState('1');
   const radioButtons2 = useMemo(() => ([
     {
@@ -216,21 +219,42 @@ export default function HomeScreen({  }) {
     }
   }, [])
 
+  // useEffect(() => {
+  //   const backAction = () => {
+  //     if (Platform.OS === 'android') {
+  //       BackHandler.exitApp(); // Minimize the app (simulating background run)
+  //       return true; // Prevent default back action
+  //     }
+  //     return false;
+  //   };
+
+  //   const backHandler = BackHandler.addEventListener(
+  //     'hardwareBackPress',
+  //     backAction
+  //   );
+
+  //   return () => backHandler.remove(); // Cleanup the event listener on component unmount
+  // }, []);
+
   useEffect(() => {
     const backAction = () => {
-      if (Platform.OS === 'android') {
-        BackHandler.exitApp(); // Minimize the app (simulating background run)
-        return true; // Prevent default back action
-      }
-      return false;
+      Alert.alert('Hold on!', 'Are you sure you want to go back?', [
+        {
+          text: 'Cancel',
+          onPress: () => null,
+          style: 'cancel',
+        },
+        {text: 'YES', onPress: () => BackHandler.exitApp()},
+      ]);
+      return true;
     };
 
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
-      backAction
+      backAction,
     );
 
-    return () => backHandler.remove(); // Cleanup the event listener on component unmount
+    return () => backHandler.remove();
   }, []);
 
   const requestLocationPermission = async () => {
@@ -240,7 +264,7 @@ export default function HomeScreen({  }) {
         {
           title: 'Location Permission Required',
           message: 'This app needs to access your location',
-        },
+        }
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         getCurrentLocation();
@@ -248,7 +272,22 @@ export default function HomeScreen({  }) {
         Alert.alert('Permission Denied', 'Location permission is required');
       }
     } else {
-      getCurrentLocation(); // iOS handles via Info.plist
+      const status = await check(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+      if (status === RESULTS.GRANTED) {
+        getCurrentLocation();
+      } else if (status === RESULTS.DENIED) {
+        const result = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+        if (result === RESULTS.GRANTED) {
+          getCurrentLocation();
+        } else {
+          Alert.alert('Permission Denied', 'Location permission is required');
+        }
+      } else if (status === RESULTS.BLOCKED) {
+        Alert.alert(
+          'Permission Blocked',
+          'Please enable location permissions from settings',
+        );
+      }
     }
   };
 
@@ -274,12 +313,16 @@ export default function HomeScreen({  }) {
   };
 
   const getAddressFromCoords = async (latitude, longitude) => {
+    console.log(latitude, longitude, 'latitude and longitude')
     try {
       const apiKey = GOOGLE_MAP_KEY;
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`
       );
       const json = await response.json();
+
+      console.log(json, 'json')
+      console.log(apiKey, 'hhh');
 
       if (json.results.length > 0) {
         const firstResult = json.results[0];
@@ -296,6 +339,10 @@ export default function HomeScreen({  }) {
         setLocationName(place);
         setCountryName(countryName);
         setIsLocationDataReady(true);
+
+        if (countryName) {
+          await AsyncStorage.setItem('countryName', countryName);
+        }
 
         // Update profile with location information
         const usertoken = await AsyncStorage.getItem('userToken');
@@ -370,6 +417,11 @@ export default function HomeScreen({  }) {
     })
       .then(res => {
         let userInfo = res.data.data;
+        let minPrice = res.data.min_price;
+        let maxPrice = res.data.max_price;
+        setMinPrice(0)
+        setMaxPrice(maxPrice)
+        setPriceValues([0,maxPrice])
         const formattedData = userInfo.map(item => ({
           label: item.name,
           value: item.id
@@ -397,6 +449,7 @@ export default function HomeScreen({  }) {
 
           if (res.data.response == true) {
             let banner = res.data.data;
+            console.log(banner,'hjghjg');
             setIsBannerShown(banner)
           } else {
             setIsBannerShown([])
@@ -647,11 +700,11 @@ export default function HomeScreen({  }) {
     }
   }, [countryName, latitude, longitude]);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchProfileDetails()
-    }, [])
-  )
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     fetchProfileDetails()
+  //   }, [])
+  // )
 
   // Function to save selected tab to AsyncStorage
   const saveSelectedTab = async (tabValue) => {
@@ -687,18 +740,20 @@ export default function HomeScreen({  }) {
   }, [activeTab, isLocationDataReady, latitude, longitude, countryName]);
 
   const renderRecentView = ({ item }) => (
-    <View style={styles.productSection}>
-      <View style={styles.topAstrologerSection}>
-        <View style={styles.totalValue}>
-          <Image source={{ uri: item?.package?.cover_photo_url }} style={styles.productImg} />
-          <Text style={styles.productText} numberOfLines={1}>{item?.package?.name}</Text>
+    <TouchableWithoutFeedback onPress={() => navigation.navigate('PackageDetailsScreen', { packageId: item.package_id })}>
+      <View style={styles.productSection}>
+        <View style={styles.topAstrologerSection}>
+          <View style={styles.totalValue}>
+            <Image source={{ uri: item?.package?.cover_photo_url }} style={styles.productImg} />
+            <Text style={styles.productText} numberOfLines={1}>{item?.package?.name}</Text>
+          </View>
+        </View>
+        <View style={styles.tagTextView}>
+          <Text style={styles.tagText}>{item?.package?.location}</Text>
         </View>
       </View>
-      <View style={styles.tagTextView}>
-        <Text style={styles.tagText}>{item?.package?.location}</Text>
-      </View>
-    </View>
-  );
+    </TouchableWithoutFeedback>
+  ); 
 
   const renderNearbyTourPlanner = ({ item }) => (
     <TouchableWithoutFeedback onPress={() => navigation.navigate('TravelAgencyDetails', { item: item, countryName: countryName })}>
@@ -708,7 +763,7 @@ export default function HomeScreen({  }) {
             <Image source={{ uri: item?.profile_photo_url }} style={styles.productImg3} />
             <View style={{ margin: 5 }}>
               <Text style={styles.productText3}>{item.name}</Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center',paddingRight:10 }}>
                 <Image source={mappinImg} style={styles.pinImg} />
                 <Text style={styles.addressText} numberOfLines={1}>{item.address}</Text>
               </View>
@@ -721,10 +776,12 @@ export default function HomeScreen({  }) {
               />
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 5 }}>
                 <Text style={styles.packageAvlText}>Package : {item.no_of_active_packages}</Text>
-                <View style={styles.rateingView}>
-                  <Image source={starImg} style={[styles.staricon, { marginTop: -5 }]} />
-                  <Text style={styles.ratingText}>{item.rating}</Text>
-                </View>
+                {item?.rating !== null && item?.rating !== undefined && item?.rating !== 0 && (
+                  <View style={styles.rateingView}>
+                    <Image source={starImg} style={[styles.staricon, { marginTop: -5 }]} />
+                    <Text style={styles.ratingText}>{item.rating}</Text>
+                  </View>
+                )}
               </View>
             </View>
             {/* <View style={styles.tagTextView3}>
@@ -766,7 +823,7 @@ export default function HomeScreen({  }) {
               <Text style={styles.travelerText}>{item?.agent?.name}</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View style={{ flex: 1 }}>
-                  {item?.date_type === 0 ?
+                  {item?.date_type == 0 ?
                     <Text style={styles.addressText}>Slots : {item?.seat_slots - item?.booked_slots}</Text>
                     :
                     null
@@ -782,7 +839,7 @@ export default function HomeScreen({  }) {
                 }}
               />
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 5 }}>
-                {item?.date_type === 0 ?
+                {item?.date_type == 0 ?
                   <Text style={styles.packageAvlText}>
                     {(() => {
                       const start = moment(item.start_date);
@@ -796,13 +853,15 @@ export default function HomeScreen({  }) {
                     {item?.itinerary.length} Days {item?.itinerary.length - 1} Nights
                   </Text>
                 }
-                <View style={styles.rateingView}>
-                  <Image
-                    source={starImg}
-                    style={[styles.staricon, { marginTop: -5 }]}
-                  />
-                  <Text style={styles.ratingText}>{item?.rating || 0}</Text>
-                </View>
+                {item?.rating != null && item?.rating != undefined && item?.rating != 0 && (
+                  <View style={styles.rateingView}>
+                    <Image
+                      source={starImg}
+                      style={[styles.staricon, { marginTop: -5 }]}
+                    />
+                    <Text style={styles.ratingText}>{item?.rating || 0}</Text>
+                  </View>
+                )}
               </View>
             </View>
             {/* <View style={styles.tagTextView3}>
@@ -844,7 +903,7 @@ export default function HomeScreen({  }) {
               <Text style={styles.travelerText}>{item?.agent?.name}</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View style={{ flex: 1 }}>
-                  {item?.date_type === 0 ?
+                  {item?.date_type == 0 ?
                     <Text style={styles.addressText}>Slots : {item?.seat_slots}</Text>
                     :
                     null
@@ -860,7 +919,7 @@ export default function HomeScreen({  }) {
                 }}
               />
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 5 }}>
-                {item?.date_type === 0 ?
+                {item?.date_type == 0 ?
                   <Text style={styles.packageAvlText}>
                     {(() => {
                       const start = moment(item.start_date);
@@ -874,13 +933,15 @@ export default function HomeScreen({  }) {
                     {item?.itinerary.length} Days {item?.itinerary.length - 1} Nights
                   </Text>
                 }
-                <View style={styles.rateingView}>
-                  <Image
-                    source={starImg}
-                    style={[styles.staricon, { marginTop: -5 }]}
-                  />
-                  <Text style={styles.ratingText}>{item?.rating || 0}</Text>
-                </View>
+                {item?.rating !== null && item?.rating !== undefined && item?.rating !== 0 && (
+                  <View style={styles.rateingView}>
+                    <Image
+                      source={starImg}
+                      style={[styles.staricon, { marginTop: -5 }]}
+                    />
+                    <Text style={styles.ratingText}>{item?.rating || 0}</Text>
+                  </View>
+                )}
               </View>
             </View>
             {/* <View style={styles.tagTextView3}>
@@ -901,6 +962,38 @@ export default function HomeScreen({  }) {
     </TouchableWithoutFeedback>
   );
 
+  const renderTopLocationItem = ({ item }) => (
+    <TouchableOpacity
+      key={item.id}
+      activeOpacity={0.5}
+      onPress={() => navigation.navigate('TopLocationScreenDetails', {
+        location: item,
+        country: userInfo?.country
+      })}
+    >
+      <View style={styles.topLocationCardContainer}>
+        {/* Background Image (Slightly Behind) */}
+        <View style={styles.topLocationBackgroundWrapper}>
+          <Image source={{ uri: item?.backgroud_image_url }} style={styles.topLocationBackgroundImage} />
+        </View>
+        {/* Main Image (On Top) */}
+        <View style={styles.topLocationMainImageWrapper}>
+          <Image source={{ uri: item?.image_url }} style={styles.topLocationMainImage} />
+          {/* Location Tag */}
+          <View style={styles.topLocationTag}>
+            <Text style={styles.topLocationTagText}>{item?.location_name}</Text>
+            <View style={styles.topLocationTagCut} />
+          </View>
+        </View>
+        {/* Price Section (Below the Main Image) */}
+        <View style={styles.topLocationPriceContainer}>
+          <Text style={styles.topLocationStartingText}>Starting at</Text>
+          <Text style={styles.topLocationPriceText}>₹{item?.lowest_price}</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+
   const handleRequestQuote = async () => {
     try {
       // Validate required fields
@@ -919,7 +1012,7 @@ export default function HomeScreen({  }) {
         return;
       }
 
-      if (!adultPassengers || !kidsPassengers) {
+      if (!adultPassengers) {
         Alert.alert('Error', 'Please enter number of passengers');
         return;
       }
@@ -932,7 +1025,7 @@ export default function HomeScreen({  }) {
         sdate: moment(fromDate).format('YYYY-MM-DD'),
         edate: moment(toDate).format('YYYY-MM-DD'),
         edults: parseInt(adultPassengers),
-        kids: parseInt(kidsPassengers),
+        kids: kidsPassengers ? parseInt(kidsPassengers) : 0,
       };
 
       const usertoken = await AsyncStorage.getItem('userToken');
@@ -964,6 +1057,9 @@ export default function HomeScreen({  }) {
         setToDate(new Date());
         setAdultPassengers("");
         setKidsPassengers("");
+        navigation.navigate('Talk', {
+          screen: 'QuotesScreen',
+      });
       } else {
         Alert.alert('Error', response.data.message || 'Failed to submit quote request');
       }
@@ -1033,13 +1129,20 @@ export default function HomeScreen({  }) {
   const toggleFilterModal = () => {
     setFilterModalVisible(!isFilterModalVisible);
   };
+
+  const handlePriceChange = (values) => {
+    console.log(values,'values')
+    setPriceValues(values);
+};
   const resetFilters = async () => {
     try {
       // Reset all filter states to initial values
       setFromDateModal(new Date());
       setToDateModal(new Date());
-      setPriceValues([5000, 25000]);
-      setStarCount(0);
+      setPriceValues([0, maxPrice]);
+      setStarCount(5);
+      setActiveTab('all_packages')
+      setSelectedId2('1')
       // Close the filter modal
       toggleFilterModal();
     } catch (error) {
@@ -1146,6 +1249,7 @@ export default function HomeScreen({  }) {
                 <TouchableOpacity
                   key={tab.value}
                   onPress={() => {
+                    setIsLoading(true)
                     setActiveTab(tab.value);
                     saveSelectedTab(tab.value);
                   }}
@@ -1199,7 +1303,7 @@ export default function HomeScreen({  }) {
         </View>
       </TouchableOpacity> */}
         {isBannerShown.length > 0 ?
-          <TouchableOpacity onPress={() => navigation.navigate('ReviewScreen')}>
+          <TouchableOpacity onPress={() => navigation.navigate('ReviewScreen',{agentId: isBannerShown[0].agent_id,packageId:isBannerShown[0].package_id})}>
             <Image
               source={freebannerPlaceHolder}
               style={styles.freebannerImg}
@@ -1228,42 +1332,15 @@ export default function HomeScreen({  }) {
           </TouchableOpacity>
         </View>
         {destinationsData.length > 0 ? (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.topLocationScrollView}>
-            {destinationsData.map((item) => (
-              <TouchableOpacity
-                key={item.id}
-                activeOpacity={0.5}
-                onPress={() => navigation.navigate('TopLocationScreenDetails', {
-                  location: item,
-                  country: userInfo?.country
-                })}
-              >
-                <View style={styles.topLocationCardContainer}>
-                  {/* Background Image (Slightly Behind) */}
-                  <View style={styles.topLocationBackgroundWrapper}>
-                    <Image source={{ uri: item?.backgroud_image_url }} style={styles.topLocationBackgroundImage} />
-                  </View>
-
-                  {/* Main Image (On Top) */}
-                  <View style={styles.topLocationMainImageWrapper}>
-                    <Image source={{ uri: item?.image_url }} style={styles.topLocationMainImage} />
-
-                    {/* Location Tag */}
-                    <View style={styles.topLocationTag}>
-                      <Text style={styles.topLocationTagText}>{item?.location_name}</Text>
-                      <View style={styles.topLocationTagCut} />
-                    </View>
-                  </View>
-
-                  {/* Price Section (Below the Main Image) */}
-                  <View style={styles.topLocationPriceContainer}>
-                    <Text style={styles.topLocationStartingText}>Starting at</Text>
-                    <Text style={styles.topLocationPriceText}>₹{item?.lowest_price}</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+          <FlatList
+            data={destinationsData}
+            keyExtractor={(item) => item.id?.toString()}
+            renderItem={renderTopLocationItem}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ marginHorizontal: 10 }}
+            style={styles.topLocationScrollView}
+          />
         ) : (
           <View style={styles.noLocationContainer}>
             <Text style={styles.noLocationText}>No location found</Text>
@@ -1311,7 +1388,7 @@ export default function HomeScreen({  }) {
                   inputSearchStyle={styles.inputSearchStyle}
                   itemTextStyle={styles.selectedTextStyle}
                   data={locationList}
-                  //search
+                  search
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
@@ -1385,6 +1462,7 @@ export default function HomeScreen({  }) {
                       mode="date"
                       display="default"
                       onChange={onChangeToDate}
+                      minimumDate={fromDate} // Only allow dates after the selected From Date
                     />
                   )}
                 </View>
@@ -1398,7 +1476,7 @@ export default function HomeScreen({  }) {
                   borderWidth: 1,
                   borderColor: "#ddd",
                   paddingHorizontal: 10,
-                  paddingVertical: 0,
+                  paddingVertical: 5,
                   borderRadius: 5,
                   marginTop: 5,
                 }}
@@ -1423,7 +1501,7 @@ export default function HomeScreen({  }) {
                   borderWidth: 1,
                   borderColor: "#ddd",
                   paddingHorizontal: 10,
-                  paddingVertical: 0,
+                  paddingVertical: 5,
                   borderRadius: 5,
                   marginTop: 5,
                 }}
@@ -1526,7 +1604,7 @@ export default function HomeScreen({  }) {
           justifyContent: 'flex-end',
         }}>
         {/* <TouchableWithoutFeedback onPress={() => setIsFocus(false)} style={{  }}> */}
-        <View style={{ height: '75%', backgroundColor: '#fff', position: 'absolute', bottom: 0, width: '100%', borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
+        <View style={{ height: '70%', backgroundColor: '#fff', position: 'absolute', bottom: 0, width: '100%', borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
           <View style={{ padding: 0 }}>
             <View style={{ paddingVertical: 5, paddingHorizontal: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: responsiveHeight(2), marginTop: responsiveHeight(2) }}>
               <Text style={{ fontSize: responsiveFontSize(2.5), color: '#2D2D2D', fontFamily: 'Poppins-Bold', }}>Filter</Text>
@@ -1540,7 +1618,6 @@ export default function HomeScreen({  }) {
               <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Days</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: responsiveHeight(2) }}>
                 <View style={{ flexDirection: 'column' }}>
-                  {/* From Date */}
                   <Text style={styles.textinputHeader}>Departure Date</Text>
                   <TouchableOpacity
                     onPress={() => setShowFromDatePickerModal(true)}
@@ -1568,7 +1645,6 @@ export default function HomeScreen({  }) {
                   )}
                 </View>
                 <View style={{ flexDirection: 'column' }}>
-                  {/* To Date */}
                   <Text style={styles.textinputHeader}>Return Date</Text>
                   <TouchableOpacity
                     onPress={() => setShowToDatePickerModal(true)}
@@ -1592,18 +1668,20 @@ export default function HomeScreen({  }) {
                       mode="date"
                       display="default"
                       onChange={onChangeToDateModal}
+                      minimumDate={fromDateModal} // Only allow dates after the selected From Date in modal
                     />
                   )}
                 </View>
               </View>
               <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Type</Text>
-              <View style={{ marginTop: responsiveHeight(2), marginBottom: responsiveHeight(2), marginLeft: -responsiveWidth(2.5) }}>
+              <View style={{ marginTop: responsiveHeight(2), marginBottom: responsiveHeight(2), marginLeft: -responsiveWidth(2.5)}}>
                 <RadioGroup
                   radioButtons={radioButtons2}
                   onPress={setSelectedId2}
                   selectedId={selectedId2}
                   layout='row'
-                  containerStyle={{}}
+                  containerStyle={{ flexWrap: 'wrap' }}
+                  labelStyle={{ flexShrink: 1, flexWrap: 'wrap', maxWidth: responsiveWidth(40), }}
                 />
               </View>
               <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Price</Text>
@@ -1611,10 +1689,10 @@ export default function HomeScreen({  }) {
                 <MultiSlider
                   values={pricevalues}
                   sliderLength={responsiveWidth(80)}
-                  onValuesChange={setPriceValues}
-                  min={5000}
-                  max={25000}
-                  step={100}
+                  onValuesChange={handlePriceChange}
+                  min={minPrice}
+                  max={maxPrice}
+                  step={500}
                   selectedStyle={{ backgroundColor: "#FF455C" }}
                   unselectedStyle={{ backgroundColor: "rgba(0, 0, 0, 0.15)" }}
                   markerStyle={{ backgroundColor: "#FF455C" }}
@@ -2052,7 +2130,7 @@ const styles = StyleSheet.create({
   },
 
   topLocationScrollView: {
-    marginHorizontal: 10,
+    marginHorizontal: responsiveWidth(2),
   },
   topLocationCardContainer: {
     width: responsiveWidth(43),
@@ -2217,3 +2295,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+
