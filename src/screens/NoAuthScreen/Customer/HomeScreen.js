@@ -12,7 +12,6 @@ import {
   StyleSheet,
   Alert,
   Dimensions,
-  Pressable,
   BackHandler,
   Platform,
   TextInput,
@@ -55,11 +54,17 @@ const { width } = Dimensions.get('window');
 const itemWidth = width * 0.8; // 80% of screen width
 const imageHeight = itemWidth * 0.5; // Maintain a 4:3 aspect ratio
 
-// const destinations = [
-//   { id: 1, name: "Dubai", image: productImg },
-//   { id: 2, name: "Goa", image: productImg },
-//   { id: 3, name: "Kevadia", image: productImg },
-// ];
+// Memoized constants
+const TABS = [
+  { label: 'All  packages', value: 'all_packages' },
+  { label: 'International', value: 'international' },
+  { label: 'Domestic', value: 'domestic' },
+];
+
+const SWITCH_OPTIONS = [
+  { label: "New Packages", value: "New Packages" },
+  { label: "Near by", value: "Near by" },
+];
 
 
 export default function HomeScreen() {
@@ -69,36 +74,37 @@ export default function HomeScreen() {
   const { data: products, status } = useSelector(state => state.products)
   const { logout } = useContext(AuthContext);
   // const { userInfo } = useContext(AuthContext)
+  // Loading states
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [recentview, setRecentview] = useState([])
+  
+  // Data states
+  const [recentview, setRecentview] = useState([]);
+  const [destinationsData, setDestinationsData] = useState([]);
+  const [isBannerShown, setIsBannerShown] = useState([]);
 
-  const [destinationsData, setDestinationsData] = useState([])
-
+  // Nearby tour agent states
   const [nearbyTourAgent, setNearbyTourAgent] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const [pageno, setPageno] = useState(1);
   const [loading, setLoading] = useState(false);
 
+  // New package states
   const [newPackageData, setNewPackageData] = useState([]);
   const [hasMoreNewPackages, setHasMoreNewPackages] = useState(true);
   const [pagenoNewPackages, setPagenoNewPackages] = useState(1);
   const [loadingNewPackages, setLoadingNewPackages] = useState(false);
 
+  // Nearby package states
   const [nearbyPackageData, setNearbyPackageData] = useState([]);
   const [hasMoreNearbyPackages, setHasMoreNearbyPackages] = useState(true);
   const [pagenoNearbyPackages, setPagenoNearbyPackages] = useState(1);
   const [loadingNearbyPackages, setLoadingNearbyPackages] = useState(false);
 
+  // Tab states
   const [activeTab, setActiveTab] = useState('all_packages');
-  const tabs = [
-    { label: 'All  packages', value: 'all_packages' },
-    { label: 'International', value: 'international' },
-    { label: 'Domestic', value: 'domestic' },
-  ];
-
-  const [activeTab2, setActiveTab2] = useState('New Packages')
-  const [activeButtonNo, setActiveButtonNo] = useState(0)
+  const [activeTab2, setActiveTab2] = useState('New Packages');
+  const [activeButtonNo, setActiveButtonNo] = useState(0);
 
   const [fromDate, setFromDate] = useState(new Date());
   const [toDate, setToDate] = useState(new Date());
@@ -118,10 +124,9 @@ export default function HomeScreen() {
   const [isPackageFocus, setYearIsFocus] = useState(false);
   const [packagevalue, setPackageValue] = useState(null);
   const [location, setlocation] = useState('');
-  const [locationId, setLocationId] = useState('')
+  const [locationId, setLocationId] = useState('');
   const [locationError, setlocationError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isBannerShown, setIsBannerShown] = useState([])
 
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
   const [fromDateModal, setFromDateModal] = useState(new Date());
@@ -133,26 +138,23 @@ export default function HomeScreen() {
   const [maxPrice, setMaxPrice] = useState(25000);
   const [starCount, setStarCount] = useState(5)
   const [selectedId2, setSelectedId2] = useState('1');
+  
+  // Memoized radio buttons to prevent unnecessary re-renders
   const radioButtons2 = useMemo(() => ([
     {
       id: '1',
       label: 'All packages',
       value: 'all_packages',
-      labelStyle: {
-        color: '#131313'
-      },
+      labelStyle: { color: '#131313' },
       borderColor: '#FF455C',
       color: '#FF455C',
       size: 20,
-
     },
     {
       id: '2',
       label: 'International',
       value: 'international',
-      labelStyle: {
-        color: '#131313'
-      },
+      labelStyle: { color: '#131313' },
       borderColor: '#FF455C',
       color: '#FF455C',
       size: 20,
@@ -161,47 +163,43 @@ export default function HomeScreen() {
       id: '3',
       label: 'Domestic',
       value: 'domestic',
-      labelStyle: {
-        color: '#131313'
-      },
+      labelStyle: { color: '#131313' },
       borderColor: '#FF455C',
       color: '#FF455C',
       size: 20,
     },
   ]), []);
 
-  const onChangeFromDateModal = (event, selectedDate) => {
-    setShowFromDatePickerModal(Platform.OS === "ios"); // Keep picker open on iOS
+  // Optimized date change handlers with useCallback
+  const onChangeFromDateModal = useCallback((event, selectedDate) => {
+    setShowFromDatePickerModal(Platform.OS === "ios");
     if (selectedDate) setFromDateModal(selectedDate);
-  };
+  }, []);
 
-  const onChangeToDateModal = (event, selectedDate) => {
-    setShowToDatePickerModal(Platform.OS === "ios"); // Keep picker open on iOS
+  const onChangeToDateModal = useCallback((event, selectedDate) => {
+    setShowToDatePickerModal(Platform.OS === "ios");
     if (selectedDate) setToDateModal(selectedDate);
-  };
+  }, []);
 
-  const onChangeFromDate = (event, selectedDate) => {
-    setShowFromDatePicker(Platform.OS === "ios"); // Keep picker open on iOS
+  const onChangeFromDate = useCallback((event, selectedDate) => {
+    setShowFromDatePicker(Platform.OS === "ios");
     if (selectedDate) setFromDate(selectedDate);
-  };
+  }, []);
 
-  const onChangeToDate = (event, selectedDate) => {
-    setShowToDatePicker(Platform.OS === "ios"); // Keep picker open on iOS
+  const onChangeToDate = useCallback((event, selectedDate) => {
+    setShowToDatePicker(Platform.OS === "ios");
     if (selectedDate) setToDate(selectedDate);
-  };
+  }, []);
 
-  const getFCMToken = async () => {
+  const getFCMToken = useCallback(async () => {
     try {
-      // if (Platform.OS == 'android') {
       await messaging().registerDeviceForRemoteMessages();
-      // }
       const token = await messaging().getToken();
-      AsyncStorage.setItem('fcmToken', token)
-      //console.log(token, 'fcm token');
+      await AsyncStorage.setItem('fcmToken', token);
     } catch (e) {
-      console.log(e);
+      console.log('FCM Token Error:', e);
     }
-  };
+  }, []);
 
   useEffect(() => {
     getFCMToken()
@@ -257,52 +255,57 @@ export default function HomeScreen() {
     return () => backHandler.remove();
   }, []);
 
-  const requestLocationPermission = async () => {
-    if (Platform.OS === 'android') {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        {
-          title: 'Location Permission Required',
-          message: 'This app needs to access your location',
-        }
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        getCurrentLocation();
-      } else {
-        Alert.alert('Permission Denied', 'Location permission is required');
-      }
-    } else {
-      const status = await check(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
-      if (status === RESULTS.GRANTED) {
-        getCurrentLocation();
-      } else if (status === RESULTS.DENIED) {
-        const result = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
-        if (result === RESULTS.GRANTED) {
+  const requestLocationPermission = useCallback(async () => {
+    try {
+      if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: 'Location Permission Required',
+            message: 'This app needs to access your location',
+          }
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           getCurrentLocation();
         } else {
           Alert.alert('Permission Denied', 'Location permission is required');
         }
-      } else if (status === RESULTS.BLOCKED) {
-        Alert.alert(
-          'Permission Blocked',
-          'Please enable location permissions from settings',
-        );
+      } else {
+        const status = await check(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+        if (status === RESULTS.GRANTED) {
+          getCurrentLocation();
+        } else if (status === RESULTS.DENIED) {
+          const result = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+          if (result === RESULTS.GRANTED) {
+            getCurrentLocation();
+          } else {
+            Alert.alert('Permission Denied', 'Location permission is required');
+          }
+        } else if (status === RESULTS.BLOCKED) {
+          Alert.alert(
+            'Permission Blocked',
+            'Please enable location permissions from settings',
+          );
+        }
       }
+    } catch (error) {
+      console.log('Location Permission Error:', error);
     }
-  };
+  }, []);
 
-  const getCurrentLocation = () => {
+  const getCurrentLocation = useCallback(() => {
     Geolocation.getCurrentPosition(
       async position => {
         const { latitude, longitude } = position.coords;
         const placeName = await getAddressFromCoords(latitude, longitude);
         setLatitude(latitude);
         setLongitude(longitude);
-        setIsLoading(false)
+        setIsLoading(false);
         console.log('You are at:', placeName);
       },
       error => {
         console.log('Location Error:', error.message);
+        setIsLoading(false);
       },
       {
         enableHighAccuracy: true,
@@ -310,19 +313,15 @@ export default function HomeScreen() {
         maximumAge: 10000,
       }
     );
-  };
+  }, []);
 
-  const getAddressFromCoords = async (latitude, longitude) => {
-    console.log(latitude, longitude, 'latitude and longitude')
+  const getAddressFromCoords = useCallback(async (latitude, longitude) => {
     try {
       const apiKey = GOOGLE_MAP_KEY;
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`
       );
       const json = await response.json();
-
-      console.log(json, 'json')
-      console.log(apiKey, 'hhh');
 
       if (json.results.length > 0) {
         const firstResult = json.results[0];
@@ -332,9 +331,6 @@ export default function HomeScreen() {
           component.types.includes("country")
         );
         const countryName = countryComponent ? countryComponent.long_name : null;
-
-        console.log('Place name:', place);
-        console.log('Country name:', countryName);
 
         setLocationName(place);
         setCountryName(countryName);
@@ -371,7 +367,7 @@ export default function HomeScreen() {
       console.error('Geocoding error:', error);
       return null;
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchProfileDetails();
@@ -739,7 +735,7 @@ export default function HomeScreen() {
     }
   }, [activeTab, isLocationDataReady, latitude, longitude, countryName]);
 
-  const renderRecentView = ({ item }) => (
+  const renderRecentView = useCallback(({ item }) => (
     <TouchableWithoutFeedback onPress={() => navigation.navigate('PackageDetailsScreen', { packageId: item.package_id })}>
       <View style={styles.productSection}>
         <View style={styles.topAstrologerSection}>
@@ -753,9 +749,9 @@ export default function HomeScreen() {
         </View>
       </View>
     </TouchableWithoutFeedback>
-  ); 
+  ), [navigation]); 
 
-  const renderNearbyTourPlanner = ({ item }) => (
+  const renderNearbyTourPlanner = useCallback(({ item }) => (
     <TouchableWithoutFeedback onPress={() => navigation.navigate('TravelAgencyDetails', { item: item, countryName: countryName })}>
       <View style={styles.productSection}>
         <View style={styles.topAstrologerSection}>
@@ -763,7 +759,7 @@ export default function HomeScreen() {
             <Image source={{ uri: item?.profile_photo_url }} style={styles.productImg3} />
             <View style={{ margin: 5 }}>
               <Text style={styles.productText3}>{item.name}</Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center',paddingRight:10 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: 10 }}>
                 <Image source={mappinImg} style={styles.pinImg} />
                 <Text style={styles.addressText} numberOfLines={1}>{item.address}</Text>
               </View>
@@ -784,25 +780,22 @@ export default function HomeScreen() {
                 )}
               </View>
             </View>
-            {/* <View style={styles.tagTextView3}>
-              <Image source={likefillImg} style={styles.likeImg} tintColor="#FFFFFF" />
-            </View> */}
           </View>
         </View>
       </View>
     </TouchableWithoutFeedback>
-  );
+  ), [navigation, countryName]);
 
-  const formatNumber = (num) => {
+  const formatNumber = useCallback((num) => {
     if (num >= 100000) {
       return (num / 100000).toFixed(1).replace(/\.0$/, '') + 'L'; // Lakhs
     } else if (num >= 1000) {
       return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K'; // Thousands
     }
     return num.toString(); // Less than 1000
-  };
+  }, []);
 
-  const renderNewPackageItem = ({ item }) => (
+  const renderNewPackageItem = useCallback(({ item }) => (
     <TouchableWithoutFeedback onPress={() => navigation.navigate('PackageDetailsScreen', { packageId: item.id })}>
       <View style={styles.productSection}>
         <View style={styles.topAstrologerSection}>
@@ -864,13 +857,6 @@ export default function HomeScreen() {
                 )}
               </View>
             </View>
-            {/* <View style={styles.tagTextView3}>
-              <Image
-                source={likefillImg}
-                style={styles.likeImg}
-                tintColor={"#FFFFFF"}
-              />
-            </View> */}
             <View style={styles.tagTextView4}>
               <View style={styles.newPackageTagCutLeft} />
               <Text style={styles.tagText}>New</Text>
@@ -880,9 +866,9 @@ export default function HomeScreen() {
         </View>
       </View>
     </TouchableWithoutFeedback>
-  );
+  ), [navigation, formatNumber]);
 
-  const renderNearbyPackageItem = ({ item }) => (
+  const renderNearbyPackageItem = useCallback(({ item }) => (
     <TouchableWithoutFeedback onPress={() => navigation.navigate('PackageDetailsScreen', { packageId: item.id })}>
       <View style={styles.productSection}>
         <View style={styles.topAstrologerSection}>
@@ -944,25 +930,13 @@ export default function HomeScreen() {
                 )}
               </View>
             </View>
-            {/* <View style={styles.tagTextView3}>
-              <Image
-                source={likefillImg}
-                style={styles.likeImg}
-                tintColor={"#FFFFFF"}
-              />
-            </View> */}
-            {/* <View style={styles.tagTextView4}>
-              <View style={styles.newPackageTagCutLeft} />
-              <Text style={styles.tagText}>New</Text>
-              <View style={styles.newPackageTagCutRight} />
-            </View> */}
           </View>
         </View>
       </View>
     </TouchableWithoutFeedback>
-  );
+  ), [navigation, formatNumber]);
 
-  const renderTopLocationItem = ({ item }) => (
+  const renderTopLocationItem = useCallback(({ item }) => (
     <TouchableOpacity
       key={item.id}
       activeOpacity={0.5}
@@ -992,9 +966,9 @@ export default function HomeScreen() {
         </View>
       </View>
     </TouchableOpacity>
-  );
+  ), [navigation, userInfo?.country]);
 
-  const handleRequestQuote = async () => {
+  const handleRequestQuote = useCallback(async () => {
     try {
       // Validate required fields
       if (!locationId) {
@@ -1059,7 +1033,7 @@ export default function HomeScreen() {
         setKidsPassengers("");
         navigation.navigate('Talk', {
           screen: 'QuotesScreen',
-      });
+        });
       } else {
         Alert.alert('Error', response.data.message || 'Failed to submit quote request');
       }
@@ -1085,28 +1059,26 @@ export default function HomeScreen() {
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [locationId, fromDate, toDate, adultPassengers, kidsPassengers, location, navigation]);
 
-  // Add this function to handle load more for nearby tour planners
-  const handleLoadMore = () => {
+  // Optimized load more functions with useCallback
+  const handleLoadMore = useCallback(() => {
     if (!loading && hasMore) {
       setPageno(prevPage => prevPage + 1);
     }
-  };
+  }, [loading, hasMore]);
 
-  // Add this function to handle load more for new packages
-  const handleLoadMoreNewPackages = () => {
+  const handleLoadMoreNewPackages = useCallback(() => {
     if (!loadingNewPackages && hasMoreNewPackages) {
       setPagenoNewPackages(prevPage => prevPage + 1);
     }
-  };
+  }, [loadingNewPackages, hasMoreNewPackages]);
 
-  // Add this function to handle load more for nearby packages
-  const handleLoadMoreNearbyPackages = () => {
+  const handleLoadMoreNearbyPackages = useCallback(() => {
     if (!loadingNearbyPackages && hasMoreNearbyPackages) {
       setPagenoNearbyPackages(prevPage => prevPage + 1);
     }
-  };
+  }, [loadingNearbyPackages, hasMoreNearbyPackages]);
 
   useEffect(() => {
     if (pageno > 1) {
@@ -1126,31 +1098,31 @@ export default function HomeScreen() {
     }
   }, [pagenoNearbyPackages]);
 
-  const toggleFilterModal = () => {
+  const toggleFilterModal = useCallback(() => {
     setFilterModalVisible(!isFilterModalVisible);
-  };
+  }, [isFilterModalVisible]);
 
-  const handlePriceChange = (values) => {
-    console.log(values,'values')
+  const handlePriceChange = useCallback((values) => {
     setPriceValues(values);
-};
-  const resetFilters = async () => {
+  }, []);
+
+  const resetFilters = useCallback(async () => {
     try {
       // Reset all filter states to initial values
       setFromDateModal(new Date());
       setToDateModal(new Date());
       setPriceValues([0, maxPrice]);
       setStarCount(5);
-      setActiveTab('all_packages')
-      setSelectedId2('1')
+      setActiveTab('all_packages');
+      setSelectedId2('1');
       // Close the filter modal
       toggleFilterModal();
     } catch (error) {
       console.log('Error resetting filters:', error);
     }
-  };
+  }, [maxPrice, toggleFilterModal]);
 
-  const submitForFilter = async () => {
+  const submitForFilter = useCallback(async () => {
     try {
       const filters = {
         flag: selectedId2 == "1" ? "all_packages" : selectedId2 == "2" ? "international" : "domestic",
@@ -1161,27 +1133,35 @@ export default function HomeScreen() {
         max_price: pricevalues[1],
         rating: starCount
       };
-      console.log(filters)
       navigation.navigate('FilterPackageResult', { filters });
       // Close the filter modal
       toggleFilterModal();
     } catch (error) {
       console.log('Error applying filters:', error);
     }
-  };
+  }, [selectedId2, countryName, fromDateModal, toDateModal, pricevalues, starCount, navigation, toggleFilterModal]);
 
-  // Add this function to handle pull-to-refresh
-  const onRefresh = async () => {
+  // Optimized pull-to-refresh function with useCallback
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await Promise.all([
-      fetchProfileDetails(),
-      fetchalllocation(),
-      fetchBanner(),
-      fetchRecentViewed(),
-      requestLocationPermission(),
-    ]);
-    setRefreshing(false);
-  };
+    try {
+      await Promise.all([
+        fetchProfileDetails(),
+        fetchalllocation(),
+        fetchBanner(),
+        fetchRecentViewed(),
+        requestLocationPermission(),
+      ]);
+    } catch (error) {
+      console.log('Refresh error:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [fetchProfileDetails, fetchalllocation, fetchBanner, fetchRecentViewed, requestLocationPermission]);
+
+  // Memoized key extractors for better FlatList performance
+  const keyExtractor = useCallback((item, index) => item.id?.toString() ?? index.toString(), []);
+  const recentViewKeyExtractor = useCallback((item) => item.id?.toString(), []);
 
   if (isLoading) {
     return (
@@ -1245,11 +1225,11 @@ export default function HomeScreen() {
         <View style={styles.tabView}>
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
             <View style={styles.tabContainer}>
-              {tabs.map((tab) => (
+              {TABS.map((tab) => (
                 <TouchableOpacity
                   key={tab.value}
                   onPress={() => {
-                    setIsLoading(true)
+                    setIsLoading(true);
                     setActiveTab(tab.value);
                     saveSelectedTab(tab.value);
                   }}
@@ -1318,11 +1298,14 @@ export default function HomeScreen() {
         <View style={{ marginRight: responsiveWidth(2) }}>
           <FlatList
             data={recentview}
-            keyExtractor={(item) => item.id}
+            keyExtractor={recentViewKeyExtractor}
             renderItem={renderRecentView}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ marginHorizontal: 10 }}
+            removeClippedSubviews={true}
+            maxToRenderPerBatch={5}
+            windowSize={5}
           />
         </View>
         <View style={styles.sectionHeaderView}>
@@ -1334,12 +1317,15 @@ export default function HomeScreen() {
         {destinationsData.length > 0 ? (
           <FlatList
             data={destinationsData}
-            keyExtractor={(item) => item.id?.toString()}
+            keyExtractor={keyExtractor}
             renderItem={renderTopLocationItem}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ marginHorizontal: 10 }}
             style={styles.topLocationScrollView}
+            removeClippedSubviews={true}
+            maxToRenderPerBatch={3}
+            windowSize={5}
           />
         ) : (
           <View style={styles.noLocationContainer}>
@@ -1537,7 +1523,7 @@ export default function HomeScreen() {
         <View style={{ marginRight: responsiveWidth(2) }}>
           <FlatList
             data={nearbyTourAgent}
-            keyExtractor={(item) => item.id}
+            keyExtractor={keyExtractor}
             renderItem={renderNearbyTourPlanner}
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -1545,6 +1531,9 @@ export default function HomeScreen() {
             onEndReached={handleLoadMore}
             onEndReachedThreshold={0.5}
             ListFooterComponent={() => loading && <ActivityIndicator size="small" color="#FF455C" style={{ alignSelf: 'center' }} />}
+            removeClippedSubviews={true}
+            maxToRenderPerBatch={5}
+            windowSize={5}
           />
         </View>
         <View style={{ paddingHorizontal: 15, marginVertical: responsiveHeight(1) }}>
@@ -1559,10 +1548,7 @@ export default function HomeScreen() {
             height={responsiveHeight(7)}
             valuePadding={6}
             hasPadding
-            options={[
-              { label: "New Packages", value: "New Packages", }, //images.feminino = require('./path_to/assets/img/feminino.png')
-              { label: "Near by", value: "Near by", }, //images.masculino = require('./path_to/assets/img/masculino.png')
-            ]}
+            options={SWITCH_OPTIONS}
             testID="gender-switch-selector"
             accessibilityLabel="gender-switch-selector"
           />
@@ -1570,7 +1556,7 @@ export default function HomeScreen() {
         {activeTab2 == 'New Packages' ?
           <FlatList
             data={newPackageData}
-            keyExtractor={(item, index) => item.id?.toString() ?? index.toString()}
+            keyExtractor={keyExtractor}
             renderItem={renderNewPackageItem}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 10 }}
@@ -1579,11 +1565,19 @@ export default function HomeScreen() {
             onEndReached={handleLoadMoreNewPackages}
             onEndReachedThreshold={0.5}
             ListFooterComponent={() => loadingNewPackages && <ActivityIndicator size="small" color="#FF455C" style={{ alignSelf: 'center' }} />}
+            removeClippedSubviews={true}
+            maxToRenderPerBatch={4}
+            windowSize={5}
+            getItemLayout={(data, index) => ({
+              length: 200, // Approximate item height
+              offset: 200 * Math.floor(index / 2),
+              index,
+            })}
           />
           :
           <FlatList
             data={nearbyPackageData}
-            keyExtractor={(item, index) => item.id?.toString() ?? index.toString()}
+            keyExtractor={keyExtractor}
             renderItem={renderNearbyPackageItem}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 10 }}
@@ -1592,6 +1586,14 @@ export default function HomeScreen() {
             onEndReached={handleLoadMoreNearbyPackages}
             onEndReachedThreshold={0.5}
             ListFooterComponent={() => loadingNearbyPackages && <ActivityIndicator size="small" color="#FF455C" style={{ alignSelf: 'center' }} />}
+            removeClippedSubviews={true}
+            maxToRenderPerBatch={4}
+            windowSize={5}
+            getItemLayout={(data, index) => ({
+              length: 200, // Approximate item height
+              offset: 200 * Math.floor(index / 2),
+              index,
+            })}
           />
         }
 
