@@ -275,14 +275,29 @@ export default function TravelAgencyDetails({ route }) {
                                     style={styles.filterIcon}
                                 />
                             </TouchableOpacity>
-                            <Text style={[styles.title, { marginLeft: responsiveWidth(2) }]}>{travelAgencyData?.name}</Text>
+                            
+                            <View style={{ marginLeft: responsiveWidth(1) }}>
+                                {/* Text with background overlay */}
+                                <View style={{
+                                    backgroundColor: 'rgba(11, 10, 10, 0.5)', // light gray, semi-transparent
+                                    borderRadius: 8,
+                                    paddingHorizontal: responsiveWidth(2),
+                                    paddingVertical: responsiveHeight(0.5),
+                                    maxWidth: responsiveWidth(70),
+                                }}>
+                                    <Text
+                                        style={[
+                                            styles.title,
+                                            { zIndex: 2 }
+                                        ]}
+                                        numberOfLines={1}
+                                        ellipsizeMode="tail"
+                                    >
+                                        {travelAgencyData?.name || 'Travel Agency'}
+                                    </Text>
+                                </View>
+                            </View>
                         </View>
-                        {/* <TouchableOpacity style={styles.iconButton}>
-                            <Image
-                                source={shareImg}
-                                style={styles.filterIcon}
-                            />
-                        </TouchableOpacity> */}
                     </View>
 
                     {/* Bottom Like Button */}
@@ -395,7 +410,7 @@ export default function TravelAgencyDetails({ route }) {
                                                 <Text style={styles.travelerText}>{item.agent?.name}</Text>
                                                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', }}>
                                                     {item?.date_type == 0 ?
-                                                        <Text style={styles.addressText}>Slots : {item.available_slots}</Text>
+                                                        <Text style={styles.addressText}>Slots : {item?.seat_slots - item?.booked_slots}</Text>
                                                         :
                                                         null
                                                     }
@@ -563,12 +578,13 @@ const styles = StyleSheet.create({
     },
     header: {
         position: 'absolute',
-        top: 35,
-        left: 20,
-        right: 20,
+        top: 30,
+        left: 0,
+        right: 0,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
+        marginHorizontal: responsiveWidth(5),
     },
     title: {
         fontFamily: 'Poppins-Bold',
@@ -821,6 +837,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 3,
         marginBottom: 10,
+        marginHorizontal: 2,
     },
     header2: {
         flexDirection: 'row',
