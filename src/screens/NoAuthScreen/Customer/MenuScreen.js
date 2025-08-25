@@ -44,8 +44,8 @@ const menuItems = [
     // { id: 6, title: 'Settings', icon: settingsMenuImg, page: 'MyBookingList' },
     { id: 6, title: 'Delete Account', icon: settingsMenuImg, page: 'DeleteAccount' },
     { id: 7, title: 'Support', icon: supportMenuImg, page: 'CustomerSupport' },
-    { id: 8, title: 'Term And Condition', icon: termMenuImg, page: 'CustomerSupport' },
-    { id: 9, title: 'Privacy Policy', icon: policyMenuImg, page: 'MyBookingList' },
+    { id: 8, title: 'Term And Condition', icon: termMenuImg, page: 'Termsofuse' },
+    { id: 9, title: 'Privacy Policy', icon: policyMenuImg, page: 'PrivacyPolicy' },
     { id: 10, title: 'Logout', icon: logoutMenuImg, page: 'Logout' },
 ];
 

@@ -37,6 +37,7 @@ import NearbyTourPlanerList from '../screens/NoAuthScreen/Customer/NearbyTourPla
 import FilterPackageResult from '../screens/NoAuthScreen/Customer/FilterPackageResult';
 import WishlistPackage from '../screens/NoAuthScreen/Customer/WishlistPackage';
 import TransactionScreen from '../screens/NoAuthScreen/Customer/TransactionScreen';
+import Termsofuse from '../screens/NoAuthScreen/Customer/Termsofuse';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -233,6 +234,16 @@ const MenuStack = ({ route }) => {
       <Stack.Screen
         name="CustomerSupport"
         component={CustomerSupport}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="PrivacyPolicy"
+        component={PrivacyPolicy}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Termsofuse"
+        component={Termsofuse}
         options={{ headerShown: false }}
       />
       <Stack.Screen
