@@ -67,7 +67,7 @@ export const requestNotificationPermission = async () => {
 export const showNotificationPermissionAlert = () => {
   Alert.alert(
     'Notification Permission Required',
-    'This app needs notification permission for chat functionality. Please enable notifications in settings.',
+    'This app requires notification permission to keep you informed and function properly. Please enable notifications in settings.',
     [
       { text: 'Cancel', style: 'cancel' },
       { 

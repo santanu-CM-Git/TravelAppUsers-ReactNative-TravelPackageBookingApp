@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
+import { splashIcon } from '../../utils/Images';
 
 const SplashScreen = ({  }) => {
     const navigation = useNavigation();
@@ -60,7 +61,7 @@ const SplashScreen = ({  }) => {
             >
                 <Animated.View style={[styles.logoContainer, { marginLeft: moveAnim }]}>
                     <Animated.Image
-                        source={require('../../assets/images/gt_icon.jpg')}
+                        source={splashIcon}
                         style={[styles.image, { opacity: fadeAnim }]}
                     />
                 </Animated.View> 
@@ -83,8 +84,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     image: {
-        width: responsiveWidth(90),
-        height: responsiveHeight(7),
+        width: responsiveWidth(30),
+        height: responsiveHeight(30),
         resizeMode:'contain'
     },
     logoContainer: {
