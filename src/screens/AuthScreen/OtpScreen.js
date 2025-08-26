@@ -7,9 +7,12 @@ import {
     TouchableOpacity,
     StyleSheet,
     Alert,
-    StatusBar
+    StatusBar,
+    Keyboard,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView
 } from 'react-native';
-import OTPInputView from '@twotalltotems/react-native-otp-input'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { API_URL } from '@env'
@@ -25,17 +28,29 @@ import { useNavigation } from '@react-navigation/native';
 
 const OtpScreen = ({ route }) => {
     const navigation = useNavigation();
-    const [otp, setOtp] = useState('');
+    const [otp, setOtp] = useState(['', '', '', '']);
     const [comingOTP, setComingOTP] = useState(route?.params?.otp)
     const [errors, setError] = useState(true)
     const [errorText, setErrorText] = useState('Please enter OTP.')
     const [isLoading, setIsLoading] = useState(false)
     const [isResendDisabled, setIsResendDisabled] = useState(true);
+    const inputRefs = [useRef(), useRef(), useRef(), useRef()];
 
     const { login, userToken } = useContext(AuthContext);
 
-    const inputRef = useRef();
     const [timer, setTimer] = useState(60 * 1);
+    
+    // Auto-focus first input when component mounts
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (inputRefs[0].current) {
+                inputRefs[0].current.focus();
+            }
+        }, 300);
+        
+        return () => clearTimeout(timer);
+    }, []);
+    
     useEffect(() => {
         // If timer is 0, return early
         if (timer === 0) {
@@ -76,10 +91,22 @@ const OtpScreen = ({ route }) => {
     //       .catch(error => console.error('Error setting up OTP listener:', error));
     //   }, []);
 
-    const onChangeCode = (code) => {
-        setOtp(code)
-        setError(false)
-
+    const onChangeCode = (text, index) => {
+        const newOtp = [...otp];
+        newOtp[index] = text;
+        setOtp(newOtp);
+        setError(false);
+        
+        // Auto-focus next input if current input is filled
+        if (text && index < 3) {
+            inputRefs[index + 1].current.focus();
+        }
+        
+        // Check if all inputs are filled
+        if (newOtp.every(digit => digit !== '')) {
+            const otpString = newOtp.join('');
+            goToNextPage(otpString);
+        }
     }
 
     const goToNextPage = (code) => {
@@ -144,7 +171,13 @@ const OtpScreen = ({ route }) => {
             setIsLoading(false)
 
             Alert.alert('Oops..', "The OTP does not match. Please enter the correct OTP.", [
-                { text: 'OK', onPress: () => setOtp('') },
+                { text: 'OK', onPress: () => {
+                    setOtp(['', '', '', '']);
+                    // Reset focus to first input field
+                    if (inputRefs[0].current) {
+                        inputRefs[0].current.focus();
+                    }
+                }},
             ]);
 
         }
@@ -177,7 +210,11 @@ const OtpScreen = ({ route }) => {
                     setComingOTP(res.data?.otp)
                     setTimer(60 * 1)
                     setIsResendDisabled(true);
-                    setOtp('')
+                    setOtp(['', '', '', ''])
+                    // Reset focus to first input field
+                    if (inputRefs[0].current) {
+                        inputRefs[0].current.focus();
+                    }
                 } else {
                     console.log('not okk')
                     setIsLoading(false)
@@ -203,12 +240,23 @@ const OtpScreen = ({ route }) => {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        <KeyboardAvoidingView 
+            style={styles.container} 
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        >
             <StatusBar translucent={false} backgroundColor="black" barStyle="light-content" />
+            
             <View style={{ paddingHorizontal: 20, paddingVertical: 10, marginTop: responsiveHeight(5) }}>
                 <MaterialIcons name="arrow-back-ios-new" size={25} color="#000" onPress={() => navigation.goBack()} />
             </View>
-            <View style={styles.wrapper}>
+            
+            <ScrollView 
+                contentContainerStyle={styles.scrollContainer}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+            >
+                <View style={styles.wrapper}>
                 <Text
                     style={styles.header}>
                     Verification code
@@ -223,24 +271,34 @@ const OtpScreen = ({ route }) => {
                 </Text> */}
 
                 <View style={styles.textinputview}>
-                    <OTPInputView
-                        ref={inputRef}
-                        style={styles.otpTextView}
-                        pinCount={4}
-                        code={otp} //You can supply this prop or not. The component will be used as a controlled / uncontrolled component respectively.
-                        onCodeChanged={code => { onChangeCode(code) }}
-                        autoFocusOnLoad={false}
-                        codeInputFieldStyle={styles.underlineStyleBase}
-                        codeInputHighlightStyle={styles.underlineStyleHighLighted}
-                        onCodeFilled={(code) => goToNextPage(code)}
-                        keyboardType={'numeric'}
-                        keyboardAppearance={'default'}
-                    />
+                    <View style={styles.otpContainer}>
+                        {[0, 1, 2, 3].map((index) => (
+                            <TextInput
+                                key={index}
+                                ref={inputRefs[index]}
+                                style={[
+                                    styles.otpInput, 
+                                    otp[index] ? styles.otpInputFilled : null,
+                                    errors && !otp[index] ? styles.otpInputError : null
+                                ]}
+                                value={otp[index]}
+                                onChangeText={(text) => onChangeCode(text, index)}
+                                keyboardType="numeric"
+                                maxLength={1}
+                                textAlign="center"
+                                onKeyPress={({ nativeEvent }) => {
+                                    if (nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
+                                        inputRefs[index - 1].current.focus();
+                                    }
+                                }}
+                            />
+                        ))}
+                    </View>
                 </View>
                 {errors &&
                     <Text style={styles.errorText}>{errorText}</Text>
                 }
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View style={styles.bottomSection}>
                     <Text style={styles.otpText}>Didn’t receive OTP?</Text>
                     <Text style={styles.timerText}>{formatTime(timer)}</Text>
                     <TouchableOpacity onPress={() => resendOtp()} disabled={isResendDisabled}>
@@ -255,7 +313,8 @@ const OtpScreen = ({ route }) => {
                     onPress={() => navigation.navigate('PersonalInformation')}
                 />
             </View> */}
-        </SafeAreaView>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 };
 
@@ -264,14 +323,17 @@ export default OtpScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
         backgroundColor: '#FFFFFF',
-        height: responsiveHeight(100)
+    },
+    scrollContainer: {
+        flexGrow: 1,
+        justifyContent: 'flex-start',
+        paddingTop: responsiveHeight(10),
+        paddingBottom: 20,
     },
     wrapper: {
         paddingHorizontal: 25,
-        height: responsiveHeight(80),
-        marginTop: responsiveHeight(5)
+        marginTop: 0
     },
     header: {
         fontFamily: 'Poppins-Bold',
@@ -301,31 +363,47 @@ const styles = StyleSheet.create({
         paddingHorizontal: 25,
         bottom: 15
     },
-    otpTextView: {
+    otpContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         width: '100%',
-        height: 180,
-        borderRadius: 10,
+        paddingHorizontal: 10,
+        marginTop: responsiveHeight(3),
     },
-    underlineStyleBase: {
-        width: responsiveWidth(15),
+    otpInput: {
+        width: responsiveWidth(16),
         height: responsiveHeight(8),
-        borderRadius: 8,
-        color: '#2F2F2F',
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        borderRadius: 12,
+        textAlign: 'center',
+        fontSize: responsiveFontSize(3),
         fontFamily: 'Poppins-Medium',
-        fontSize: responsiveFontSize(2)
+        color: '#2F2F2F',
+        backgroundColor: '#F8F8F8',
     },
-
-    underlineStyleHighLighted: {
-        borderColor: "#2F2F2F",
-        borderRadius: 8
+    otpInputFilled: {
+        borderColor: '#2F2F2F',
+        backgroundColor: '#FFFFFF',
+    },
+    otpInputError: {
+        borderColor: '#FF0000',
+        borderWidth: 2,
     },
     errorText: {
-        fontSize: responsiveFontSize(1.5),
-        color: 'red',
-        marginBottom: 20,
-        marginTop: -25,
+        fontSize: responsiveFontSize(1.8),
+        color: '#FF0000',
+        marginBottom: responsiveHeight(2),
+        marginTop: responsiveHeight(1.5),
         alignSelf: 'center',
         fontFamily: 'Poppins-Medium'
+    },
+    bottomSection: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: responsiveHeight(3),
+        paddingHorizontal: 5,
     },
     timerText: {
         color: '#808080',
