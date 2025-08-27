@@ -1,6 +1,5 @@
 import React, { useContext, useState, useRef, useCallback, useEffect } from 'react';
 import {
-  SafeAreaView,
   ScrollView,
   View,
   Text,
@@ -36,6 +35,7 @@ import Toast from 'react-native-toast-message';
 import { plus, userPhoto } from '../../../utils/Images';
 import Svg, { Circle, Defs, LinearGradient, Stop, Mask, Rect } from 'react-native-svg';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width: screenWidth } = Dimensions.get('window');
 

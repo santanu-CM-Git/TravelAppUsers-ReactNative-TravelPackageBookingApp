@@ -2,7 +2,6 @@ import React, { useContext, useMemo, useState, useEffect, memo, useCallback, use
 import {
     View,
     Text,
-    SafeAreaView,
     ScrollView,
     Image,
     RefreshControl,
@@ -48,6 +47,7 @@ import Icon from 'react-native-vector-icons/Entypo';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import Toast from 'react-native-toast-message';
 import { CountryPicker } from "react-native-country-codes-picker";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 const itemWidth = width * 0.8; // 80% of screen width

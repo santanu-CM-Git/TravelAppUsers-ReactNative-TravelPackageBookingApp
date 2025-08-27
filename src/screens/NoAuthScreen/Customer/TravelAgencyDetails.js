@@ -2,7 +2,6 @@ import React, { useContext, useMemo, useState, useEffect, memo, useCallback, use
 import {
     View,
     Text,
-    SafeAreaView,
     ScrollView,
     Image,
     RefreshControl,
@@ -44,6 +43,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import Icon from 'react-native-vector-icons/Entypo';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import Svg, { Circle, Defs, LinearGradient, Stop, Mask, Rect } from 'react-native-svg';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 const { width } = Dimensions.get('window');

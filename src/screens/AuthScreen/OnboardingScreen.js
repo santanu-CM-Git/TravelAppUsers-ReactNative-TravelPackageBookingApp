@@ -1,5 +1,6 @@
 import React from 'react'
-import { SafeAreaView, View, Text, TouchableOpacity,Image } from 'react-native';
+import { View, Text, TouchableOpacity,Image } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Logo from '../..//assets/images/misc/logo.svg';

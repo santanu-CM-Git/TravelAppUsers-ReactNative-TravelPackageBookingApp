@@ -1,7 +1,6 @@
 import React, { useContext, useState, useEffect,useCallback } from 'react';
 import {
     BackHandler,
-    SafeAreaView,
     StyleSheet,
     useWindowDimensions,
 } from 'react-native';
@@ -9,6 +8,7 @@ import { WebView } from 'react-native-webview';
 import CustomHeader from '../../../components/CustomHeader';
 import Loader from '../../../utils/Loader';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function PrivacyPolicy({  }) {
     const navigation = useNavigation();

@@ -2,7 +2,6 @@ import React, { useContext, useMemo, useState, useEffect, memo, useCallback, use
 import {
     View,
     Text,
-    SafeAreaView,
     ScrollView,
     Image,
     RefreshControl,
@@ -43,6 +42,7 @@ import StarRating from 'react-native-star-rating-widget';
 import SwitchSelector from "react-native-switch-selector";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 const itemWidth = width * 0.8; // 80% of screen width

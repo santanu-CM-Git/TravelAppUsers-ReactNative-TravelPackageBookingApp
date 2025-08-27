@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { SafeAreaView, View, Text, StyleSheet, StatusBar, BackHandler } from 'react-native';
+import { View, Text, StyleSheet, StatusBar, BackHandler } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Thankyou from '../../../assets/images/misc/Thankyou.svg';
 import LinearGradient from 'react-native-linear-gradient';

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
-import { SafeAreaView, StatusBar } from 'react-native';
+import { StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { AuthProvider } from './src/context/AuthContext';
 import AppNav from './src/navigation/AppNav';
 import store from './src/store/store';
@@ -13,6 +14,7 @@ import { requestNotificationPopup, setupNotificationHandlers } from './src/utils
 import { navigate } from './src/navigation/NavigationService'; // Import the navigation function
 import { requestCameraAndAudioPermissions } from './src/utils/PermissionHandler';
 import { PERMISSIONS, request } from 'react-native-permissions';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 function App() {
   const [notifications, setNotifications] = useState([]);
@@ -62,6 +64,7 @@ function App() {
 
   return (
     <Provider store={store}>
+      <SafeAreaProvider>
         <StatusBar
           translucent={false}
           backgroundColor="#000"
@@ -72,6 +75,7 @@ function App() {
           <AppNav />
         </AuthProvider>
         <Toast />
+        </SafeAreaProvider>
     </Provider>
   );
 }

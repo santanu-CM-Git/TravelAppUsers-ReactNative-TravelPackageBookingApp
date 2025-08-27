@@ -2,7 +2,6 @@ import React, { useContext, useMemo, useState, useEffect, memo, useCallback, use
 import {
   View,
   Text,
-  SafeAreaView,
   ScrollView,
   Image,
   RefreshControl,
@@ -51,6 +50,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { ensureNotificationPermission } from '../../../utils/NotificationPermission';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 const itemWidth = width * 0.8; // 80% of screen width

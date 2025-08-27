@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect, useCallback } from 'react';
-import { View, Text, SafeAreaView, StyleSheet, ScrollView, ImageBackground, Image, StatusBar, BackHandler } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, ImageBackground, Image, StatusBar, BackHandler } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import CustomHeader from '../../../components/CustomHeader'
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
 import { TouchableOpacity } from 'react-native-gesture-handler'
