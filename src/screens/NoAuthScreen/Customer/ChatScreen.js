@@ -1417,7 +1417,7 @@ const ChatScreen = ({ route }) => {
   }
 
   return (
-    <SafeAreaView style={styles.Container}>
+    <SafeAreaView style={[styles.Container, { paddingBottom: activeTab === 'audio' ? 0 : 10 }]}>
       <StatusBar translucent={false} backgroundColor="black" barStyle="light-content" />
       <View style={styles.headerContainer}>
         <GestureTouchableOpacity onPress={handleGoBack}>
@@ -1575,7 +1575,7 @@ const styles = StyleSheet.create({
   Container: {
     flex: 1,
     backgroundColor: '#EAECF0',
-    paddingBottom: 10,
+    //paddingBottom: 10,
     position: 'relative',
   },
   headerContainer: {

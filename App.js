@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
-import { StatusBar } from 'react-native';
+import { SafeAreaView, StatusBar } from 'react-native';
 import { AuthProvider } from './src/context/AuthContext';
 import AppNav from './src/navigation/AppNav';
 import store from './src/store/store';
@@ -13,22 +13,22 @@ import { requestNotificationPopup, setupNotificationHandlers } from './src/utils
 import { navigate } from './src/navigation/NavigationService'; // Import the navigation function
 import { requestCameraAndAudioPermissions } from './src/utils/PermissionHandler';
 import { PERMISSIONS, request } from 'react-native-permissions';
- 
+
 function App() {
   const [notifications, setNotifications] = useState([]);
   const [notifyStatus, setnotifyStatus] = useState(false);
-  
+
   useEffect(() => {
     SplashScreen.hide();
-  
+
     if (Platform.OS === 'ios') {
       requestUserPermission();
     }
-  
+
     // Request only notification permission and set up notification handlers
     requestNotificationPopup().then(() => {
       const unsubscribeForeground = setupNotificationHandlers(setNotifications, setnotifyStatus);
-  
+
       messaging().onNotificationOpenedApp(remoteMessage => {
         if (remoteMessage?.data?.screen === 'ScheduleScreen') {
           navigate('Schedule', { screen: 'ScheduleScreen' });
@@ -36,7 +36,7 @@ function App() {
           navigate('WalletScreen');
         }
       });
-  
+
       messaging().getInitialNotification().then(remoteMessage => {
         if (remoteMessage?.data?.screen === 'ScheduleScreen') {
           navigate('Schedule', { screen: 'ScheduleScreen' });
@@ -44,7 +44,7 @@ function App() {
           navigate('WalletScreen');
         }
       });
-  
+
       return () => {
         if (unsubscribeForeground) unsubscribeForeground();
       };
@@ -54,7 +54,7 @@ function App() {
   async function requestUserPermission() {
     const result = await request(PERMISSIONS.IOS.CAMERA);
     const authorizationStatus = await messaging().requestPermission();
-  
+
     if (authorizationStatus) {
       console.log('Permission status:', authorizationStatus);
     }
@@ -62,12 +62,16 @@ function App() {
 
   return (
     <Provider store={store}>
-      <StatusBar backgroundColor="#000" />
-      <OfflineNotice />
-      <AuthProvider>
-        <AppNav />
-      </AuthProvider>
-      <Toast />
+        <StatusBar
+          translucent={false}
+          backgroundColor="#000"
+          barStyle="light-content"
+        />
+        <OfflineNotice />
+        <AuthProvider>
+          <AppNav />
+        </AuthProvider>
+        <Toast />
     </Provider>
   );
 }
