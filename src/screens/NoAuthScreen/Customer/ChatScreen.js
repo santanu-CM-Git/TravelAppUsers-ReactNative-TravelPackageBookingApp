@@ -596,11 +596,11 @@ const ChatScreen = ({ route }) => {
       } else {
         //const cameraStatus = await check(PERMISSIONS.IOS.CAMERA);
         const micStatus = await check(PERMISSIONS.IOS.MICROPHONE);
-  
+
         // if (cameraStatus !== RESULTS.GRANTED) {
         //   await request(PERMISSIONS.IOS.CAMERA);
         // }
-  
+
         if (micStatus !== RESULTS.GRANTED) {
           await request(PERMISSIONS.IOS.MICROPHONE);
         }
@@ -1485,13 +1485,13 @@ const ChatScreen = ({ route }) => {
             <GestureTouchableOpacity onPress={() => toggleMic()}>
               <Image
                 source={micOn ? audioonIcon : audiooffIcon}
-                style={[styles.iconStyle,{marginRight: responsiveWidth(2)}]}
+                style={[styles.iconStyle, { marginRight: responsiveWidth(2) }]}
               />
             </GestureTouchableOpacity>
             <GestureTouchableOpacity onPress={() => toggleSpeaker()}>
               <Image
                 source={speakerOn ? speakeronIcon : speakeroffIcon}
-                style={[styles.iconStyle,{marginRight: responsiveWidth(2)}]}
+                style={[styles.iconStyle, { marginRight: responsiveWidth(2) }]}
               />
             </GestureTouchableOpacity>
             {/* 🔴 End Button */}
@@ -1543,7 +1543,22 @@ const ChatScreen = ({ route }) => {
             )}
             <GestureTouchableOpacity
               onPress={() => setIsImageModalVisible(false)}
-              style={{ position: 'absolute', top: 40, right: 30, backgroundColor: '#fff', borderRadius: 20, padding: 8 }}
+              style={{ 
+                position: 'absolute',
+                top: 40,
+                alignSelf: 'center',   // center horizontally
+                backgroundColor: '#fff',
+                width: 40,
+                height: 40,
+                borderRadius: 20,      // half of width/height → perfect circle
+                justifyContent: 'center',
+                alignItems: 'center',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.3,
+                shadowRadius: 3,
+                elevation: 5,          // for Android shadow
+              }}
             >
               <Text style={{ fontSize: 18, color: '#222' }}>✕</Text>
             </GestureTouchableOpacity>
@@ -1864,7 +1879,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  
+
   endButtonText: {
     color: 'white',
     fontFamily: 'Poppins-Medium',

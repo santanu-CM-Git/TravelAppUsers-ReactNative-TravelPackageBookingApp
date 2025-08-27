@@ -48,7 +48,7 @@ const itemWidth = width * 0.8; // 80% of screen width
 const imageHeight = itemWidth * 0.5; // Maintain a 4:3 aspect ratio
 
 
-export default function TopLocationScreen({  }) {
+export default function TopLocationScreen({ }) {
     const navigation = useNavigation();
     const carouselRef = useRef(null);
     const dispatch = useDispatch();
@@ -131,16 +131,16 @@ export default function TopLocationScreen({  }) {
     useFocusEffect(
         useCallback(() => {
             const backAction = () => {
-               navigation.goBack()
-               return true
-              };
-          
-              const backHandler = BackHandler.addEventListener(
+                navigation.goBack()
+                return true
+            };
+
+            const backHandler = BackHandler.addEventListener(
                 'hardwareBackPress',
                 backAction,
-              );
-          
-              return () => backHandler.remove();
+            );
+
+            return () => backHandler.remove();
         }, [navigation])
     );
 
@@ -149,11 +149,17 @@ export default function TopLocationScreen({  }) {
             location: item,
             country: userInfo?.country
         })}>
-            <ImageBackground source={{uri: item?.image_url}} style={styles.card} imageStyle={styles.imageStyle}>
+            <ImageBackground source={{ uri: item?.image_url }} style={styles.card} imageStyle={styles.imageStyle}>
 
                 <LinearGradient colors={["transparent", "rgba(0,0,0,0.8)"]} style={styles.overlay} />
                 <View style={styles.textContainer}>
-                    <Text style={styles.title}>{item?.location_name}</Text>
+                    <Text
+                        style={[styles.title, { maxWidth: '90%',flexShrink: 1, }]}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                    >
+                        {item?.location_name}
+                    </Text>
                     <Text style={styles.activities}>{item?.total} activities</Text>
                 </View>
 

@@ -183,7 +183,7 @@ export default function NearbyTourPlanerList({  }) {
                         <Image source={{ uri: item?.profile_photo_url }} style={styles.productImg3} />
                         <View style={{ margin: 5 }}>
                             <Text style={styles.productText3}>{item.name}</Text>
-                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center',paddingRight: 10 }}>
                                 <Image source={mappinImg} style={styles.pinImg} />
                                 <Text style={styles.addressText} numberOfLines={1}>{item.address}</Text>
                             </View>

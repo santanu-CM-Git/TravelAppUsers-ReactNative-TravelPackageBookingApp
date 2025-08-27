@@ -79,7 +79,7 @@ export default function HomeScreen() {
   // Loading states
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // Data states
   const [recentview, setRecentview] = useState([]);
   const [destinationsData, setDestinationsData] = useState([]);
@@ -141,7 +141,7 @@ export default function HomeScreen() {
   const [maxPrice, setMaxPrice] = useState(25000);
   const [starCount, setStarCount] = useState(5)
   const [selectedId2, setSelectedId2] = useState('1');
-  
+
   // Memoized radio buttons to prevent unnecessary re-renders
   const radioButtons2 = useMemo(() => ([
     {
@@ -245,7 +245,7 @@ export default function HomeScreen() {
           onPress: () => null,
           style: 'cancel',
         },
-        {text: 'YES', onPress: () => BackHandler.exitApp()},
+        { text: 'YES', onPress: () => BackHandler.exitApp() },
       ]);
       return true;
     };
@@ -396,7 +396,7 @@ export default function HomeScreen() {
     fetchBanner();
     fetchRecentViewed();
     requestLocationPermission();
-    
+
     // Check notification permission on app start
     const checkInitialNotificationPermission = async () => {
       try {
@@ -417,7 +417,7 @@ export default function HomeScreen() {
         console.log('Initial notification permission check error:', error);
       }
     };
-    
+
     checkInitialNotificationPermission();
   }, [])
 
@@ -461,7 +461,7 @@ export default function HomeScreen() {
         let maxPrice = res.data.max_price;
         setMinPrice(0)
         setMaxPrice(maxPrice)
-        setPriceValues([0,maxPrice])
+        setPriceValues([0, maxPrice])
         const formattedData = userInfo.map(item => ({
           label: item.name,
           value: item.id
@@ -489,7 +489,7 @@ export default function HomeScreen() {
 
           if (res.data.response == true) {
             let banner = res.data.data;
-            console.log(banner,'hjghjg');
+            console.log(banner, 'hjghjg');
             setIsBannerShown(banner)
           } else {
             setIsBannerShown([])
@@ -793,7 +793,7 @@ export default function HomeScreen() {
         </View>
       </View>
     </TouchableWithoutFeedback>
-  ), [navigation]); 
+  ), [navigation]);
 
   const renderNearbyTourPlanner = useCallback(({ item }) => (
     <TouchableWithoutFeedback onPress={() => navigation.navigate('TravelAgencyDetails', { item: item, countryName: countryName })}>
@@ -999,7 +999,12 @@ export default function HomeScreen() {
           <Image source={{ uri: item?.image_url }} style={styles.topLocationMainImage} />
           {/* Location Tag */}
           <View style={styles.topLocationTag}>
-            <Text style={styles.topLocationTagText}>{item?.location_name}</Text>
+            <Text style={[styles.topLocationTagText, { maxWidth: 110 }]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {item?.location_name}
+            </Text>
             <View style={styles.topLocationTagCut} />
           </View>
         </View>
@@ -1327,7 +1332,7 @@ export default function HomeScreen() {
         </View>
       </TouchableOpacity> */}
         {isBannerShown.length > 0 ?
-          <TouchableOpacity onPress={() => navigation.navigate('ReviewScreen',{agentId: isBannerShown[0].agent_id,packageId:isBannerShown[0].package_id})}>
+          <TouchableOpacity onPress={() => navigation.navigate('ReviewScreen', { agentId: isBannerShown[0].agent_id, packageId: isBannerShown[0].package_id })}>
             <Image
               source={freebannerPlaceHolder}
               style={styles.freebannerImg}
@@ -1359,18 +1364,18 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
         {destinationsData.length > 0 ? (
-          <FlatList
-            data={destinationsData}
-            keyExtractor={keyExtractor}
-            renderItem={renderTopLocationItem}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ marginHorizontal: 10 }}
-            style={styles.topLocationScrollView}
-            removeClippedSubviews={true}
-            maxToRenderPerBatch={3}
-            windowSize={5}
-          />
+            <FlatList
+              data={destinationsData}
+              keyExtractor={keyExtractor}
+              renderItem={renderTopLocationItem}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal: 10 }}
+              style={styles.topLocationScrollView}
+              removeClippedSubviews={true}
+              maxToRenderPerBatch={3}
+              windowSize={5}
+            />
         ) : (
           <View style={styles.noLocationContainer}>
             <Text style={styles.noLocationText}>No location found</Text>
@@ -1720,7 +1725,7 @@ export default function HomeScreen() {
                 </View>
               </View>
               <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Type</Text>
-              <View style={{ marginTop: responsiveHeight(2), marginBottom: responsiveHeight(2), marginLeft: -responsiveWidth(2.5)}}>
+              <View style={{ marginTop: responsiveHeight(2), marginBottom: responsiveHeight(2), marginLeft: -responsiveWidth(2.5) }}>
                 <RadioGroup
                   radioButtons={radioButtons2}
                   onPress={setSelectedId2}

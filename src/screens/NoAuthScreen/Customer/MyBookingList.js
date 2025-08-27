@@ -157,7 +157,12 @@ const MyBookingList = ({ route }) => {
                 >
                     <LinearGradient colors={["transparent", "rgba(0,0,0,0.8)"]} style={styles.overlay} />
                     <View style={styles.textContainer}>
-                        <Text style={styles.title}>{item?.package?.location || 'Jammu-Kashmir'}</Text>
+                        <Text style={[styles.title, { maxWidth: '90%',flexShrink: 1, }]}
+                        numberOfLines={1} 
+                        ellipsizeMode="tail"
+                        >
+                        {item?.package?.location || 'Jammu-Kashmir'}
+                        </Text>
                         {item?.rating !== null && item?.rating !== undefined && item?.rating !== 0 && (
                         <View style={styles.rateingView}>
                             <Image
