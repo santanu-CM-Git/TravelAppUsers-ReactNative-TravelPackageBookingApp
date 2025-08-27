@@ -12,7 +12,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   BackHandler,
-  ActivityIndicator
+  ActivityIndicator,
+  Dimensions
 } from 'react-native';
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -35,6 +36,8 @@ import Toast from 'react-native-toast-message';
 import { plus, userPhoto } from '../../../utils/Images';
 import Svg, { Circle, Defs, LinearGradient, Stop, Mask, Rect } from 'react-native-svg';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+
+const { width: screenWidth } = Dimensions.get('window');
 
 const dataGender = [
   { label: 'Male', value: 'Male' },
@@ -63,6 +66,13 @@ const ProfileEditScreen = ({ route }) => {
 
   const [isLoading, setIsLoading] = useState(false)
   const { login, userToken } = useContext(AuthContext);
+
+  // Calculate responsive dimensions
+  const profileImageSize = responsiveWidth(20); // 20% of screen width
+  const svgSize = profileImageSize * 2; // SVG container size
+  const centerPoint = svgSize / 2;
+  const innerCircleRadius = profileImageSize * 0.65;
+  const outerCircleRadius = profileImageSize * 0.8;
 
   const fetchProfileData = async () => {
     try {
@@ -102,39 +112,6 @@ const ProfileEditScreen = ({ route }) => {
     fetchProfileData();
   }, []);
 
-  // const pickDocument = async () => {
-  //   try {
-  //     const result = await DocumentPicker.pick({
-  //       type: [DocumentPicker.types.allFiles],
-  //     });
-
-  //     const pickedDocument = result[0];
-  //     setPickedDocument(pickedDocument);
-
-  //     const formData = new FormData();
-  //     if (pickedDocument) {
-  //       formData.append("profile_pic", {
-  //         uri: pickedDocument.uri,
-  //         type: pickedDocument.type || 'image/jpeg',
-  //         name: pickedDocument.name || 'photo.jpg',
-  //       });
-  //     } else {
-  //       formData.append("profile_pic", "");
-  //     }
-
-  //   } catch (err) {
-  //     setIsPicUploadLoading(false);
-  //     if (DocumentPicker.isCancel(err)) {
-  //       console.log('Document picker was cancelled');
-  //     } else if (err.response) {
-  //       console.log('Error response:', err.response.data?.response?.records);
-  //       handleAlert('Oops..', err.response.data?.message);
-  //     } else {
-  //       console.error('Error picking document', err);
-  //     }
-  //   }
-  // };
-
   const pickDocument = async () => {
     try {
       setIsPicUploadLoading(true);
@@ -170,6 +147,7 @@ const ProfileEditScreen = ({ route }) => {
       }
     }
   };
+
   const changeFirstname = (text) => {
     setFirstname(text);
     if (text) {
@@ -211,7 +189,6 @@ const ProfileEditScreen = ({ route }) => {
     } else {
       setLastNameError('');
     }
-
 
     setIsLoading(true);
     const formData = new FormData();
@@ -271,13 +248,14 @@ const ProfileEditScreen = ({ route }) => {
       
           return () => backHandler.remove();
     }, [navigation])
-);
+  );
 
   if (isLoading) {
     return (
       <Loader />
     )
   }
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAwareScrollView showsVerticalScrollIndicator={false} style={{ marginBottom: responsiveHeight(0) }}>
@@ -287,45 +265,102 @@ const ProfileEditScreen = ({ route }) => {
         </View>
         <View style={styles.wrapper}>
           <View style={styles.mainView}>
-            {/* SVG for Circular Ripple with Bottom Fade */}
-            <Svg height="250" width="250" style={styles.svg}>
-              <Defs>
-                {/* Gradient Mask to Fade Bottom */}
-                <LinearGradient id="fadeGradient" x1="0" y1="0" x2="0" y2="1">
-                  <Stop offset="0%" stopColor="white" stopOpacity="1" />
-                  <Stop offset="80%" stopColor="white" stopOpacity="0.3" />
-                  <Stop offset="100%" stopColor="white" stopOpacity="0" />
-                </LinearGradient>
+            {/* Improved SVG for Circular Ripple with Better Responsiveness */}
+            <View style={[styles.svgContainer, { width: svgSize, height: svgSize }]}>
+              <Svg height={svgSize} width={svgSize} style={styles.svg}>
+                <Defs>
+                  {/* Gradient Mask to Fade Bottom */}
+                  <LinearGradient id="fadeGradient" x1="0" y1="0" x2="0" y2="1">
+                    <Stop offset="0%" stopColor="white" stopOpacity="1" />
+                    <Stop offset="70%" stopColor="white" stopOpacity="0.6" />
+                    <Stop offset="100%" stopColor="white" stopOpacity="0" />
+                  </LinearGradient>
 
-                {/* Masking the Circles */}
-                <Mask id="circleMask">
-                  <Rect x="0" y="0" width="250" height="160" fill="url(#fadeGradient)" />
-                </Mask>
-              </Defs>
+                  {/* Masking the Circles */}
+                  <Mask id="circleMask">
+                    <Rect x="0" y="0" width={svgSize} height={svgSize * 0.65} fill="url(#fadeGradient)" />
+                  </Mask>
+                </Defs>
 
-              {/* Outer Circles with Mask */}
-              <Circle cx="125" cy="125" r="60" stroke="#FF7788" strokeWidth="2" fill="none" mask="url(#circleMask)" />
-              <Circle cx="125" cy="125" r="50" stroke="#FF99AA" strokeWidth="2" fill="none" mask="url(#circleMask)" />
-            </Svg>
-            <View style={styles.imageContainer}>
-              {isPicUploadLoading ? (
-                <ActivityIndicator size="small" color="#417AA4" style={styles.loader} />
-              ) : (
-                pickedDocument == null ? (
-                  imageFile != null ? (
-                    <Image source={{ uri: imageFile }} style={styles.imageStyle} />
-                  ) : (
-                    <Image source={userPhoto} style={styles.imageStyle} />
-                  )
+                {/* Outer Circles with Mask - Now Responsive */}
+                <Circle 
+                  cx={centerPoint} 
+                  cy={centerPoint} 
+                  r={outerCircleRadius} 
+                  stroke="#FF7788" 
+                  strokeWidth="1.5" 
+                  fill="none" 
+                  mask="url(#circleMask)" 
+                />
+                <Circle 
+                  cx={centerPoint} 
+                  cy={centerPoint} 
+                  r={innerCircleRadius} 
+                  stroke="#FF99AA" 
+                  strokeWidth="1.5" 
+                  fill="none" 
+                  mask="url(#circleMask)" 
+                />
+              </Svg>
+              
+              {/* Profile Image Container - Positioned in center of SVG */}
+              <View style={[styles.imageContainer, {
+                width: profileImageSize,
+                height: profileImageSize,
+                position: 'absolute',
+                top: centerPoint - (profileImageSize / 2),
+                left: centerPoint - (profileImageSize / 2),
+              }]}>
+                {isPicUploadLoading ? (
+                  <ActivityIndicator size="small" color="#417AA4" style={styles.loader} />
                 ) : (
-                  <Image source={{ uri: pickedDocument.uri }} style={styles.imageStyle} />
-                )
-              )}
+                  pickedDocument == null ? (
+                    imageFile != null ? (
+                      <Image 
+                        source={{ uri: imageFile }} 
+                        style={[styles.imageStyle, {
+                          width: profileImageSize * 0.9,
+                          height: profileImageSize * 0.9,
+                          borderRadius: (profileImageSize * 0.9) / 2,
+                        }]} 
+                      />
+                    ) : (
+                      <Image 
+                        source={userPhoto} 
+                        style={[styles.imageStyle, {
+                          width: profileImageSize * 0.9,
+                          height: profileImageSize * 0.9,
+                          borderRadius: (profileImageSize * 0.9) / 2,
+                        }]} 
+                      />
+                    )
+                  ) : (
+                    <Image 
+                      source={{ uri: pickedDocument.uri }} 
+                      style={[styles.imageStyle, {
+                        width: profileImageSize * 0.9,
+                        height: profileImageSize * 0.9,
+                        borderRadius: (profileImageSize * 0.9) / 2,
+                      }]} 
+                    />
+                  )
+                )}
+              </View>
+              
+              {/* Plus Icon - Positioned relative to the image */}
+              <TouchableOpacity 
+                style={[styles.plusIcon, {
+                  position: 'absolute',
+                  bottom: centerPoint - (profileImageSize / 2) - 1,
+                  right: centerPoint - (profileImageSize / 2) - 1,
+                }]} 
+                onPress={pickDocument}
+              >
+                <Image source={plus} style={styles.iconStyle} />
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.plusIcon} onPress={pickDocument}>
-              <Image source={plus} style={styles.iconStyle} />
-            </TouchableOpacity>
           </View>
+
           <View style={styles.textinputview}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Text style={styles.header}>First name</Text>
@@ -371,27 +406,10 @@ const ProfileEditScreen = ({ route }) => {
                 onChangeText={(text) => changeMobile(text)}
               />
             </View>
-
-            {/* <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={styles.header}>Address</Text>
-            </View>
-            <View style={styles.inputView}>
-              <InputField
-                label={'Address'}
-                keyboardType="default"
-                value={address}
-                inputType={'nonedit'}
-                onChangeText={(text) => setAddress(text)}
-              />
-            </View> */}
           </View>
-
         </View>
-
-
       </KeyboardAwareScrollView>
       <View style={styles.buttonwrapper}>
-
         <CustomButton label={"Submit"}
           onPress={() => { submitForm() }}
         />
@@ -403,15 +421,12 @@ const ProfileEditScreen = ({ route }) => {
 export default ProfileEditScreen;
 
 const styles = StyleSheet.create({
-
   container: {
-    //justifyContent: 'center',
     backgroundColor: '#FFFFFF',
     flex: 1
   },
   wrapper: {
     paddingHorizontal: 23,
-    //height: responsiveHeight(78)
     marginBottom: responsiveHeight(2)
   },
   header1: {
@@ -449,19 +464,14 @@ const styles = StyleSheet.create({
     marginTop: responsiveHeight(2)
   },
   imageStyle: {
-    height: 80,
-    width: 80,
-    borderRadius: 40,
-    marginBottom: 10
+    resizeMode: 'cover',
   },
   plusIcon: {
-    position: 'absolute',
-    bottom: 10,
-    left: 50
+    // Dynamic positioning will be applied inline
   },
   textinputview: {
     marginBottom: responsiveHeight(15),
-    marginTop: responsiveHeight(5)
+    marginTop: responsiveHeight(3) // Reduced from 5 to 3
   },
   inputView: {
     paddingVertical: 1
@@ -477,7 +487,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     paddingHorizontal: 10,
     paddingVertical: 10,
-    //borderWidth: 1,
     borderColor: '#DDD',
     borderRadius: 5
   },
@@ -486,12 +495,10 @@ const styles = StyleSheet.create({
   },
   dropdownMenuSubsection: {
     borderBottomWidth: 0,
-
   },
   mainWrapper: {
     flex: 1,
     marginTop: responsiveHeight(1)
-
   },
   dropdownHalf: {
     height: responsiveHeight(7.2),
@@ -538,20 +545,18 @@ const styles = StyleSheet.create({
   termsView: {
     marginBottom: responsiveHeight(3),
     paddingHorizontal: 10,
-    //alignSelf: 'flex-start',
   },
   termsText: {
     color: '#746868',
     fontFamily: 'Poppins-Regular',
     fontSize: responsiveFontSize(1.5),
-    //textAlign: 'center',
   },
   termsLinkText: {
     color: '#746868',
     fontFamily: 'Poppins-Regular',
     fontSize: responsiveFontSize(1.5),
     textAlign: 'center',
-    textDecorationLine: 'underline', // Optional: to make the link look more like a link
+    textDecorationLine: 'underline',
   },
   doneButton: {
     marginTop: 10,
@@ -568,23 +573,29 @@ const styles = StyleSheet.create({
   },
   mainView: {
     alignSelf: 'center',
-    marginTop: responsiveHeight(2),
+    marginTop: responsiveHeight(1), // Reduced from 2 to 1
     justifyContent: 'center',
     alignItems: 'center'
   },
-  imageContainer: {
-    height: 90,
-    width: 90,
+  svgContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 10,
+    position: 'relative',
+  },
+  imageContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
   },
   loader: {
     position: 'absolute',
   },
-  iconStyle: { height: 25, width: 25, resizeMode: 'contain' },
+  iconStyle: { 
+    height: 25, 
+    width: 25, 
+    resizeMode: 'contain' 
+  },
   svg: {
-    position: 'absolute',
-    bottom: -responsiveHeight(8)
+    // Remove absolute positioning
   },
 });

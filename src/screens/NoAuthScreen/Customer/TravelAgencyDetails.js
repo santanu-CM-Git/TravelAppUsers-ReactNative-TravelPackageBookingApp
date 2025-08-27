@@ -45,6 +45,7 @@ import Icon from 'react-native-vector-icons/Entypo';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import Svg, { Circle, Defs, LinearGradient, Stop, Mask, Rect } from 'react-native-svg';
 
+
 const { width } = Dimensions.get('window');
 const itemWidth = width * 0.8; // 80% of screen width
 const imageHeight = itemWidth * 0.5; // Maintain a 4:3 aspect ratio
@@ -309,31 +310,65 @@ export default function TravelAgencyDetails({ route }) {
                     </TouchableOpacity> */}
                 </ImageBackground>
                 <View style={{ marginBottom: responsiveHeight(5) }}>
-                    {/* SVG for Circular Ripple with Bottom Fade */}
-                    <Svg height="250" width="250" style={styles.svg}>
+                    {/* SVG for Half Circular Ripple Effect */}
+                    <Svg 
+                        height={responsiveWidth(50)} 
+                        width={responsiveWidth(50)} 
+                        style={styles.svg}
+                        viewBox="0 0 200 200"
+                    >
                         <Defs>
-                            {/* Gradient Mask to Fade Top */}
+                            {/* Gradient Mask for Bottom Half */}
                             <LinearGradient id="fadeGradient" x1="0" y1="1" x2="0" y2="0">
                                 <Stop offset="0%" stopColor="white" stopOpacity="1" />
-                                <Stop offset="80%" stopColor="white" stopOpacity="0.3" />
+                                <Stop offset="70%" stopColor="white" stopOpacity="0.8" />
                                 <Stop offset="100%" stopColor="white" stopOpacity="0" />
                             </LinearGradient>
 
-                            {/* Masking the Circles */}
-                            <Mask id="circleMask">
-                                <Rect x="0" y="125" width="250" height="125" fill="url(#fadeGradient)" />
+                            {/* Mask for Half Circle Effect */}
+                            <Mask id="halfCircleMask">
+                                <Rect x="0" y="100" width="200" height="100" fill="url(#fadeGradient)" />
                             </Mask>
                         </Defs>
 
-                        {/* Outer Circles with Mask */}
-                        <Circle cx="125" cy="125" r="55" stroke="#FF7788" strokeWidth="2" fill="none" mask="url(#circleMask)" />
-                        <Circle cx="125" cy="125" r="45" stroke="#FF99AA" strokeWidth="2" fill="none" mask="url(#circleMask)" />
+                        {/* Half Circle Ripples */}
+                        <Circle 
+                            cx="100" 
+                            cy="100" 
+                            r="70" 
+                            stroke="#FF7788" 
+                            strokeWidth="1.5" 
+                            fill="none" 
+                            mask="url(#halfCircleMask)" 
+                            opacity="0.6"
+                        />
+                        <Circle 
+                            cx="100" 
+                            cy="100" 
+                            r="55" 
+                            stroke="#FF99AA" 
+                            strokeWidth="1.5" 
+                            fill="none" 
+                            mask="url(#halfCircleMask)" 
+                            opacity="0.8"
+                        />
+                        <Circle 
+                            cx="100" 
+                            cy="100" 
+                            r="40" 
+                            stroke="#FFB3C1" 
+                            strokeWidth="1.5" 
+                            fill="none" 
+                            mask="url(#halfCircleMask)" 
+                            opacity="1"
+                        />
                     </Svg>
+                    
                     {/* Profile Picture Section */}
                     <View style={styles.profileContainer}>
                         <View style={styles.profilePicWrapper}>
                             <Image
-                                source={{ uri: travelAgencyData?.profile_photo_url }} // Replace with actual profile image
+                                source={{ uri: travelAgencyData?.profile_photo_url }}
                                 style={styles.profilePic}
                             />
                         </View>
@@ -886,9 +921,9 @@ const styles = StyleSheet.create({
     },
     svg: {
         position: 'absolute',
-        bottom: -responsiveHeight(16),
-        zIndex: 2,
+        bottom: -responsiveHeight(12),
         alignSelf: 'center',
+        zIndex: 2,
     },
     profileContainer: {
         alignItems: "center",

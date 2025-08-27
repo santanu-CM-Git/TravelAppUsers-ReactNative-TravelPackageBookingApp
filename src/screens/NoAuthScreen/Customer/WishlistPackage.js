@@ -43,7 +43,6 @@ import SwitchSelector from "react-native-switch-selector";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Icon from 'react-native-vector-icons/Entypo';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
-import Svg, { Circle, Defs, LinearGradient, Stop, Mask, Rect } from 'react-native-svg';
 
 const { width } = Dimensions.get('window');
 const itemWidth = width * 0.8; // 80% of screen width
