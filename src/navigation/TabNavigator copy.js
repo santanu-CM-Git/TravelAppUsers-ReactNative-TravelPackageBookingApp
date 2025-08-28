@@ -37,6 +37,7 @@ import NearbyTourPlanerList from '../screens/NoAuthScreen/Customer/NearbyTourPla
 import FilterPackageResult from '../screens/NoAuthScreen/Customer/FilterPackageResult';
 import WishlistPackage from '../screens/NoAuthScreen/Customer/WishlistPackage';
 import TransactionScreen from '../screens/NoAuthScreen/Customer/TransactionScreen';
+import Termsofuse from '../screens/NoAuthScreen/Customer/Termsofuse';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -236,6 +237,16 @@ const MenuStack = ({ route }) => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
+        name="PrivacyPolicy"
+        component={PrivacyPolicy}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Termsofuse"
+        component={Termsofuse}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
         name="WishlistPackage"
         component={WishlistPackage}
         options={{ headerShown: false }}
@@ -245,9 +256,25 @@ const MenuStack = ({ route }) => {
         component={TransactionScreen}
         options={{ headerShown: false }}
       />
+      {/* Renamed to avoid conflict with HomeStack */}
       <Stack.Screen
-        name="PackageDetailsScreen"
+        name="MenuPackageDetailsScreen"
         component={PackageDetailsScreen}
+        options={{ headerShown: false }}
+      />
+       <Stack.Screen
+        name="BookingSummary"
+        component={BookingSummary}
+        options={{ headerShown: false }}
+      />
+       <Stack.Screen
+        name='ChatScreen'
+        component={ChatScreen}
+        options={{ headerShown: false }}
+      />
+        <Stack.Screen
+        name="RefundScreen"
+        component={RefundScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
@@ -416,7 +443,49 @@ const getTabBarVisibility = route => {
     return 'none';
   } else if (routeName == 'PaymentFailed') {
     return 'none';
+  } else if (routeName == 'BookingSummary') {
+    return 'none';
   } else if (routeName == 'ProfileScreen') {
+    return 'none';
+  } else if (routeName == 'MenuPackageDetailsScreen') {
+    return 'none';
+  } else if (routeName == 'SearchScreen') {
+    return 'none';
+  } else if (routeName == 'TopLocationScreen') {
+    return 'none';
+  } else if (routeName == 'TopLocationScreenDetails') {
+    return 'none';
+  } else if (routeName == 'TravelAgencyDetails') {
+    return 'none';
+  } else if (routeName == 'Notification') {
+    return 'none';
+  } else if (routeName == 'PackageDetailsScreen') {
+    return 'none';
+  } else if (routeName == 'RefundScreen') {
+    return 'none';
+  } else if (routeName == 'PaymentSuccessScreen') {
+    return 'none';
+  } else if (routeName == 'MyBookingDetails') {
+    return 'none';
+  } else if (routeName == 'NearbyTourPlanerList') {
+    return 'none';
+  } else if (routeName == 'FilterPackageResult') {
+    return 'none';
+  } else if (routeName == 'QuotesListScreen') {
+    return 'none';
+  } else if (routeName == 'ProfileEditScreen') {
+    return 'none';
+  } else if (routeName == 'MyBookingList') {
+    return 'none';
+  } else if (routeName == 'CompletedBookingDetails') {
+    return 'none';
+  } else if (routeName == 'UpcommingBookingDetails') {
+    return 'none';
+  }else if (routeName == 'CustomerSupport') {
+    return 'none';
+  }else if (routeName == 'WishlistPackage') {
+    return 'none';
+  }else if (routeName == 'TransactionScreen') {
     return 'none';
   } else {
     return 'flex';

@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { Text, Image, View, Platform } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
+import { useSafeAreaInsets } from 'react-native-safe-area-context'; // Add this import
 
 import HomeScreen from '../screens/NoAuthScreen/Customer/HomeScreen';
 import NotificationScreen from '../screens/NoAuthScreen/Customer/NotificationScreen';
@@ -283,8 +284,10 @@ const MenuStack = ({ route }) => {
 };
 
 const TabNavigator = ({  }) => {
-  const cartProducts = useSelector(state => state.cart)
-  console.log(cartProducts)
+  const cartProducts = useSelector(state => state.cart);
+  const insets = useSafeAreaInsets(); // Get safe area insets
+  console.log(cartProducts);
+  
   return (
     <Tab.Navigator
       screenOptions={{
@@ -293,7 +296,11 @@ const TabNavigator = ({  }) => {
         tabBarInactiveTintColor: '#1F1F1F',
         tabBarActiveTintColor: '#FF455C',
         tabBarStyle: {
-          height: 100,
+          height: Platform.select({
+            android: responsiveHeight(8) + insets.bottom, // Add bottom safe area
+            ios: responsiveHeight(11) + insets.bottom, // Add bottom safe area
+          }),
+          paddingBottom: insets.bottom, // Add padding for safe area
         },
       }}
     >
@@ -306,15 +313,14 @@ const TabNavigator = ({  }) => {
             backgroundColor: '#FAFAFA',
             width: responsiveWidth(100),
             height: Platform.select({
-              android: responsiveHeight(8),
-              ios: responsiveHeight(11),
+              android: responsiveHeight(8) + Math.max(insets.bottom, 10), // Ensure minimum padding
+              ios: responsiveHeight(11) + Math.max(insets.bottom, 10), // Ensure minimum padding
             }),
             alignSelf: 'center',
-            //marginTop: -responsiveHeight(10),
-            //borderRadius: 30,
-            //marginBottom: 20,
-            //borderWidth: 1,
-            //borderColor: '#CACCCE'
+            paddingBottom: Math.max(insets.bottom, 10), // Ensure minimum padding
+            paddingTop: 5, // Add some top padding
+            //borderTopWidth: 1,
+            //borderTopColor: '#E0E0E0', // Optional: Add border for visual separation
           },
           tabBarIcon: ({ color, size, focused }) => (
             <View style={{ alignItems: 'center', justifyContent: 'center', }}>
@@ -323,44 +329,34 @@ const TabNavigator = ({  }) => {
             </View>
           ),
           tabBarLabel: ({ color, focused }) => (
-            <Text style={{ color, fontSize: responsiveFontSize(1.2), marginBottom: responsiveHeight(1),marginTop: responsiveHeight(1) }}>Home</Text>
+            <Text style={{ color, fontSize: responsiveFontSize(1.2), marginBottom: responsiveHeight(0.5), marginTop: responsiveHeight(1) }}>Home</Text>
           ),
         })}
       />
       <Tab.Screen
         name="Talk"
         component={QuotesStack}
-        // listeners={{
-        //   tabPress: e => {
-        //     e.preventDefault();
-        //     navigation.navigate('QuotesScreen')
-        //   },
-        // }}
         options={({ route }) => ({
           tabBarStyle: {
             display: getTabBarVisibility(route),
             backgroundColor: '#FAFAFA',
             width: responsiveWidth(100),
             height: Platform.select({
-              android: responsiveHeight(8),
-              ios: responsiveHeight(11),
+              android: responsiveHeight(8) + Math.max(insets.bottom, 10),
+              ios: responsiveHeight(11) + Math.max(insets.bottom, 10),
             }),
             alignSelf: 'center',
-            //marginTop: -responsiveHeight(10),
-            //borderRadius: 30,
-            //marginBottom: 20,
-            //borderWidth: 1,
-            //borderColor: '#CACCCE'
+            paddingBottom: Math.max(insets.bottom, 10),
+            paddingTop: 5,
           },
           tabBarIcon: ({ color, size, focused }) => (
             <View style={{ alignItems: 'center', justifyContent: 'center', }}>
               {focused && <View style={{ width: responsiveWidth(12), borderColor: color, backgroundColor: color, borderBottomLeftRadius: 5, borderBottomRightRadius: 5 }} />}
-              {/* <FontAwesome name="rupee-sign" color={color} size={size} style={{ marginTop: responsiveHeight(1.2) }} /> */}
               <Image source={quotesImg} tintColor={color} style={{ width: responsiveWidth(7), height: responsiveHeight(3.5), marginTop: responsiveHeight(1.4), resizeMode: 'contain' }} />
             </View>
           ),
           tabBarLabel: ({ color, focused }) => (
-            <Text style={{ color, fontSize: responsiveFontSize(1.2), marginBottom: responsiveHeight(1),marginTop: responsiveHeight(1) }}>Quotes</Text>
+            <Text style={{ color, fontSize: responsiveFontSize(1.2), marginBottom: responsiveHeight(0.5), marginTop: responsiveHeight(1) }}>Quotes</Text>
           ),
         })}
       />
@@ -373,15 +369,12 @@ const TabNavigator = ({  }) => {
             backgroundColor: '#FAFAFA',
             width: responsiveWidth(100),
             height: Platform.select({
-              android: responsiveHeight(8),
-              ios: responsiveHeight(11),
+              android: responsiveHeight(8) + Math.max(insets.bottom, 10),
+              ios: responsiveHeight(11) + Math.max(insets.bottom, 10),
             }),
             alignSelf: 'center',
-            //marginTop: -responsiveHeight(10),
-            //borderRadius: 30,
-            //marginBottom: 20,
-            //borderWidth: 1,
-            //borderColor: '#CACCCE'
+            paddingBottom: Math.max(insets.bottom, 10),
+            paddingTop: 5,
           },
           tabBarIcon: ({ color, size, focused }) => (
             <View style={{ alignItems: 'center', justifyContent: 'center', }}>
@@ -390,7 +383,7 @@ const TabNavigator = ({  }) => {
             </View>
           ),
           tabBarLabel: ({ color, focused }) => (
-            <Text style={{ color, fontSize: responsiveFontSize(1.2), marginBottom: responsiveHeight(1),marginTop: responsiveHeight(1) }}>Messages</Text>
+            <Text style={{ color, fontSize: responsiveFontSize(1.2), marginBottom: responsiveHeight(0.5), marginTop: responsiveHeight(1) }}>Messages</Text>
           ),
         })}
       />
@@ -403,15 +396,12 @@ const TabNavigator = ({  }) => {
             backgroundColor: '#FAFAFA',
             width: responsiveWidth(100),
             height: Platform.select({
-              android: responsiveHeight(8),
-              ios: responsiveHeight(11),
+              android: responsiveHeight(8) + Math.max(insets.bottom, 10),
+              ios: responsiveHeight(11) + Math.max(insets.bottom, 10),
             }),
             alignSelf: 'center',
-            //marginTop: -responsiveHeight(10),
-            //borderRadius: 30,
-            //marginBottom: 20,
-            //borderWidth: 1,
-            //borderColor: '#CACCCE'
+            paddingBottom: Math.max(insets.bottom, 10),
+            paddingTop: 5,
           },
           tabBarIcon: ({ color, size, focused }) => (
             <View style={{ alignItems: 'center', justifyContent: 'center', }}>
@@ -420,7 +410,7 @@ const TabNavigator = ({  }) => {
             </View>
           ),
           tabBarLabel: ({ color, focused }) => (
-            <Text style={{ color, fontSize: responsiveFontSize(1.2), marginBottom: responsiveHeight(1),marginTop: responsiveHeight(1) }}>Menu</Text>
+            <Text style={{ color, fontSize: responsiveFontSize(1.2), marginBottom: responsiveHeight(0.5), marginTop: responsiveHeight(1) }}>Menu</Text>
           ),
         })}
       />
