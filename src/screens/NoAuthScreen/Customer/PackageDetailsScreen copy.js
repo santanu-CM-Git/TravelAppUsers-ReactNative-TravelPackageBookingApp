@@ -2,7 +2,6 @@ import React, { useContext, useMemo, useState, useEffect, memo, useCallback, use
 import {
     View,
     Text,
-    SafeAreaView,
     ScrollView,
     Image,
     RefreshControl,
@@ -46,6 +45,7 @@ import Icon from 'react-native-vector-icons/Entypo';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import { ActivityIndicator } from '@react-native-material/core';
 import StaticMap from '../../../utils/StaticMap';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 const itemWidth = width * 0.8; // 80% of screen width
@@ -360,7 +360,8 @@ export default function PackageDetailsScreen({ route }) {
     return (
         <SafeAreaView style={styles.Container}>
             {/* <CustomHeader commingFrom={'Top location'} onPressProfile={() => navigation.navigate('Profile')} title={'Top location'} /> */}
-            <StatusBar translucent backgroundColor="transparent" />
+            {/* <StatusBar translucent backgroundColor="transparent" /> */}
+            <StatusBar translucent={false} backgroundColor="black" barStyle="light-content" />
             <ScrollView>
                 <ImageBackground
                     source={packageInfo?.cover_photo_url ? { uri: packageInfo.cover_photo_url } : productImg}
@@ -376,31 +377,31 @@ export default function PackageDetailsScreen({ route }) {
                                     style={styles.filterIcon}
                                 />
                             </TouchableOpacity>
-                            <View style={{ position: 'relative', justifyContent: 'center' }}>
-                                {/* Light gray overlay */}
+                            
+                            <View style={{ marginLeft: responsiveWidth(1), marginRight: responsiveWidth(2) }}>
+                                {/* Text with background overlay */}
                                 <View style={{
-                                    position: 'absolute',
-                                    left: 0,
-                                    top: 0,
-                                    right: 0,
-                                    bottom: 0,
                                     backgroundColor: 'rgba(11, 10, 10, 0.5)', // light gray, semi-transparent
                                     borderRadius: 8,
-                                    zIndex: 1,
-                                }} />
-                                {/* Text */}
-                                <Text
-                                    style={[
-                                        styles.titleM,
-                                        { width: responsiveWidth(70), marginLeft: responsiveWidth(2), zIndex: 2 }
-                                    ]}
-                                    numberOfLines={1}
-                                >
-                                    {packageInfo?.name || 'Package Details'}
-                                </Text>
+                                    paddingHorizontal: responsiveWidth(2),
+                                    paddingVertical: responsiveHeight(0.5),
+                                    maxWidth: responsiveWidth(55),
+                                }}>
+                                    <Text
+                                        style={[
+                                            styles.titleM,
+                                            { zIndex: 2 }
+                                        ]}
+                                        numberOfLines={1}
+                                        ellipsizeMode="tail"
+                                    >
+                                        {packageInfo?.name || 'Package Details'}
+                                    </Text>
+                                </View>
                             </View>
                         </View>
-                        <TouchableOpacity style={styles.iconButton} onPress={onShare}>
+                        
+                        <TouchableOpacity style={[styles.iconButton, { backgroundColor: 'rgba(0,0,0,0.3)' }]} onPress={onShare}>
                             <Image
                                 source={shareImg}
                                 style={styles.filterIcon}
@@ -431,7 +432,9 @@ export default function PackageDetailsScreen({ route }) {
 
                 <View style={{ margin: 5, paddingHorizontal: 10 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Text style={styles.productText3}>{packageInfo?.name || 'Travel Agency'}</Text>
+                        <View style={{ flex: 1,marginRight: responsiveWidth(2) }}>
+                            <Text style={styles.productText3}>{packageInfo?.name || 'Travel Agency'}</Text>
+                        </View>
                         <Text style={styles.priceText22}>₹{packageInfo?.discounted_price || 0}</Text>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -733,14 +736,13 @@ const styles = StyleSheet.create({
     },
     header: {
         position: 'absolute',
-        top: 35,
-        //left: 20,
-        //right: 20,
+        top: 25,
+        left: 0,
+        right: 0,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         marginHorizontal: responsiveWidth(5),
-        alignSelf: 'center',
     },
     titleM: {
         fontFamily: 'Poppins-Bold',

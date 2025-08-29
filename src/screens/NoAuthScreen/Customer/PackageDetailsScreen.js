@@ -72,6 +72,65 @@ export default function PackageDetailsScreen({ route }) {
     const [loadingLikes, setLoadingLikes] = useState({});
     const [countryName, setCountryName] = useState('');
 
+    // Helper function to check if package booking should be disabled
+    const isPackageExpired = () => {
+        if (!packageInfo) return false;
+        
+        // Check if no seats available (sold out)
+        const availableSeats = packageInfo?.seat_slots - packageInfo?.booked_slots;
+        if (availableSeats <= 0) {
+            return true;
+        }
+        
+        const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0); // Reset time to start of day for accurate comparison
+        
+        if (packageInfo?.date_type == 0) {
+            // Fixed date type - check if start_date is over
+            const startDate = new Date(packageInfo?.start_date);
+            startDate.setHours(0, 0, 0, 0);
+            return startDate < currentDate;
+        } else if (packageInfo?.date_type == 1) {
+            // Flexible date type - check if end_date is over
+            const endDate = new Date(packageInfo?.end_date);
+            endDate.setHours(0, 0, 0, 0);
+            return endDate < currentDate;
+        }
+        
+        return false;
+    };
+
+    // Helper function to get the appropriate button text
+    const getButtonText = () => {
+        if (!packageInfo) return 'Book Now';
+        
+        // Check seat availability first
+        const availableSeats = packageInfo?.seat_slots - packageInfo?.booked_slots;
+        if (availableSeats <= 0) {
+            return 'Sold Out';
+        }
+        
+        // Check date expiry
+        const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0);
+        
+        if (packageInfo?.date_type == 0) {
+            const startDate = new Date(packageInfo?.start_date);
+            startDate.setHours(0, 0, 0, 0);
+            if (startDate < currentDate) {
+                return 'Expired';
+            }
+        } else if (packageInfo?.date_type == 1) {
+            const endDate = new Date(packageInfo?.end_date);
+            endDate.setHours(0, 0, 0, 0);
+            if (endDate < currentDate) {
+                return 'Expired';
+            }
+        }
+        
+        return 'Book Now';
+    };
+
     useEffect(() => {
         if (packageInfo?.date_type == 0) {
             // Auto-populate dates for fixed date type
@@ -559,8 +618,18 @@ export default function PackageDetailsScreen({ route }) {
                         </View>
                     ))}
                     <View style={styles.buttoncontainer}>
-                        <TouchableOpacity style={styles.bookNowButton} onPress={() => { toggleFilterModal() }}>
-                            <Text style={styles.bookNowText}>Book Now</Text>
+                        <TouchableOpacity 
+                            style={[styles.bookNowButton, isPackageExpired() && styles.disabledButton]} 
+                            onPress={() => { 
+                                if (!isPackageExpired()) {
+                                    toggleFilterModal();
+                                }
+                            }}
+                            disabled={isPackageExpired()}
+                        >
+                            <Text style={[styles.bookNowText, isPackageExpired() && styles.disabledButtonText]}>
+                                {getButtonText()}
+                            </Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.talkToAgentButton} onPress={() => { navigation.navigate('ChatScreen', { agentId: packageInfo?.agent?.id }) }}>
                             <Text style={styles.talkToAgentText}>Talk to Agent</Text>
@@ -691,22 +760,24 @@ export default function PackageDetailsScreen({ route }) {
                     <View style={{ bottom: 0, width: responsiveWidth(100), paddingHorizontal: 15, borderTopColor: '#E3E3E3', borderTopWidth: 1, flexDirection: "row", alignItems: 'center', justifyContent: 'space-between' }}>
                         <Text style={{ fontSize: responsiveFontSize(2.5), color: '#22313F', fontFamily: 'Poppins-Bold', }}>₹ {(packageInfo?.discounted_price * quantityAdult) + (packageInfo?.children_price * quantityChild) || 0}</Text>
                         <View style={{ width: responsiveWidth(45), marginTop: responsiveHeight(2), alignSelf: 'center' }}>
-                            <CustomButton label={"Book Now"}
+                            <CustomButton 
+                                label={getButtonText()}
                                 onPress={() => {
-                                    setFilterModalVisible(false)
-                                    navigation.navigate('BookingSummary', {
-                                        packageInfo: packageInfo,
-                                        bookingDetails: {
-                                            fromDate: fromDate,
-                                            toDate: toDate,
-                                            adults: quantityAdult,
-                                            children: quantityChild,
-                                            totalPrice: (packageInfo?.discounted_price * quantityAdult) + (packageInfo?.children_price * quantityChild)
-                                        }
-                                    })
-                                }
-
-                                }
+                                    if (!isPackageExpired()) {
+                                        setFilterModalVisible(false)
+                                        navigation.navigate('BookingSummary', {
+                                            packageInfo: packageInfo,
+                                            bookingDetails: {
+                                                fromDate: fromDate,
+                                                toDate: toDate,
+                                                adults: quantityAdult,
+                                                children: quantityChild,
+                                                totalPrice: (packageInfo?.discounted_price * quantityAdult) + (packageInfo?.children_price * quantityChild)
+                                            }
+                                        })
+                                    }
+                                }}
+                                disabled={isPackageExpired()}
                             />
                         </View>
                     </View>
@@ -1163,5 +1234,12 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#333',
         marginHorizontal: 10,
+    },
+    disabledButton: {
+        backgroundColor: '#CCCCCC',
+        opacity: 0.6,
+    },
+    disabledButtonText: {
+        color: '#888888',
     },
 });
