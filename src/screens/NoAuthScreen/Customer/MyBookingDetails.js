@@ -397,6 +397,14 @@ export default function MyBookingDetails({ route }) {
         }
     }
 
+    // Check if booking end date has passed
+    const isBookingExpired = useMemo(() => {
+        if (!bookingData?.end_date) return false;
+        const endDate = moment(bookingData.end_date);
+        const currentDate = moment();
+        return currentDate.isAfter(endDate, 'day');
+    }, [bookingData?.end_date]);
+
     useFocusEffect(
         useCallback(() => {
             const backAction = () => {
@@ -521,10 +529,14 @@ export default function MyBookingDetails({ route }) {
                     </View>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: responsiveHeight(1) }}>
                         <Text style={styles.productText3}>Co Traveler</Text>
-                        <TouchableOpacity onPress={() => toggleFilterModal()}>
+                        <TouchableOpacity 
+                            onPress={() => !isBookingExpired && toggleFilterModal()}
+                            disabled={isBookingExpired}
+                            style={[styles.addNewButtonContainer, isBookingExpired && styles.disabledButtonContainer]}
+                        >
                             <Image
                                 source={addnewImg}
-                                style={styles.addnewIcon}
+                                style={[styles.addnewIcon, isBookingExpired && styles.disabledAddnewIcon]}
                             />
                         </TouchableOpacity>
                     </View>
@@ -1058,6 +1070,15 @@ const styles = StyleSheet.create({
         height: responsiveHeight(4),
         width: responsiveWidth(25),
         resizeMode: 'contain'
+    },
+    addNewButtonContainer: {
+        // Default styles for the button container if needed
+    },
+    disabledButtonContainer: {
+        opacity: 0.5,
+    },
+    disabledAddnewIcon: {
+        opacity: 0.5,
     },
     contactListContainer: {
         backgroundColor: "#fff",
