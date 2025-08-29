@@ -258,6 +258,12 @@ export default function HomeScreen() {
     return () => backHandler.remove();
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+      fetchRecentViewed()
+    }, [])
+);
+
   const requestLocationPermission = useCallback(async () => {
     try {
       if (Platform.OS === 'android') {
