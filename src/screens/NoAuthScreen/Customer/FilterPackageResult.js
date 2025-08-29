@@ -279,15 +279,15 @@ export default function FilterPackageResult({ route }) {
                                 style={styles.productImg4}
                             />
                             <View style={{ margin: 5 }}>
-                                <Text style={styles.productText4}>{item?.name}</Text>
+                                <Text style={styles.productText4} numberOfLines={1}>{item?.name}</Text>
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <Image
                                         source={mappinImg}
                                         style={styles.pinImg}
                                     />
-                                    <Text style={styles.addressText}>{item?.location}</Text>
+                                    <Text style={styles.addressText} numberOfLines={1}>{item?.location}</Text>
                                 </View>
-                                <Text style={styles.travelerText}>{item?.agent?.name}</Text>
+                                <Text style={styles.travelerText} numberOfLines={1}>{item?.agent?.name}</Text>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', }}>
                                     {item?.date_type == 0 ?
                                         <Text style={styles.addressText}>Slots : {item?.seat_slots - item?.booked_slots}</Text>
