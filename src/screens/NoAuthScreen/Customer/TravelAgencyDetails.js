@@ -374,7 +374,7 @@ export default function TravelAgencyDetails({ route }) {
                         </View>
                     </View>
                 </View>
-                <View style={{ margin: 5, paddingHorizontal: 10 }}>
+                <View style={{ margin: 5, paddingHorizontal: 10,marginTop: responsiveHeight(2) }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Text style={styles.productText3}>{travelAgencyData?.name}</Text>
                         {/* <Text style={styles.priceText2}>$72.00</Text> */}

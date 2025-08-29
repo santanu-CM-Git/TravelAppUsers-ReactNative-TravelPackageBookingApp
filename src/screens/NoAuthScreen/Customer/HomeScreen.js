@@ -1205,6 +1205,9 @@ export default function HomeScreen() {
         fetchalllocation(),
         fetchBanner(),
         fetchRecentViewed(),
+        fetchTopLocation(),
+        fetchNearbyTourPlaner(1),
+        fetchNewPackage(1)
       ]);
     } catch (error) {
       console.log('Refresh error:', error);

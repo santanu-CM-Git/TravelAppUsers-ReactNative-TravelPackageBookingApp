@@ -65,19 +65,19 @@ export const requestNotificationPermission = async () => {
 
 // Function to show notification permission alert
 export const showNotificationPermissionAlert = () => {
-  Alert.alert(
-    'Notification Permission Required',
-    'This app requires notification permission to keep you informed and function properly. Please enable notifications in settings.',
-    [
-      { text: 'Cancel', style: 'cancel' },
-      { 
-        text: 'Settings', 
-        onPress: () => {
-          Linking.openSettings();
-        }
-      }
-    ]
-  );
+  // Alert.alert(
+  //   'Notification Permission Required',
+  //   'This app requires notification permission to keep you informed and function properly. Please enable notifications in settings.',
+  //   [
+  //     { text: 'Cancel', style: 'cancel' },
+  //     { 
+  //       text: 'Settings', 
+  //       onPress: () => {
+  //         Linking.openSettings();
+  //       }
+  //     }
+  //   ]
+  // );
 };
 
 // Function to check and request notification permission if needed
