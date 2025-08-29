@@ -1205,7 +1205,6 @@ export default function HomeScreen() {
         fetchalllocation(),
         fetchBanner(),
         fetchRecentViewed(),
-        requestLocationPermission(),
       ]);
     } catch (error) {
       console.log('Refresh error:', error);
