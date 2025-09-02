@@ -370,23 +370,23 @@ export default function PackageDetailsScreen({ route }) {
 
     const onShare = async () => {
         try {
-            const shareMessage = `Check out this amazing travel package!\n\n${packageInfo?.name}\nLocation: ${packageInfo?.location_data?.name}\nPrice: ${packageInfo?.discounted_price}\n\nBook now and enjoy your dream vacation!`;
-
+            const appStoreLink = "https://apps.apple.com/app/your-app/id123456789";
+            const playStoreLink = "https://play.google.com/store/apps/details?id=your.app.package";
+            
+            const shareMessage = `Check out this amazing travel package!\n\n${packageInfo?.name}\nLocation: ${packageInfo?.location_data?.name}\nPrice: ${packageInfo?.discounted_price}\n\nBook now and enjoy your dream vacation!\n\nDownload our app:\n📱 iOS: ${appStoreLink}\n📱 Android: ${playStoreLink}`;
+    
             const result = await Share.share({
                 message: shareMessage,
                 title: 'Share Travel Package',
             });
-
+    
             if (result.action === Share.sharedAction) {
                 if (result.activityType) {
-                    // shared with activity type of result.activityType
                     console.log('Shared with activity type:', result.activityType);
                 } else {
-                    // shared
                     console.log('Shared successfully');
                 }
             } else if (result.action === Share.dismissedAction) {
-                // dismissed
                 console.log('Share dismissed');
             }
         } catch (error) {
