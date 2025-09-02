@@ -160,7 +160,7 @@ export default function TopLocationScreen({ }) {
                     >
                         {item?.location_name}
                     </Text>
-                    <Text style={styles.activities}>{item?.total} activities</Text>
+                    <Text style={styles.activities}>{item?.active_packages_count} activities</Text>
                 </View>
 
             </ImageBackground>
