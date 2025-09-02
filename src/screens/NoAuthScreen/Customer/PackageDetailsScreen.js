@@ -270,7 +270,7 @@ export default function PackageDetailsScreen({ route }) {
             })
                 .then(res => {
                     let packageInfo = res.data.data;
-                    console.log(packageInfo, 'package data from package details')
+                    console.log(JSON.stringify(packageInfo), 'package data from package details')
                     setPackageInfo(packageInfo)
                     // Set tabs based on itinerary
                     if (packageInfo.itinerary && packageInfo.itinerary.length > 0) {
@@ -619,6 +619,28 @@ export default function PackageDetailsScreen({ route }) {
                                 style={styles.checkicon}
                             />
                             <Text style={styles.packageAvlText}>{doc}</Text>
+                        </View>
+                    ))}
+                    
+                    <Text style={styles.productText3}>Package Inclusions</Text>
+                    {packageInfo?.package_inclusion && JSON.parse(packageInfo.package_inclusion).map((inclusion, index) => (
+                        <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image
+                                source={CheckImg}
+                                style={styles.checkicon}
+                            />
+                            <Text style={styles.packageAvlText}>{inclusion}</Text>
+                        </View>
+                    ))}
+                    
+                    <Text style={styles.productText3}>Package Exclusions</Text>
+                    {packageInfo?.package_exclusion && JSON.parse(packageInfo.package_exclusion).map((exclusion, index) => (
+                        <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image
+                                source={CheckImg}
+                                style={styles.checkicon}
+                            />
+                            <Text style={styles.packageAvlText}>{exclusion}</Text>
                         </View>
                     ))}
                     <View style={styles.buttoncontainer}>
