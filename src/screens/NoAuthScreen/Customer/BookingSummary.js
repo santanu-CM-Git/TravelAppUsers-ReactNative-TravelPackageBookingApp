@@ -459,7 +459,7 @@ const BookingSummary = ({ route }) => {
         }
 
         // Check if coupon usage limit is reached
-        if (coupon.applied >= coupon.available_for) {
+        if (coupon.applied <= coupon.available_for) {
             setCouponError('Coupon usage limit reached');
             return;
         }
