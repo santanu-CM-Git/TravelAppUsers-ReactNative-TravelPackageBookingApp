@@ -106,6 +106,7 @@ const MyBookingList = ({ route }) => {
     useFocusEffect(
         useCallback(() => {
             fetchBookings(activeTab);
+            setActiveTab('Upcomming')
         }, [navigation])
     );
 

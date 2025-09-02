@@ -76,10 +76,12 @@ export default function PackageDetailsScreen({ route }) {
     const isPackageExpired = () => {
         if (!packageInfo) return false;
         
-        // Check if no seats available (sold out)
-        const availableSeats = packageInfo?.seat_slots - packageInfo?.booked_slots;
-        if (availableSeats <= 0) {
-            return true;
+        // Check if no seats available (sold out) - only for fixed date packages
+        if (packageInfo?.date_type == 0) {
+            const availableSeats = packageInfo?.seat_slots - packageInfo?.booked_slots;
+            if (availableSeats <= 0) {
+                return true;
+            }
         }
         
         const currentDate = new Date();
@@ -91,7 +93,7 @@ export default function PackageDetailsScreen({ route }) {
             startDate.setHours(0, 0, 0, 0);
             return startDate < currentDate;
         } else if (packageInfo?.date_type == 1) {
-            // Flexible date type - check if end_date is over
+            // Flexible date type (custom package) - check if end_date is over
             const endDate = new Date(packageInfo?.end_date);
             endDate.setHours(0, 0, 0, 0);
             return endDate < currentDate;
@@ -104,10 +106,12 @@ export default function PackageDetailsScreen({ route }) {
     const getButtonText = () => {
         if (!packageInfo) return 'Book Now';
         
-        // Check seat availability first
-        const availableSeats = packageInfo?.seat_slots - packageInfo?.booked_slots;
-        if (availableSeats <= 0) {
-            return 'Sold Out';
+        // Check seat availability first - only for fixed date packages
+        if (packageInfo?.date_type == 0) {
+            const availableSeats = packageInfo?.seat_slots - packageInfo?.booked_slots;
+            if (availableSeats <= 0) {
+                return 'Sold Out';
+            }
         }
         
         // Check date expiry
