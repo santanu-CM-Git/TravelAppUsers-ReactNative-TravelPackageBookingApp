@@ -36,7 +36,7 @@ const BannerWidth = Dimensions.get('window').width;
 const ITEM_WIDTH = Math.round(BannerWidth * 0.7)
 const { height, width } = Dimensions.get('screen')
 
-const LoginScreen = ({  }) => {
+const LoginScreen = ({ }) => {
   const navigation = useNavigation();
   const [phone, setPhone] = useState('');
   const [deviceId, setDeviceId] = useState('')
@@ -93,17 +93,17 @@ const LoginScreen = ({  }) => {
       setMobileError('Please enter mobile no.')
     } else if (!countryCode) {
       setMobileError('Please enter country code.')
-    } else if (!phoneRegex.test(phone)) { 
+    } else if (!phoneRegex.test(phone)) {
       setMobileError('Please enter a 10-digit number.')
     } else {
       setIsLoading(true)
-      console.log(API_URL); 
+      console.log(API_URL);
 
       AsyncStorage.getItem('fcmToken', (err, fcmToken) => {
         //console.log(fcmToken, 'firebase token')
         //console.log(deviceId, 'device id')
         const option = {
-          "country_code": countryCode,  
+          "country_code": countryCode,
           "mobile": phone,
           //"firebase_token": fcmToken,
           //"deviceid": deviceId,
@@ -163,19 +163,26 @@ const LoginScreen = ({  }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar translucent backgroundColor="transparent" />
-      <KeyboardAwareScrollView>
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.scrollContainer}
+        enableOnAndroid={true}
+        extraScrollHeight={Platform.OS === 'android' ? responsiveHeight(3) : 20}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        extraHeight={Platform.OS === 'android' ? responsiveHeight(3) : 100}
+      >
         <View style={styles.bannaerContainer}>
           <Image
             source={patientLoginImg}
             style={styles.bannerBg}
           />
 
-           <Image
+          <Image
             source={gtIconImg}
-            style={{height:60,width:55,resizeMode:'cover',position:'absolute',top:30,right:20,borderRadius:10}}
+            style={{ height: 60, width: 55, resizeMode: 'cover', position: 'absolute', top: 30, right: 20, borderRadius: 10 }}
           />
         </View>
-         
+
         <View style={styles.wrapper}>
           <View style={{ marginBottom: responsiveHeight(2) }}>
             <Text style={styles.headerText}>Login or sign up</Text>
@@ -232,7 +239,7 @@ const LoginScreen = ({  }) => {
       </View>
 
       <View style={styles.termsView}>
-      <View style={styles.checkboxContainer}>
+        <View style={styles.checkboxContainer}>
           <CheckBox
             disabled={false}
             value={toggleCheckBox}
@@ -241,7 +248,7 @@ const LoginScreen = ({  }) => {
           />
         </View>
         <Text style={styles.termsText}>
-        I accept{' '}
+          I accept{' '}
           <Text
             style={styles.termsLinkText}
             onPress={() => navigation.navigate('Termsofuse')}>
@@ -277,6 +284,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     flex: 1
   },
+  scrollContainer: {
+    flexGrow: 1,
+    // Remove any fixed height constraints
+  },
   wrapper: {
     paddingHorizontal: 20,
     marginTop: -responsiveHeight(2),
@@ -296,6 +307,7 @@ const styles = StyleSheet.create({
   },
   buttonwrapper: {
     paddingHorizontal: 20,
+    marginTop: responsiveHeight(2), // Add top margin
   },
   countryModal: {
 
@@ -335,9 +347,9 @@ const styles = StyleSheet.create({
     marginBottom: responsiveHeight(5),
     paddingHorizontal: 20,
     alignSelf: 'center',
-    flexDirection:'row',
-    justifyContent:'center',
-    alignItems:'center'
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   termsText: {
     color: '#746868',
