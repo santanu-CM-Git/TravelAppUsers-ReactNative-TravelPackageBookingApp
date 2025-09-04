@@ -23,7 +23,17 @@ function App() {
   const [showNotificationPopup, setShowNotificationPopup] = useState(false);
   const [currentNotification, setCurrentNotification] = useState(null);
   const notificationQueue = useRef([]).current;
+  // useEffect(() => {
+  //   if (Platform.OS == 'android' || Platform.OS === 'ios') {
+  //     /* this is app foreground notification */
+  //     const unsubscribe = messaging().onMessage(async remoteMessage => {
+  //       // Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+  //        console.log('Received background message:', JSON.stringify(remoteMessage));
 
+  //     });
+  //     return unsubscribe;
+  //   }
+  // }, [])
   useEffect(() => {
     // Hide splash screen
     SplashScreen.hide();
@@ -76,7 +86,7 @@ function App() {
         if (remoteMessage?.data?.screen === 'ChatScreen') {
           navigate('Message', {
             screen: 'ChatScreen', params: {
-              agentId: 1,
+              agentId: 2,
               flag: remoteMessage?.data?.flag,
             }
           });
@@ -88,10 +98,11 @@ function App() {
       // Handle notification when the app is opened from a quit state
       messaging().getInitialNotification().then(remoteMessage => {
         console.log('Notification opened app:', remoteMessage);
+        console.log('Notification opened app flag:', remoteMessage?.data?.flag);
         if (remoteMessage?.data?.screen === 'ChatScreen') {
           navigate('Message', {
             screen: 'ChatScreen', params: {
-              agentId: 1,
+              agentId: 2,
               flag: remoteMessage?.data?.flag,
             }
           });
@@ -188,7 +199,7 @@ function App() {
     if (notification?.data?.screen === 'ChatScreen') {
       navigate('Message', {
         screen: 'ChatScreen', params: {
-          agentId: 1,
+          agentId: 2,
           flag: notification?.data?.flag,
         }
       });

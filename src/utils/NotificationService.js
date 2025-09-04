@@ -4,20 +4,40 @@ import { PERMISSIONS, request, check, RESULTS } from 'react-native-permissions';
 
 // Request notification permission
 export const requestNotificationPermission = async () => {
-  const permission = Platform.OS === 'android'
-    ? PERMISSIONS.ANDROID.POST_NOTIFICATIONS
-    : PERMISSIONS.IOS.NOTIFICATIONS;
+  try {
+    const permission = Platform.OS === 'android'
+      ? PERMISSIONS.ANDROID.POST_NOTIFICATIONS
+      : PERMISSIONS.IOS.NOTIFICATIONS;
 
-  return await request(permission);
+    if (!permission) {
+      console.warn('Permission not available for platform:', Platform.OS);
+      return 'unavailable';
+    }
+
+    return await request(permission);
+  } catch (error) {
+    console.error('Error requesting notification permission:', error);
+    return 'denied';
+  }
 };
 
 // Check notification permission
 export const checkNotificationPermission = async () => {
-  const permission = Platform.OS === 'android'
-    ? PERMISSIONS.ANDROID.POST_NOTIFICATIONS
-    : PERMISSIONS.IOS.NOTIFICATIONS;
+  try {
+    const permission = Platform.OS === 'android'
+      ? PERMISSIONS.ANDROID.POST_NOTIFICATIONS
+      : PERMISSIONS.IOS.NOTIFICATIONS;
 
-  return await check(permission);
+    if (!permission) {
+      console.warn('Permission not available for platform:', Platform.OS);
+      return 'unavailable';
+    }
+
+    return await check(permission);
+  } catch (error) {
+    console.error('Error checking notification permission:', error);
+    return 'denied';
+  }
 };
 
 // Open app settings
