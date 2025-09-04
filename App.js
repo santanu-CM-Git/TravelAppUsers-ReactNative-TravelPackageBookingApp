@@ -86,7 +86,7 @@ function App() {
         if (remoteMessage?.data?.screen === 'ChatScreen') {
           navigate('Message', {
             screen: 'ChatScreen', params: {
-              agentId: 2,
+              agentId: remoteMessage?.data?.id,
               flag: remoteMessage?.data?.flag,
             }
           });
@@ -102,7 +102,7 @@ function App() {
         if (remoteMessage?.data?.screen === 'ChatScreen') {
           navigate('Message', {
             screen: 'ChatScreen', params: {
-              agentId: 2,
+              agentId: remoteMessage?.data?.id,
               flag: remoteMessage?.data?.flag,
             }
           });
@@ -199,7 +199,7 @@ function App() {
     if (notification?.data?.screen === 'ChatScreen') {
       navigate('Message', {
         screen: 'ChatScreen', params: {
-          agentId: 2,
+          agentId: notification?.data?.id,
           flag: notification?.data?.flag,
         }
       });
