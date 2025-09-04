@@ -136,6 +136,7 @@ const ChatScreen = ({ route }) => {
 
         await setupVideoSDKEngine();
         KeepAwake.activate();
+        await goingToactiveTab(route.params.flag || 'chat');
       } catch (error) {
         console.error('Error initializing chat:', error);
         Alert.alert('Error', 'Failed to initialize chat. Please try again.');
