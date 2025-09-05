@@ -511,6 +511,25 @@ const ChatScreen = ({ route }) => {
         .collection('messages')
         .add(messageData);
 
+      // Call message-send API
+      try {
+        const userToken = await AsyncStorage.getItem('userToken');
+        if (userToken) {
+          await axios.post(`${API_URL}/customer/message-send`, {
+            agent_id: route.params.agentId
+          }, {
+            headers: {
+              Accept: 'application/json',
+              "Authorization": 'Bearer ' + userToken,
+            },
+          });
+          console.log('Message-send API called successfully');
+        }
+      } catch (apiError) {
+        console.error('Error calling message-send API:', apiError);
+        // Don't throw here as the message was already sent to Firestore
+      }
+
       // Update local state with the correct user ID
       const localMessage = {
         ...message,
@@ -1028,12 +1047,13 @@ const ChatScreen = ({ route }) => {
       /* this is app foreground notification */
       const unsubscribe = messaging().onMessage(async remoteMessage => {
         // Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
-        // console.log('Received background message:', JSON.stringify(remoteMessage));
+         console.log('Received background message:', JSON.stringify(remoteMessage));
         if (remoteMessage?.data?.screen === 'Cancel') {
           //console.log(remoteMessage?.data?.flag, 'ddddddddd')
           goingToactiveTab(remoteMessage?.data?.flag)
         }
         if (remoteMessage?.data?.screen === 'ChatScreen') {
+          if(remoteMessage?.notification?.title != 'Message Sent'){
           Alert.alert(
             '',
             `The agent wants to switch to ${remoteMessage?.data?.flag}. Do you agree?`,
@@ -1054,7 +1074,7 @@ const ChatScreen = ({ route }) => {
                 console.log('cancel')
             },
           );
-
+        }
         }
       });
       return unsubscribe;
@@ -1222,9 +1242,28 @@ const ChatScreen = ({ route }) => {
         .add(firestoreData);
 
       console.log('Message stored in Firestore');
-
       // Update local state for immediate UI update
       setMessages(previousMessages => GiftedChat.append(previousMessages, [messageData]));
+      // Call message-send API
+      try {
+        const userToken = await AsyncStorage.getItem('userToken');
+        if (userToken) {
+          await axios.post(`${API_URL}/customer/message-send`, {
+            agent_id: route.params.agentId
+          }, {
+            headers: {
+              Accept: 'application/json',
+              "Authorization": 'Bearer ' + userToken,
+            },
+          });
+          console.log('Message-send API called successfully for document');
+        }
+      } catch (apiError) {
+        console.error('Error calling message-send API for document:', apiError);
+        // Don't throw here as the message was already sent to Firestore
+      }
+
+
 
     } catch (err) {
       console.error('Document picker error:', err);
@@ -1328,9 +1367,28 @@ const ChatScreen = ({ route }) => {
         .add(firestoreData);
 
       console.log('Image message stored in Firestore');
-
       // Update local state for immediate UI update
       setMessages(previousMessages => GiftedChat.append(previousMessages, [messageData]));
+      // Call message-send API
+      try {
+        const userToken = await AsyncStorage.getItem('userToken');
+        if (userToken) {
+          await axios.post(`${API_URL}/customer/message-send`, {
+            agent_id: route.params.agentId
+          }, {
+            headers: {
+              Accept: 'application/json',
+              "Authorization": 'Bearer ' + userToken,
+            },
+          });
+          console.log('Message-send API called successfully for image');
+        }
+      } catch (apiError) {
+        console.error('Error calling message-send API for image:', apiError);
+        // Don't throw here as the message was already sent to Firestore
+      }
+
+
 
     } catch (err) {
       console.error('Image picker error:', err);
@@ -1545,7 +1603,7 @@ const ChatScreen = ({ route }) => {
             )}
             <GestureTouchableOpacity
               onPress={() => setIsImageModalVisible(false)}
-              style={{ 
+              style={{
                 position: 'absolute',
                 top: 40,
                 alignSelf: 'center',   // center horizontally
