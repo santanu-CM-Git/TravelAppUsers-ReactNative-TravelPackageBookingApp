@@ -206,7 +206,7 @@ const OtpScreen = ({ route }) => {
                         position: 'top',
                         topOffset: Platform.OS == 'ios' ? 55 : 20
                     });
-                    alert(res.data?.otp)
+                    //alert(res.data?.otp)
                     setComingOTP(res.data?.otp)
                     setTimer(60 * 1)
                     setIsResendDisabled(true);

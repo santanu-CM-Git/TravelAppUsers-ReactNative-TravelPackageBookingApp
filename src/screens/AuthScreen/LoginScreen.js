@@ -125,7 +125,7 @@ const LoginScreen = ({ }) => {
               //   position: 'top',
               //   topOffset: Platform.OS == 'ios' ? 55 : 20
               // });
-              alert(res.data?.otp)
+              //alert(res.data?.otp)
               // login(res.data.token)
               //navigation.navigate('Otp', { countrycode: countryCode, phone: phone, otp: res.data?.otp, token: res.data?.token, name: res.data?.data?.name })
               navigation.navigate('Otp', { countrycode: countryCode, phone: phone, otp: res.data?.otp, fcmToken: fcmToken })
