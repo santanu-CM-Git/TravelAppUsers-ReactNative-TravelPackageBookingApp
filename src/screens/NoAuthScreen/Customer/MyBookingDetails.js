@@ -534,10 +534,11 @@ export default function MyBookingDetails({ route }) {
                             disabled={isBookingExpired}
                             style={[styles.addNewButtonContainer, isBookingExpired && styles.disabledButtonContainer]}
                         >
+                            {bookingData?.status === 'rejected' || bookingData?.status === 'cancelled' ? null :
                             <Image
                                 source={addnewImg}
                                 style={[styles.addnewIcon, isBookingExpired && styles.disabledAddnewIcon]}
-                            />
+                            />}
                         </TouchableOpacity>
                     </View>
                     <View style={styles.contactListContainer}>
