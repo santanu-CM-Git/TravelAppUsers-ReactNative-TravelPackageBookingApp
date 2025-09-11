@@ -105,6 +105,15 @@ const QuotesScreen = ({ route }) => {
             </View>
         );
     };
+
+    const renderEmptyComponent = () => {
+        if (isLoading || loading) return null;
+        return (
+            <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>No quote request</Text>
+            </View>
+        );
+    };
     const renderQuote = ({ item }) => {
 
         return (
@@ -185,6 +194,7 @@ const QuotesScreen = ({ route }) => {
                     onEndReached={handleLoadMore}
                     onEndReachedThreshold={0.5}
                     ListFooterComponent={renderFooter}
+                    ListEmptyComponent={renderEmptyComponent}
                     refreshControl={
                         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FF455C" colors={['#FF455C']} />
                     }
@@ -278,5 +288,17 @@ const styles = StyleSheet.create({
         height: responsiveHeight(8),
         width: responsiveWidth(40),
         //resizeMode:'contain'
+    },
+    emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: responsiveHeight(20),
+    },
+    emptyText: {
+        fontFamily: 'Poppins-Regular',
+        fontSize: responsiveFontSize(2),
+        color: '#888',
+        textAlign: 'center',
     }
 });
