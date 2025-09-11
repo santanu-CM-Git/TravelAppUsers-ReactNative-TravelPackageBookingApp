@@ -159,7 +159,7 @@ const MyBookingList = ({ route }) => {
                 >
                     <LinearGradient colors={["transparent", "rgba(0,0,0,0.8)"]} style={styles.overlay} />
                     <View style={styles.textContainer}>
-                        <Text style={[styles.title, { maxWidth: '90%',flexShrink: 1, }]}
+                        <Text style={[styles.title, { maxWidth: '70%', flexShrink: 1 }]}
                         numberOfLines={1} 
                         ellipsizeMode="tail"
                         >
@@ -174,12 +174,18 @@ const MyBookingList = ({ route }) => {
                                 <Text style={styles.ratingText}>{item.rating}</Text>
                             </View>
                         )}
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Text style={styles.priceText}>₹{formatNumber(item.final_amount)}</Text>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', }}>
+                        <View style={styles.bottomRow}>
+                            <Text 
+                                style={styles.priceText}
+                                numberOfLines={1}
+                                ellipsizeMode="tail"
+                            >
+                                ₹{formatNumber(item.final_amount)}
+                            </Text>
+                            <View style={styles.buttonContainer}>
                                 {activeTab === 'Upcomming' ? (
                                     <TouchableOpacity
-                                        style={[styles.buttonView, { backgroundColor: '#FF455C', marginRight: 8, elevation: 10 }]}
+                                        style={[styles.buttonView, { backgroundColor: '#FF455C' }]}
                                         onPress={(e) => {
                                             e.stopPropagation();
                                             //navigation.navigate('ChatScreen', { agentId: item?.agent?.id });
@@ -196,7 +202,6 @@ const MyBookingList = ({ route }) => {
                                         <Text style={styles.buttonText}>{getStatusText()}</Text>
                                     </View>
                                 )}
-
                             </View>
                         </View>
                     </View>
@@ -320,6 +325,7 @@ const styles = StyleSheet.create({
         position: "absolute",
         bottom: 15,
         left: 15,
+        right: 15,
     },
     imageStyle: {
         borderRadius: 15,
@@ -377,16 +383,38 @@ const styles = StyleSheet.create({
         fontSize: responsiveFontSize(2),
         color: '#FF455C',
         fontFamily: 'Poppins-Bold',
+        maxWidth: responsiveWidth(25),
+        flexShrink: 1,
     },
     buttonText: {
         fontSize: responsiveFontSize(1.6),
         color: '#FFFFFF',
         fontFamily: 'Poppins-Medium',
     },
+    bottomRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 5,
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        minWidth: responsiveWidth(18),
+        justifyContent: 'flex-end',
+    },
     buttonView: {
-        padding: 5,
-        borderRadius: 5,
-        marginLeft: responsiveWidth(3)
+        paddingVertical: 6,
+        paddingHorizontal: 10,
+        borderRadius: 6,
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
     },
     noDataContainer: {
         flex: 1,
