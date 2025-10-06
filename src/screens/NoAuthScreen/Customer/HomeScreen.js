@@ -237,26 +237,26 @@ export default function HomeScreen() {
   //   return () => backHandler.remove(); // Cleanup the event listener on component unmount
   // }, []);
 
-  useEffect(() => {
-    const backAction = () => {
-      Alert.alert('Hold on!', 'Are you sure you want to go back?', [
-        {
-          text: 'Cancel',
-          onPress: () => null,
-          style: 'cancel',
-        },
-        { text: 'YES', onPress: () => BackHandler.exitApp() },
-      ]);
-      return true;
-    };
+  // useEffect(() => {
+  //   const backAction = () => {
+  //     Alert.alert('Hold on!', 'Are you sure you want to go back?', [
+  //       {
+  //         text: 'Cancel',
+  //         onPress: () => null,
+  //         style: 'cancel',
+  //       },
+  //       { text: 'YES', onPress: () => BackHandler.exitApp() },
+  //     ]);
+  //     return true;
+  //   };
 
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction,
-    );
+  //   const backHandler = BackHandler.addEventListener(
+  //     'hardwareBackPress',
+  //     backAction,
+  //   );
 
-    return () => backHandler.remove();
-  }, []);
+  //   return () => backHandler.remove();
+  // }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -1572,7 +1572,7 @@ export default function HomeScreen() {
           </View>
         </View>
         <View style={styles.sectionHeaderView}>
-          <Text style={styles.sectionHeaderText}>Nearby tour planner</Text>
+          <Text style={styles.sectionHeaderText}>Tour planner</Text>
           <TouchableOpacity onPress={() => navigation.navigate('NearbyTourPlanerList')}>
             <Text style={styles.seeallText}>View All</Text>
           </TouchableOpacity>

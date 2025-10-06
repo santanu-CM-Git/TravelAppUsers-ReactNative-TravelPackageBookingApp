@@ -611,38 +611,50 @@ export default function PackageDetailsScreen({ route }) {
                     <View style={{ marginTop: responsiveHeight(2) }}>
                         <StaticMap latitude={packageInfo?.location_data?.latitude} longitude={packageInfo?.location_data?.longitude} label={packageInfo?.location} />
                     </View>
-                    <Text style={styles.productText3}>Required documents</Text>
-                    {packageInfo?.document && JSON.parse(packageInfo.document).map((doc, index) => (
-                        <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image
-                                source={CheckImg}
-                                style={styles.checkicon}
-                            />
-                            <Text style={styles.packageAvlText}>{doc}</Text>
-                        </View>
-                    ))}
+                    {packageInfo?.document && JSON.parse(packageInfo.document).length > 0 && (
+                        <>
+                            <Text style={styles.productText3}>Required documents</Text>
+                            {JSON.parse(packageInfo.document).map((doc, index) => (
+                                <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Image
+                                        source={CheckImg}
+                                        style={styles.checkicon}
+                                    />
+                                    <Text style={styles.packageAvlText}>{doc}</Text>
+                                </View>
+                            ))}
+                        </>
+                    )}
                     
-                    <Text style={styles.productText3}>Package Inclusions</Text>
-                    {packageInfo?.package_inclusion && JSON.parse(packageInfo.package_inclusion).map((inclusion, index) => (
-                        <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image
-                                source={CheckImg}
-                                style={styles.checkicon}
-                            />
-                            <Text style={styles.packageAvlText}>{inclusion}</Text>
-                        </View>
-                    ))}
+                    {packageInfo?.package_inclusion && JSON.parse(packageInfo.package_inclusion).length > 0 && (
+                        <>
+                            <Text style={styles.productText3}>Package Inclusions</Text>
+                            {JSON.parse(packageInfo.package_inclusion).map((inclusion, index) => (
+                                <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Image
+                                        source={CheckImg}
+                                        style={styles.checkicon}
+                                    />
+                                    <Text style={styles.packageAvlText}>{inclusion}</Text>
+                                </View>
+                            ))}
+                        </>
+                    )}
                     
-                    <Text style={styles.productText3}>Package Exclusions</Text>
-                    {packageInfo?.package_exclusion && JSON.parse(packageInfo.package_exclusion).map((exclusion, index) => (
-                        <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image
-                                source={CheckImg}
-                                style={styles.checkicon}
-                            />
-                            <Text style={styles.packageAvlText}>{exclusion}</Text>
-                        </View>
-                    ))}
+                    {packageInfo?.package_exclusion && JSON.parse(packageInfo.package_exclusion).length > 0 && (
+                        <>
+                            <Text style={styles.productText3}>Package Exclusions</Text>
+                            {JSON.parse(packageInfo.package_exclusion).map((exclusion, index) => (
+                                <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Image
+                                        source={CheckImg}
+                                        style={styles.checkicon}
+                                    />
+                                    <Text style={styles.packageAvlText}>{exclusion}</Text>
+                                </View>
+                            ))}
+                        </>
+                    )}
                     <View style={styles.buttoncontainer}>
                         <TouchableOpacity 
                             style={[styles.bookNowButton, isPackageExpired() && styles.disabledButton]} 

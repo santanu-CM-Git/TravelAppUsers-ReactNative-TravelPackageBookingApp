@@ -12,7 +12,7 @@ import HomeScreen from '../screens/NoAuthScreen/Customer/HomeScreen';
 import NotificationScreen from '../screens/NoAuthScreen/Customer/NotificationScreen';
 import PrivacyPolicy from '../screens/NoAuthScreen/Customer/PrivacyPolicy';
 import ChatScreen from '../screens/NoAuthScreen/Customer/ChatScreen';
-import { bookmarkedFill, bookmarkedNotFill, bookmarkednotFocusedImg, calenderFocusedImg, calenderImg, homeIconFocusedImg, homeIconNotFocusedImg, menuImg, messageImg, quotesImg, talkFocusedImg, talkImg } from '../utils/Images';
+import { bookingMenu, bookmarkedFill, bookmarkedNotFill, bookmarkednotFocusedImg, calenderFocusedImg, calenderImg, homeIconFocusedImg, homeIconNotFocusedImg, menuImg, messageImg, quotesImg, talkFocusedImg, talkImg } from '../utils/Images';
 import ThankYouBookingScreen from '../screens/NoAuthScreen/Customer/ThankYouBookingScreen';
 import BookingSummary from '../screens/NoAuthScreen/Customer/BookingSummary';
 import PaymentFailed from '../screens/NoAuthScreen/Customer/PaymentFailed';
@@ -185,6 +185,26 @@ const MessageStack = ({ route }) => {
        <Stack.Screen
         name='ChatScreen'
         component={ChatScreen}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  )
+
+};
+
+const BookingStack = ({ route }) => {
+  const navigation = useNavigation();
+  useFocusEffect(
+    React.useCallback(() => {
+      // Reset to the initial screen (TherapistList) whenever the tab is focused
+      navigation.navigate('MyBookingList');
+    }, [navigation])
+  );
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="MyBookingList"
+        component={MyBookingList}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
@@ -384,6 +404,33 @@ const TabNavigator = ({  }) => {
           ),
           tabBarLabel: ({ color, focused }) => (
             <Text style={{ color, fontSize: responsiveFontSize(1.2), marginBottom: responsiveHeight(0.5), marginTop: responsiveHeight(1) }}>Messages</Text>
+          ),
+        })}
+      />
+     <Tab.Screen
+        name="Booking"
+        component={BookingStack}
+        options={({ route }) => ({
+          tabBarStyle: {
+            display: getTabBarVisibility(route),
+            backgroundColor: '#FAFAFA',
+            width: responsiveWidth(100),
+            height: Platform.select({
+              android: responsiveHeight(8) + Math.max(insets.bottom, 10),
+              ios: responsiveHeight(11) + Math.max(insets.bottom, 10),
+            }),
+            alignSelf: 'center',
+            paddingBottom: Math.max(insets.bottom, 10),
+            paddingTop: 5,
+          },
+          tabBarIcon: ({ color, size, focused }) => (
+            <View style={{ alignItems: 'center', justifyContent: 'center', }}>
+              {focused && <View style={{ width: responsiveWidth(12), borderColor: color, backgroundColor: color, borderBottomLeftRadius: 5, borderBottomRightRadius: 5 }} />}
+              <Image source={bookingMenu} tintColor={color} style={{ width: responsiveWidth(7), height: responsiveHeight(3.5), marginTop: responsiveHeight(1.4), resizeMode: 'contain' }} />
+            </View>
+          ),
+          tabBarLabel: ({ color, focused }) => (
+            <Text style={{ color, fontSize: responsiveFontSize(1.2), marginBottom: responsiveHeight(0.5), marginTop: responsiveHeight(1) }}>Booking</Text>
           ),
         })}
       />
