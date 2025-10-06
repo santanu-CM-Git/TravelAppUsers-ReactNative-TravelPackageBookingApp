@@ -297,7 +297,7 @@ export default function TopLocationScreenDetails({ route }) {
                                 />
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
 
-                                    {item?.date_type === 0 ?
+                                    {item?.date_type == 0 ?
                                         <Text style={styles.packageAvlText}>
                                             {(() => {
                                                 const start = moment(item.start_date);
@@ -338,7 +338,7 @@ export default function TopLocationScreenDetails({ route }) {
                                     />
                                 )}
                             </TouchableOpacity>
-                            {item?.date_type === 0 ?
+                            {item?.date_type == 0 ?
                                 <View style={styles.tagTextView4}>
                                     <View style={styles.dateContainer}>
                                         <Image source={calendarImg} tintColor={'#FFFFFF'} style={[styles.timeimage, { marginRight: 5 }]} />

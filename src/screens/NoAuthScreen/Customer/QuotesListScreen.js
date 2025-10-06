@@ -207,7 +207,7 @@ const QuotesListScreen = ({ route }) => {
                                     </View>
                                     <Text style={styles.priceText2}>₹{formatNumber(item?.package?.discounted_price)}</Text>
                                 </View>
-                                {item?.package?.date_type === 0 ? (
+                                {item?.package?.date_type == 0 ? (
                                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: responsiveHeight(1) }}>
                                         <Image
                                             source={userImg}
@@ -220,7 +220,7 @@ const QuotesListScreen = ({ route }) => {
                                     null
                                 )}
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    {item?.package?.date_type === 0 ? (
+                                    {item?.package?.date_type == 0 ? (
                                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                             <Image
                                                 source={timeImg}
@@ -267,7 +267,7 @@ const QuotesListScreen = ({ route }) => {
                                     ))}
                                 </View>
                             </View>
-                            {item?.package?.date_type === 0 ? (
+                            {item?.package?.date_type == 0 ? (
                                 <View style={styles.tagTextView4}>
                                     <View style={styles.dateContainer}>
                                         <Image source={calendarImg} tintColor={'#FFFFFF'} style={[styles.timeimage, { marginRight: 5 }]} />
