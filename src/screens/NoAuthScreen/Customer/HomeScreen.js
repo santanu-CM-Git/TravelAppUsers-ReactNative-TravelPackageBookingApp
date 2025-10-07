@@ -613,7 +613,10 @@ export default function HomeScreen() {
 
       const responseData = response.data.data.data;
       console.log(responseData, 'nearby tour planner data');
-      setNearbyTourAgent(prevData => page === 1 ? responseData : [...prevData, ...responseData]);
+      //setNearbyTourAgent(prevData => page === 1 ? responseData : [...prevData, ...responseData]);
+      // Store only the first 5 items
+      const limitedData = responseData.slice(0, 5);
+      setNearbyTourAgent(prevData => page === 1 ? limitedData : [...prevData, ...limitedData].slice(0, 5));
 
       if (responseData.length === 0) {
         setHasMore(false); // No more data to load
