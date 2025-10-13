@@ -706,7 +706,7 @@ export default function MyBookingDetails({ route }) {
                                 source={cancelTourImg}
                                 style={styles.cancelTourIcon}
                             />
-                            <Text style={styles.cancelText}>Are you sure you want to cancel this tour ?</Text>
+                            <Text style={styles.cancelText}>Are you sure you want to cancel this tour ? All refunds will be subject to transaction fees charged by the payment gateway.</Text>
                         </View>
                     </ScrollView>
                     <View style={{ bottom: 0, width: responsiveWidth(100), paddingHorizontal: 10, borderTopColor: '#E3E3E3', borderTopWidth: 1 }}>
@@ -1186,7 +1186,8 @@ const styles = StyleSheet.create({
         fontSize: responsiveFontSize(2),
         color: '#686868',
         fontFamily: 'Poppins-Regular',
-        marginTop: responsiveHeight(5)
+        marginTop: responsiveHeight(5),
+        textAlign: 'center'
     },
     noContactsText: {
         color: '#686868',

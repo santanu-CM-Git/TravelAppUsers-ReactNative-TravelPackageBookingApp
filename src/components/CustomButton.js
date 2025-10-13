@@ -2,11 +2,12 @@ import { Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import React from 'react';
 import { chatImg, forwordImg } from '../utils/Images';
 
-export default function CustomButton({ label, onPress, buttonIcon, buttonColor }) {
+export default function CustomButton({ label, onPress, buttonIcon, buttonColor, disabled, style }) {
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={buttonColor == 'red' ? styles.buttonViewRed : buttonColor === 'delete' ? styles.buttonViewDelete : buttonColor == 'gray' ? styles.buttonViewGray : buttonColor == 'small' ? styles.buttonViewSmall : styles.buttonView}>
+      disabled={disabled}
+      style={[buttonColor == 'red' ? styles.buttonViewRed : buttonColor === 'delete' ? styles.buttonViewDelete : buttonColor == 'gray' ? styles.buttonViewGray : buttonColor == 'small' ? styles.buttonViewSmall : styles.buttonView, style]}>
 
       <Text
         style={buttonColor == 'red' ? styles.buttonTextRed : buttonColor === 'delete' ? styles.buttonTextDelete : styles.buttonText}>

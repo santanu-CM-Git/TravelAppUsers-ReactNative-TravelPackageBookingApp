@@ -40,7 +40,7 @@ const BookingSummary = ({ route }) => {
     const [couponDeduction, setCouponDeduction] = useState(0);
     const [couponId, setCouponId] = useState(null)
     const [walletDeduction, setWalletDeduction] = useState(0);
-    const [toggleCheckBox, setToggleCheckBox] = useState(true)
+    const [toggleCheckBox, setToggleCheckBox] = useState(false)
     const [couponData, setCouponData] = useState(null);
     const [couponError, setCouponError] = useState('');
     const [appliedCoupon, setAppliedCoupon] = useState(null);
@@ -702,7 +702,9 @@ const BookingSummary = ({ route }) => {
                         />
                     </View>
                     <Text style={styles.termsText}>
-                        I accept term and condition and privacy policy and cancellation policy
+                        I accept term and condition and privacy policy and cancellation policy.
+                        <Text style={{fontFamily: 'Poppins-Medium',color: '#746868', fontSize: responsiveFontSize(1.5), textAlign: 'center', paddingHorizontal: 10, lineHeight: 18,}}>You are about to make a payment to {packageInfo?.agent?.name || 'the travel agency'}. Please ensure you have fully read the travel package details and the cancellation policy provided by the travel agency.</Text>
+                       
                     </Text>
                 </View>
             </ScrollView>
@@ -720,8 +722,8 @@ const BookingSummary = ({ route }) => {
                         <CustomButton
                             label={isLoading ? "Processing..." : "Pay Now"}
                             onPress={beforeHandlePayment}
-                            disabled={isLoading || !packageInfo?.agent_bank_details}
-                            style={(!packageInfo?.agent_bank_details || isLoading) ? styles.disabledButton : null}
+                            disabled={isLoading || !packageInfo?.agent_bank_details || !toggleCheckBox}
+                            style={(!packageInfo?.agent_bank_details || isLoading || !toggleCheckBox) ? styles.disabledButton : null}
                         />
                     </View>
                 </View>
@@ -907,7 +909,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         flexDirection: 'row',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'flex-start'
     },
     termsText: {
         color: '#746868',
