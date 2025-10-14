@@ -207,6 +207,11 @@ const BookingStack = ({ route }) => {
         component={MyBookingList}
         options={{ headerShown: false }}
       />
+       <Stack.Screen
+        name="PaymentSuccessScreen"
+        component={PaymentSuccessScreen}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   )
 
@@ -296,6 +301,11 @@ const MenuStack = ({ route }) => {
         <Stack.Screen
         name="RefundScreen"
         component={RefundScreen}
+        options={{ headerShown: false }}
+      />
+       <Stack.Screen
+        name="PaymentSuccessScreen"
+        component={PaymentSuccessScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
