@@ -622,7 +622,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.travel.travelapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.grouptour.travelapp;
 				PRODUCT_NAME = GroupTravel;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -650,7 +650,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.travel.travelapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.grouptour.travelapp;
 				PRODUCT_NAME = GroupTravel;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
