@@ -53,6 +53,10 @@
 	<string>This App needs to access your Photo Library to upload media.</string>
 	<key>NSUserNotificationUsageDescription</key>
 	<string>This App would like to send you notifications to keep you updated.</string>
+	<key>NSAppleMusicUsageDescription</key>
+    <string>This app requires access to your media library to manage and play audio content.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app requires location access to show nearby destinations and improve your experience.</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UIAppFonts</key>
