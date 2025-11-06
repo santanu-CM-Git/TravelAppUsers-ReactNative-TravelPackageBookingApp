@@ -17,27 +17,27 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>$(MARKETING_VERSION)</string>
+	<string>1.0.2</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
-	<true/>
+	<true />
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
-		<true/>
+		<true />
 		<key>NSExceptionDomains</key>
 		<dict>
 			<key>103.191.208.50</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
+				<true />
 				<key>NSExceptionRequiresForwardSecrecy</key>
-				<false/>
+				<false />
 				<key>NSIncludesSubdomains</key>
-				<true/>
+				<true />
 			</dict>
 		</dict>
 	</dict>
@@ -54,11 +54,11 @@
 	<key>NSUserNotificationUsageDescription</key>
 	<string>This App would like to send you notifications to keep you updated.</string>
 	<key>NSAppleMusicUsageDescription</key>
-    <string>This app requires access to your media library to manage and play audio content.</string>
+	<string>This app requires access to your media library to manage and play audio content.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>This app requires location access to show nearby destinations and improve your experience.</string>
 	<key>RCTNewArchEnabled</key>
-	<true/>
+	<true />
 	<key>UIAppFonts</key>
 	<array>
 		<string>DMSans-Black.ttf</string>
@@ -148,6 +148,6 @@
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<false/>
+	<false />
 </dict>
 </plist>
