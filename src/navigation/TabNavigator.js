@@ -328,7 +328,7 @@ const TabNavigator = ({  }) => {
         tabBarStyle: {
           height: Platform.select({
             android: responsiveHeight(8) + insets.bottom, // Add bottom safe area
-            ios: responsiveHeight(11) + insets.bottom, // Add bottom safe area
+            ios: responsiveHeight(8) + insets.bottom, // Add bottom safe area
           }),
           paddingBottom: insets.bottom, // Add padding for safe area
         },
@@ -344,7 +344,7 @@ const TabNavigator = ({  }) => {
             width: responsiveWidth(100),
             height: Platform.select({
               android: responsiveHeight(8) + Math.max(insets.bottom, 10), // Ensure minimum padding
-              ios: responsiveHeight(11) + Math.max(insets.bottom, 10), // Ensure minimum padding
+              ios: responsiveHeight(8) + Math.max(insets.bottom, 10), // Ensure minimum padding
             }),
             alignSelf: 'center',
             paddingBottom: Math.max(insets.bottom, 10), // Ensure minimum padding
@@ -373,7 +373,7 @@ const TabNavigator = ({  }) => {
             width: responsiveWidth(100),
             height: Platform.select({
               android: responsiveHeight(8) + Math.max(insets.bottom, 10),
-              ios: responsiveHeight(11) + Math.max(insets.bottom, 10),
+              ios: responsiveHeight(8) + Math.max(insets.bottom, 10),
             }),
             alignSelf: 'center',
             paddingBottom: Math.max(insets.bottom, 10),
@@ -400,7 +400,7 @@ const TabNavigator = ({  }) => {
             width: responsiveWidth(100),
             height: Platform.select({
               android: responsiveHeight(8) + Math.max(insets.bottom, 10),
-              ios: responsiveHeight(11) + Math.max(insets.bottom, 10),
+              ios: responsiveHeight(8) + Math.max(insets.bottom, 10),
             }),
             alignSelf: 'center',
             paddingBottom: Math.max(insets.bottom, 10),
@@ -427,7 +427,7 @@ const TabNavigator = ({  }) => {
             width: responsiveWidth(100),
             height: Platform.select({
               android: responsiveHeight(8) + Math.max(insets.bottom, 10),
-              ios: responsiveHeight(11) + Math.max(insets.bottom, 10),
+              ios: responsiveHeight(8) + Math.max(insets.bottom, 10),
             }),
             alignSelf: 'center',
             paddingBottom: Math.max(insets.bottom, 10),
@@ -454,7 +454,7 @@ const TabNavigator = ({  }) => {
             width: responsiveWidth(100),
             height: Platform.select({
               android: responsiveHeight(8) + Math.max(insets.bottom, 10),
-              ios: responsiveHeight(11) + Math.max(insets.bottom, 10),
+              ios: responsiveHeight(8) + Math.max(insets.bottom, 10),
             }),
             alignSelf: 'center',
             paddingBottom: Math.max(insets.bottom, 10),
