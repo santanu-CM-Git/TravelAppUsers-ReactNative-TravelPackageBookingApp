@@ -208,6 +208,11 @@ const BookingStack = ({ route }) => {
         options={{ headerShown: false }}
       />
        <Stack.Screen
+        name="MyBookingDetails"
+        component={MyBookingDetails}
+        options={{ headerShown: false }}
+      />
+       <Stack.Screen
         name="PaymentSuccessScreen"
         component={PaymentSuccessScreen}
         options={{ headerShown: false }}
@@ -522,9 +527,7 @@ const getTabBarVisibility = route => {
     return 'none';
   } else if (routeName == 'ProfileEditScreen') {
     return 'none';
-  } else if (routeName == 'MyBookingList') {
-    return 'none';
-  } else if (routeName == 'CompletedBookingDetails') {
+  }  else if (routeName == 'CompletedBookingDetails') {
     return 'none';
   } else if (routeName == 'UpcommingBookingDetails') {
     return 'none';

@@ -573,7 +573,7 @@ export default function MyBookingDetails({ route }) {
                             />
                         </TouchableOpacity>
                     </View>
-                    {bookingData?.transaction_no ?
+                    {bookingData?.transaction_no && bookingData?.status !== "cancelled" ?
                     <View style={styles.buttoncontainer}>
                         <TouchableOpacity style={styles.talkToAgentButton} onPress={() => toggleFilterModal2()}>
                             <Text style={styles.talkToAgentText}>Cancel Package</Text>
