@@ -427,10 +427,10 @@ export default function MyBookingDetails({ route }) {
     }
 
     return (
-        <SafeAreaView style={styles.Container}>
+        <SafeAreaView style={styles.Container} edges={['bottom']}>
             {/* <CustomHeader commingFrom={'Top location'} onPressProfile={() => navigation.navigate('Profile')} title={'Top location'} /> */}
             {/* <StatusBar translucent backgroundColor="transparent" /> */}
-            <StatusBar translucent={false} backgroundColor="black" barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'} />  
+            <StatusBar translucent={true} backgroundColor="black" barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'} />  
             <ScrollView>
                 <ImageBackground
                     source={{ uri: bookingData?.package?.cover_photo_url }}
@@ -786,7 +786,7 @@ const styles = StyleSheet.create({
     },
     background: {
         width: '100%',
-        height: 300,  // Adjust height as needed
+        height: responsiveHeight(40), // Adjust height as needed
         borderBottomLeftRadius: 20,
         borderBottomRightRadius: 20,
         overflow: 'hidden',
@@ -798,7 +798,7 @@ const styles = StyleSheet.create({
     },
     header: {
         position: 'absolute',
-        top: 35,
+        top: Platform.OS === 'ios' ? responsiveHeight(6) : (StatusBar.currentHeight || 0) + responsiveHeight(1),
         left: 20,
         right: 20,
         flexDirection: 'row',

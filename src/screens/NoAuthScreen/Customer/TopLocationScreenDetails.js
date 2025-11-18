@@ -560,9 +560,9 @@ export default function TopLocationScreenDetails({ route }) {
     }
 
     return (
-        <SafeAreaView style={styles.Container}>
+        <SafeAreaView style={styles.Container} edges={['bottom']}>
             {/* <StatusBar translucent backgroundColor="transparent" /> */}
-            <StatusBar translucent={false} backgroundColor="black" barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'} />  
+            <StatusBar translucent={true} backgroundColor="black" barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'} />  
             <View style={styles.mainContainer}>
                 <ImageBackground
                     source={{ uri: locationData?.image_url }}
@@ -892,7 +892,7 @@ const styles = StyleSheet.create({
     },
     background: {
         width: '100%',
-        height: 300,  // Adjust height as needed
+        height: responsiveHeight(40), // Adjust height as needed
         borderBottomLeftRadius: 20,
         borderBottomRightRadius: 20,
         overflow: 'hidden',
@@ -904,7 +904,7 @@ const styles = StyleSheet.create({
     },
     header: {
         position: 'absolute',
-        top: 25,
+        top: Platform.OS === 'ios' ? responsiveHeight(6) : (StatusBar.currentHeight || 0) + responsiveHeight(1),
         left: 0,
         right: 0,
         flexDirection: 'row',

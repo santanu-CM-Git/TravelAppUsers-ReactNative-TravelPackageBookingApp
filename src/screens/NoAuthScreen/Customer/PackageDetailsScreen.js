@@ -431,8 +431,8 @@ export default function PackageDetailsScreen({ route }) {
 
     const onShare = async () => {
         try {
-            const appStoreLink = "https://apps.apple.com/app/your-app/id123456789";
-            const playStoreLink = "https://play.google.com/store/apps/details?id=your.app.package";
+            const appStoreLink = "https://apps.apple.com/us/app/group-tour/id6754909782";
+            const playStoreLink = "https://play.google.com/store/apps/details?id=com.grouptour.travelapp&hl=en";
             
             const shareMessage = `Check out this amazing travel package!\n\n${packageInfo?.name}\nLocation: ${packageInfo?.location_data?.name}\nPrice: ${packageInfo?.discounted_price}\n\nBook now and enjoy your dream vacation!\n\nDownload our app:\n📱 iOS: ${appStoreLink}\n📱 Android: ${playStoreLink}`;
     
@@ -947,7 +947,7 @@ const styles = StyleSheet.create({
     },
     background: {
         width: '100%',
-        height: responsiveHeight(50),  // Full cover photo height
+        height: responsiveHeight(40),  // Full cover photo height
         overflow: 'hidden',
         borderBottomLeftRadius: 20,
         borderBottomRightRadius: 20,
