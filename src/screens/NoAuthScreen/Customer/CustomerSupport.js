@@ -13,7 +13,6 @@ import {
     Linking,
     BackHandler
 } from 'react-native';
-import Clipboard from '@react-native-clipboard/clipboard';
 
 import { AuthContext } from '../../../context/AuthContext';
 
@@ -56,10 +55,6 @@ export default function CustomerSupport({  }) {
         }
     };
 
-    const copyToClipboard = (email) => {
-        Clipboard.setString(email);
-        Alert.alert('Copied!', 'Email address copied to clipboard');
-    };
 
     if (isLoading) {
         return (
@@ -88,7 +83,7 @@ export default function CustomerSupport({  }) {
             <ScrollView style={styles.wrapper}>
                 {/* <Text style={styles.header}>Talk to us</Text> */}
                 <Text style={{ color: '#746868', fontFamily: 'Poppins-Regular', fontSize: responsiveFontSize(1.7), lineHeight: responsiveHeight(2.5) }}>You can contact us for more support on the  </Text>
-                <TouchableOpacity onPress={() => copyToClipboard('support@grouptour.app')}>
+                <TouchableOpacity onPress={() => Linking.openURL(`mailto:support@grouptour.app`)}>
                     <Text style={{ color: '#FF455C', fontFamily: 'Poppins-Medium', fontSize: responsiveFontSize(2), lineHeight: responsiveHeight(2.5) }}>support@grouptour.app</Text>
                 </TouchableOpacity>
                 {/* <View style={{ flexDirection: 'row', marginTop: responsiveHeight(4), }}>
