@@ -17,9 +17,10 @@ import {
     TextInput,
     StatusBar,
     ImageBackground,
-    KeyboardAwareScrollView,
+    KeyboardAvoidingView,
     Linking
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from "react-native-modal";
 import { AuthContext } from '../../../context/AuthContext';
 import { getProducts } from '../../../store/productSlice'
@@ -589,18 +590,28 @@ export default function MyBookingDetails({ route }) {
                 style={{
                     margin: 0, // Add this line to remove the default margin
                     justifyContent: 'flex-end',
-                }}>
+                }}
+                >
                 {/* <TouchableWithoutFeedback onPress={() => setIsFocus(false)} style={{  }}> */}
-                <View style={{ height: '55%', backgroundColor: '#fff', position: 'absolute', bottom: 0, width: '100%', borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
-                    <View style={{ padding: 0 }}>
-                        <View style={{ paddingVertical: 5, paddingHorizontal: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: responsiveHeight(2), marginTop: responsiveHeight(2) }}>
-                            <Text style={{ fontSize: responsiveFontSize(2.5), color: '#2D2D2D', fontFamily: 'Poppins-Bold', }}>Add New Co Traveler</Text>
-                            <View style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: '#B0B0B0', height: 30, width: 30, borderRadius: 25, }}>
-                                <Icon name="cross" size={20} color="#000000" onPress={toggleFilterModal} />
+                <KeyboardAvoidingView 
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    style={{ flex: 1, justifyContent: 'flex-end' }}
+                >
+                    <View style={{ height: '55%', backgroundColor: '#fff', width: '100%', borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
+                        <View style={{ padding: 0 }}>
+                            <View style={{ paddingVertical: 5, paddingHorizontal: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: responsiveHeight(2), marginTop: responsiveHeight(2) }}>
+                                <Text style={{ fontSize: responsiveFontSize(2.5), color: '#2D2D2D', fontFamily: 'Poppins-Bold', }}>Add New Co Traveler</Text>
+                                <View style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: '#B0B0B0', height: 30, width: 30, borderRadius: 25, }}>
+                                    <Icon name="cross" size={20} color="#000000" onPress={toggleFilterModal} />
+                                </View>
                             </View>
                         </View>
-                    </View>
-                    <ScrollView style={{ marginBottom: responsiveHeight(0) }}>
+                        <ScrollView 
+                            style={{ flex: 1 }}
+                            keyboardShouldPersistTaps="handled"
+                            showsVerticalScrollIndicator={false}
+                            contentContainerStyle={{ paddingBottom: Platform.OS === 'ios' ? 100 : 20 }}
+                        >
                         <View style={{ borderTopColor: '#E3E3E3', borderTopWidth: 0, paddingHorizontal: 15, marginBottom: 5 }}>
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <Text style={styles.textinputheader}>Phone No</Text>
@@ -679,9 +690,9 @@ export default function MyBookingDetails({ route }) {
                                 />
                             </View>
                         </View>
-                    </ScrollView>
-
-                </View>
+                        </ScrollView>
+                    </View>
+                </KeyboardAvoidingView>
                 {/* </TouchableWithoutFeedback> */}
             </Modal>
             {/* add new cotraveler modal */}
