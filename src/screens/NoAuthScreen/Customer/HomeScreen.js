@@ -1583,6 +1583,7 @@ export default function HomeScreen() {
                   paddingVertical: 5,
                   borderRadius: 5,
                   marginTop: 5,
+                  height: Platform.OS === 'ios' ? responsiveHeight(5) : responsiveHeight(6.5)
                 }}
               >
                 <Icon name="user" size={20} color="red" />
@@ -1608,6 +1609,7 @@ export default function HomeScreen() {
                   paddingVertical: 5,
                   borderRadius: 5,
                   marginTop: 5,
+                  height: Platform.OS === 'ios' ? responsiveHeight(5) : responsiveHeight(6.5)
                 }}
               >
                 <Icon name="child" size={20} color="red" />
