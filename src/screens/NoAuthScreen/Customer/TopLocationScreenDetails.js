@@ -44,6 +44,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import Icon from 'react-native-vector-icons/Entypo';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import IOSDatePickerModal from '../../../components/IOSDatePickerModal';
 
 const { width } = Dimensions.get('window');
 const itemWidth = width * 0.8; // 80% of screen width
@@ -70,6 +71,9 @@ export default function TopLocationScreenDetails({ route }) {
     });
     const [showFromDatePicker, setShowFromDatePicker] = useState(false);
     const [showToDatePicker, setShowToDatePicker] = useState(false);
+    const [showIOSFromDatePicker, setShowIOSFromDatePicker] = useState(false);
+    const [showIOSToDatePicker, setShowIOSToDatePicker] = useState(false);
+    const filterScrollViewRef = useRef(null);
     const [searchText, setSearchText] = useState("");
     const [locationList, setLocationList] = useState([]);
     const [locationData, setLocationData] = useState(null);
@@ -104,20 +108,49 @@ export default function TopLocationScreenDetails({ route }) {
 
     // Update your existing state setters to track modifications
     const onChangeFromDate = (event, selectedDate) => {
-        setShowFromDatePicker(Platform.OS === "ios");
-        if (selectedDate) {
-            setFromDate(selectedDate);
-            setModifiedFilters(prev => ({ ...prev, dateModified: true }));
+        if (Platform.OS === "android") {
+            setShowFromDatePicker(false);
+            if (event.type === 'set' && selectedDate) {
+                setFromDate(selectedDate);
+                setModifiedFilters(prev => ({ ...prev, dateModified: true }));
+            }
+        } else {
+            // iOS - handled by modal
+            if (selectedDate) {
+                setFromDate(selectedDate);
+                setModifiedFilters(prev => ({ ...prev, dateModified: true }));
+            }
         }
     };
 
     const onChangeToDate = (event, selectedDate) => {
-        setShowToDatePicker(Platform.OS === "ios");
-        if (selectedDate) {
-            setToDate(selectedDate);
-            setModifiedFilters(prev => ({ ...prev, dateModified: true }));
+        if (Platform.OS === "android") {
+            setShowToDatePicker(false);
+            if (event.type === 'set' && selectedDate) {
+                setToDate(selectedDate);
+                setModifiedFilters(prev => ({ ...prev, dateModified: true }));
+            }
+        } else {
+            // iOS - handled by modal
+            if (selectedDate) {
+                setToDate(selectedDate);
+                setModifiedFilters(prev => ({ ...prev, dateModified: true }));
+            }
         }
     };
+
+    // iOS Modal handlers for Filter Modal section
+    const handleIOSFromDateConfirm = useCallback((selectedDate) => {
+        setFromDate(selectedDate);
+        setShowIOSFromDatePicker(false);
+        setModifiedFilters(prev => ({ ...prev, dateModified: true }));
+    }, []);
+
+    const handleIOSToDateConfirm = useCallback((selectedDate) => {
+        setToDate(selectedDate);
+        setShowIOSToDatePicker(false);
+        setModifiedFilters(prev => ({ ...prev, dateModified: true }));
+    }, []);
 
     // Update price change handler
     const handlePriceChange = (values) => {
@@ -610,7 +643,7 @@ export default function TopLocationScreenDetails({ route }) {
                     margin: 0,
                     justifyContent: 'flex-end',
                 }}>
-                <View style={{ height: '75%', backgroundColor: '#fff', position: 'absolute', bottom: 0, width: '100%', borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
+                <View style={{ height: Platform.OS === 'ios' ? 'auto' : 'auto', backgroundColor: '#fff', position: 'absolute', bottom: 0, width: '100%', borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
                     <View style={{ padding: 0 }}>
                         <View style={{ paddingVertical: 5, paddingHorizontal: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: responsiveHeight(2), marginTop: responsiveHeight(2) }}>
                             <Text style={{ fontSize: responsiveFontSize(2.5), color: '#2D2D2D', fontFamily: 'Poppins-Bold', }}>Filter</Text>
@@ -619,15 +652,19 @@ export default function TopLocationScreenDetails({ route }) {
                             </View>
                         </View>
                     </View>
-                    <ScrollView style={{ marginBottom: responsiveHeight(0) }}>
+                    <ScrollView 
+                        ref={filterScrollViewRef}
+                        style={{ marginBottom: responsiveHeight(0) }}
+                        contentContainerStyle={{ paddingBottom: responsiveHeight(5) }}
+                    >
                         <View style={{ borderTopColor: '#E3E3E3', borderTopWidth: 0, paddingHorizontal: 15, marginBottom: 5 }}>
                             <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Days</Text>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: responsiveHeight(2) }}>
-                                <View style={{ flexDirection: 'column' }}>
-                                    {/* From Date */}
+                            {/* Show date pickers in full width when open on iOS, otherwise show normal layout */}
+                            {Platform.OS === 'ios' && showIOSFromDatePicker ? (
+                                <View style={{ marginBottom: responsiveHeight(2) }}>
                                     <Text style={styles.textinputHeader}>Departure Date</Text>
                                     <TouchableOpacity
-                                        onPress={() => setShowFromDatePicker(true)}
+                                        onPress={() => setShowIOSFromDatePicker(false)}
                                         style={{
                                             flexDirection: "row",
                                             alignItems: "center",
@@ -642,20 +679,36 @@ export default function TopLocationScreenDetails({ route }) {
                                         <Icon name="calendar" size={20} color="red" />
                                         <Text style={{ marginLeft: 10, color: '#767676', fontFamily: 'Poppins-Regular', fontSize: responsiveFontSize(1.7) }}>{fromDate.toDateString()}</Text>
                                     </TouchableOpacity>
-                                    {showFromDatePicker && (
+                                    <View style={styles.iosPickerContainer}>
                                         <DateTimePicker
                                             value={fromDate}
                                             mode="date"
-                                            display="default"
-                                            onChange={onChangeFromDate}
+                                            display="spinner"
+                                            minimumDate={new Date()}
+                                            onChange={(event, selectedDate) => {
+                                                if (selectedDate) {
+                                                    setFromDate(selectedDate);
+                                                    setModifiedFilters(prev => ({ ...prev, dateModified: true }));
+                                                }
+                                            }}
+                                            textColor="#000"
+                                            themeVariant="light"
                                         />
-                                    )}
+                                        <View style={styles.iosPickerButtons}>
+                                            <TouchableOpacity
+                                                onPress={() => setShowIOSFromDatePicker(false)}
+                                                style={styles.iosPickerButton}
+                                            >
+                                                <Text style={styles.iosPickerButtonText}>Done</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
                                 </View>
-                                <View style={{ flexDirection: 'column' }}>
-                                    {/* To Date */}
+                            ) : Platform.OS === 'ios' && showIOSToDatePicker ? (
+                                <View style={{ marginBottom: responsiveHeight(2) }}>
                                     <Text style={styles.textinputHeader}>Return Date</Text>
                                     <TouchableOpacity
-                                        onPress={() => setShowToDatePicker(true)}
+                                        onPress={() => setShowIOSToDatePicker(false)}
                                         style={{
                                             flexDirection: "row",
                                             alignItems: "center",
@@ -670,46 +723,139 @@ export default function TopLocationScreenDetails({ route }) {
                                         <Icon name="calendar" size={20} color="red" />
                                         <Text style={{ marginLeft: 10, color: '#767676', fontFamily: 'Poppins-Regular', fontSize: responsiveFontSize(1.7) }}>{toDate.toDateString()}</Text>
                                     </TouchableOpacity>
-                                    {showToDatePicker && (
+                                    <View style={styles.iosPickerContainer}>
                                         <DateTimePicker
                                             value={toDate}
                                             mode="date"
-                                            display="default"
-                                            onChange={onChangeToDate}
+                                            display="spinner"
+                                            minimumDate={fromDate}
+                                            onChange={(event, selectedDate) => {
+                                                if (selectedDate) {
+                                                    setToDate(selectedDate);
+                                                    setModifiedFilters(prev => ({ ...prev, dateModified: true }));
+                                                }
+                                            }}
+                                            textColor="#000"
+                                            themeVariant="light"
                                         />
-                                    )}
+                                        <View style={styles.iosPickerButtons}>
+                                            <TouchableOpacity
+                                                onPress={() => setShowIOSToDatePicker(false)}
+                                                style={styles.iosPickerButton}
+                                            >
+                                                <Text style={styles.iosPickerButtonText}>Done</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
                                 </View>
-                            </View>
-                            <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Price</Text>
-                            <View style={styles.slidercontainer}>
-                                <MultiSlider
-                                    values={pricevalues}
-                                    sliderLength={responsiveWidth(80)}
-                                    onValuesChange={handlePriceChange}
-                                    min={minPrice}
-                                    max={maxPrice}
-                                    step={100}
-                                    selectedStyle={{ backgroundColor: "#FF455C" }}
-                                    unselectedStyle={{ backgroundColor: "rgba(0, 0, 0, 0.15)" }}
-                                    markerStyle={{ backgroundColor: "#FF455C" }}
-                                />
-                                <View style={styles.valueContainer}>
-                                    <Text style={styles.valueText}>₹{pricevalues[0]}</Text>
-                                    <Text style={styles.valueText}>₹{pricevalues[1]}</Text>
+                            ) : (
+                                <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: responsiveHeight(2) }}>
+                                    <View style={{ flexDirection: 'column', flex: 1, marginRight: 5 }}>
+                                        <Text style={styles.textinputHeader}>Departure Date</Text>
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                if (Platform.OS === 'ios') {
+                                                    setShowIOSFromDatePicker(!showIOSFromDatePicker);
+                                                    setShowIOSToDatePicker(false);
+                                                } else {
+                                                    setShowFromDatePicker(true);
+                                                }
+                                            }}
+                                            style={{
+                                                flexDirection: "row",
+                                                alignItems: "center",
+                                                borderWidth: 1,
+                                                borderColor: "#ddd",
+                                                paddingHorizontal: 10,
+                                                paddingVertical: 13,
+                                                borderRadius: 5,
+                                                marginTop: 5,
+                                            }}
+                                        >
+                                            <Icon name="calendar" size={20} color="red" />
+                                            <Text style={{ marginLeft: 10, color: '#767676', fontFamily: 'Poppins-Regular', fontSize: responsiveFontSize(1.7) }}>{fromDate.toDateString()}</Text>
+                                        </TouchableOpacity>
+                                        {Platform.OS === 'android' && showFromDatePicker && (
+                                            <DateTimePicker
+                                                value={fromDate}
+                                                mode="date"
+                                                display="default"
+                                                onChange={onChangeFromDate}
+                                            />
+                                        )}
+                                    </View>
+                                    <View style={{ flexDirection: 'column', flex: 1, marginLeft: 5 }}>
+                                        <Text style={styles.textinputHeader}>Return Date</Text>
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                if (Platform.OS === 'ios') {
+                                                    setShowIOSToDatePicker(!showIOSToDatePicker);
+                                                    setShowIOSFromDatePicker(false);
+                                                } else {
+                                                    setShowToDatePicker(true);
+                                                }
+                                            }}
+                                            style={{
+                                                flexDirection: "row",
+                                                alignItems: "center",
+                                                borderWidth: 1,
+                                                borderColor: "#ddd",
+                                                paddingHorizontal: 10,
+                                                paddingVertical: 13,
+                                                borderRadius: 5,
+                                                marginTop: 5,
+                                            }}
+                                        >
+                                            <Icon name="calendar" size={20} color="red" />
+                                            <Text style={{ marginLeft: 10, color: '#767676', fontFamily: 'Poppins-Regular', fontSize: responsiveFontSize(1.7) }}>{toDate.toDateString()}</Text>
+                                        </TouchableOpacity>
+                                        {Platform.OS === 'android' && showToDatePicker && (
+                                            <DateTimePicker
+                                                value={toDate}
+                                                mode="date"
+                                                display="default"
+                                                onChange={onChangeToDate}
+                                                minimumDate={fromDate}
+                                            />
+                                        )}
+                                    </View>
                                 </View>
-                            </View>
-                            <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Rating</Text>
-                            <View style={{ width: responsiveWidth(50), marginTop: responsiveHeight(2), marginBottom: responsiveHeight(2) }}>
-                                <StarRating
-                                    disabled={false}
-                                    maxStars={5}
-                                    rating={starCount}
-                                    onChange={handleRatingChange}
-                                    fullStarColor={'#FFCB45'}
-                                    starSize={28}
-                                    starStyle={{ marginHorizontal: responsiveWidth(1) }}
-                                />
-                            </View>
+                            )}
+                            {/* Hide other filter sections when date picker is open on iOS */}
+                            {!(Platform.OS === 'ios' && (showIOSFromDatePicker || showIOSToDatePicker)) && (
+                                <>
+                                    <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Price</Text>
+                                    <View style={styles.slidercontainer}>
+                                        <MultiSlider
+                                            values={pricevalues}
+                                            sliderLength={responsiveWidth(80)}
+                                            onValuesChange={handlePriceChange}
+                                            min={minPrice}
+                                            max={maxPrice}
+                                            step={100}
+                                            selectedStyle={{ backgroundColor: "#FF455C" }}
+                                            unselectedStyle={{ backgroundColor: "rgba(0, 0, 0, 0.15)" }}
+                                            markerStyle={{ backgroundColor: "#FF455C" }}
+                                        />
+                                        <View style={styles.valueContainer}>
+                                            <Text style={styles.valueText}>₹{pricevalues[0]}</Text>
+                                            <Text style={styles.valueText}>₹{pricevalues[1]}</Text>
+                                        </View>
+                                    </View>
+                                    <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Rating</Text>
+                                    <View style={{ width: responsiveWidth(50), marginTop: responsiveHeight(2), marginBottom: responsiveHeight(2) }}>
+                                        <StarRating
+                                            disabled={false}
+                                            maxStars={5}
+                                            rating={starCount}
+                                            onChange={handleRatingChange}
+                                            fullStarColor={'#FFCB45'}
+                                            starSize={28}
+                                            starStyle={{ marginHorizontal: responsiveWidth(1) }}
+                                        />
+                                    </View>
+                                </>
+                            )}
                         </View>
                     </ScrollView>
                     <View style={{ bottom: 0, width: responsiveWidth(100), paddingHorizontal: 10, borderTopColor: '#E3E3E3', borderTopWidth: 1 }}>
@@ -1051,5 +1197,37 @@ const styles = StyleSheet.create({
         color: '#666',
         fontFamily: 'Poppins-Medium',
         textAlign: 'center',
+    },
+    iosPickerContainer: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 10,
+        marginTop: 10,
+        paddingVertical: 15,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        height: responsiveHeight(35),
+        justifyContent: 'center',
+        width: '100%',
+    },
+    iosPickerButtons: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        paddingHorizontal: 15,
+        paddingTop: 10,
+        borderTopWidth: 1,
+        borderTopColor: '#E0E0E0',
+        marginTop: 10,
+    },
+    iosPickerButton: {
+        paddingVertical: 8,
+        paddingHorizontal: 20,
+        backgroundColor: '#007AFF',
+        borderRadius: 8,
+    },
+    iosPickerButtonText: {
+        color: '#FFFFFF',
+        fontSize: responsiveFontSize(1.8),
+        fontFamily: 'Poppins-SemiBold',
+        fontWeight: '600',
     },
 });

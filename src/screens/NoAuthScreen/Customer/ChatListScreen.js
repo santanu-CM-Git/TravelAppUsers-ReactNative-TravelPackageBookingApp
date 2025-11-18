@@ -40,7 +40,6 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import messaging from '@react-native-firebase/messaging';
 import LinearGradient from 'react-native-linear-gradient';
 import SwitchSelector from "react-native-switch-selector";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import Icon from 'react-native-vector-icons/Entypo';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import { SafeAreaView } from 'react-native-safe-area-context';

@@ -43,7 +43,6 @@ import messaging from '@react-native-firebase/messaging';
 import LinearGradient from 'react-native-linear-gradient';
 import StarRating from 'react-native-star-rating-widget';
 import SwitchSelector from "react-native-switch-selector";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import Icon from 'react-native-vector-icons/Entypo';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import Toast from 'react-native-toast-message';
