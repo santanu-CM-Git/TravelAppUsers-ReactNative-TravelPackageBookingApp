@@ -170,7 +170,7 @@ const MenuScreen = ({ route }) => {
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar translucent={false} backgroundColor="black" barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'} />  
-            <KeyboardAwareScrollView showsVerticalScrollIndicator={false} style={{ marginBottom: responsiveHeight(2) }}>
+            <KeyboardAwareScrollView showsVerticalScrollIndicator={false} style={{ marginBottom: responsiveHeight(0) }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <View style={{ paddingHorizontal: 20, paddingVertical: 25, flexDirection: 'row', alignItems: 'center' }}>
                         <MaterialIcons name="arrow-back" size={25} color="#000" onPress={() => navigation.goBack()} />
@@ -242,7 +242,7 @@ const MenuScreen = ({ route }) => {
                             </View>
                         </View>
                         
-                        <View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginTop: responsiveHeight(1) }}>
+                        <View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginTop: responsiveHeight(1),marginBottom: responsiveHeight(2) }}>
                             <Text style={styles.username}>{userInfo?.first_name} {userInfo?.last_name}</Text>
                             {/* <Text style={styles.useremail}>kristin123@gmail.com</Text> */}
                         </View>

@@ -451,21 +451,23 @@ const SearchScreen = ({ route }) => {
                         </View>
                     )}
                 </View>
-                <View style={{ paddingHorizontal: 15, }}>
-                    <Text style={{ fontSize: responsiveFontSize(2.5), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Search history</Text>
+                {searchHistory && searchHistory.length > 0 && (
+                    <View style={{ paddingHorizontal: 15, }}>
+                        <Text style={{ fontSize: responsiveFontSize(2.5), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Search history</Text>
 
-                    <FlatList
-                        data={searchHistory}
-                        keyExtractor={(item) => item.id}
-                        renderItem={renderSearchHistory}
-                        showsVerticalScrollIndicator={false}
-                        ListEmptyComponent={() => (
-                            <View style={styles.emptyContainer}>
-                                <Text style={styles.emptyText}>No search history found.</Text>
-                            </View>
-                        )}
-                    />
-                </View>
+                        <FlatList
+                            data={searchHistory}
+                            keyExtractor={(item) => item.id}
+                            renderItem={renderSearchHistory}
+                            showsVerticalScrollIndicator={false}
+                            ListEmptyComponent={() => (
+                                <View style={styles.emptyContainer}>
+                                    <Text style={styles.emptyText}>No search history found.</Text>
+                                </View>
+                            )}
+                        />
+                    </View>
+                )}
                 <View style={{ paddingHorizontal: 15, marginTop: responsiveHeight(2) }}>
                     <Text style={{ fontSize: responsiveFontSize(2.5), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Most Popular</Text>
                     <FlatList
