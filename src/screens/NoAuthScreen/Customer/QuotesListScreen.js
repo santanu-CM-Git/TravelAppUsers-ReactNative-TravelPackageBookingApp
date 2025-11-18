@@ -376,7 +376,7 @@ const QuotesListScreen = ({ route }) => {
 
     return (
         <SafeAreaView style={styles.Container}>
-            <StatusBar translucent={false} backgroundColor="black" barStyle="light-content" />
+            <StatusBar translucent={false} backgroundColor="black" barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'} />  
             <CustomHeader commingFrom={'List of quotes'} onPress={() => navigation.goBack()} title={'List of quotes'} />
             <ScrollView showsHorizontalScrollIndicator={false}>
                 <View style={styles.searchSection}>

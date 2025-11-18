@@ -529,7 +529,7 @@ export default function TopLocationScreenDetails({ route }) {
     return (
         <SafeAreaView style={styles.Container}>
             {/* <StatusBar translucent backgroundColor="transparent" /> */}
-            <StatusBar translucent={false} backgroundColor="black" barStyle="light-content" />
+            <StatusBar translucent={false} backgroundColor="black" barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'} />  
             <View style={styles.mainContainer}>
                 <ImageBackground
                     source={{ uri: locationData?.image_url }}

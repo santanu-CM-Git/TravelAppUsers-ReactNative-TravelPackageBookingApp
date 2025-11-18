@@ -603,7 +603,7 @@ const BookingSummary = ({ route }) => {
 
     return (
         <SafeAreaView style={styles.Container}>
-            <StatusBar translucent={false} backgroundColor="black" barStyle="light-content" />
+            <StatusBar translucent={false} backgroundColor="black" barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'} />
             <CustomHeader commingFrom={'Summary'} onPress={() => navigation.goBack()} title={'Summary'} />
 
             <ScrollView style={styles.wrapper}>

@@ -421,10 +421,9 @@ export default function PackageDetailsScreen({ route }) {
     }
 
     return (
-        <SafeAreaView style={styles.Container}>
+        <SafeAreaView style={styles.Container} edges={['bottom']}>
             {/* <CustomHeader commingFrom={'Top location'} onPressProfile={() => navigation.navigate('Profile')} title={'Top location'} /> */}
-            {/* <StatusBar translucent backgroundColor="transparent" /> */}
-            <StatusBar translucent={false} backgroundColor="black" barStyle="light-content" />
+            <StatusBar translucent={true} backgroundColor="transparent" barStyle="light-content" />
             <ScrollView>
                 <ImageBackground
                     source={packageInfo?.cover_photo_url ? { uri: packageInfo.cover_photo_url } : productImg}
@@ -833,25 +832,26 @@ const styles = StyleSheet.create({
     },
     background: {
         width: '100%',
-        height: 300,  // Adjust height as needed
+        height: responsiveHeight(50),  // Full cover photo height
+        overflow: 'hidden',
         borderBottomLeftRadius: 20,
         borderBottomRightRadius: 20,
-        overflow: 'hidden',
-        marginTop: -responsiveHeight(0.5)
     },
     imageStyle: {
+        resizeMode: 'cover',
         borderBottomLeftRadius: 20,
         borderBottomRightRadius: 20,
     },
     header: {
         position: 'absolute',
-        top: 25,
+        top: Platform.OS === 'ios' ? responsiveHeight(6) : (StatusBar.currentHeight || 0) + responsiveHeight(1),
         left: 0,
         right: 0,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         marginHorizontal: responsiveWidth(5),
+        zIndex: 10,
     },
     titleM: {
         fontFamily: 'Poppins-Bold',

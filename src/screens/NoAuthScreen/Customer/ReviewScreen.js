@@ -136,7 +136,7 @@ const ReviewScreen = ({ route }) => {
     }
     return (
         <SafeAreaView style={styles.Container}>
-            <StatusBar translucent={false} backgroundColor="black" barStyle="light-content" />
+            <StatusBar translucent={false} backgroundColor="black" barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'} />  
             <CustomHeader commingFrom={'Review'} onPress={() => navigation.goBack()} title={'Review'} />
             <ScrollView showsHorizontalScrollIndicator={false}>
                 <View style={{ marginBottom: responsiveHeight(5), alignSelf: 'center', marginTop: responsiveHeight(2) }}>

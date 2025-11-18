@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, StatusBar, BackHandler } from 'react-native';
+import { View, Text, StyleSheet, StatusBar, BackHandler, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Thankyou from '../../../assets/images/misc/Thankyou.svg';
@@ -63,7 +63,7 @@ const PaymentSuccessScreen = ({ route }) => {
 
     return (
         <SafeAreaView style={styles.container} onLayout={(event) => setScreenWidth(event.nativeEvent.layout.width)}>
-            <StatusBar translucent={false} backgroundColor="black" barStyle="light-content" />
+            <StatusBar translucent={false} backgroundColor="black" barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'} />  
             {/* <CustomHeader commingFrom={'Payment Successful'} onPress={() => navigation.goBack()} title={'Payment Successful'} /> */}
             {/* Confetti Animation */}
             <ConfettiCannon

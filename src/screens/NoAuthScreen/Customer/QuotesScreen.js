@@ -179,7 +179,7 @@ const QuotesScreen = ({ route }) => {
 
     return (
         <SafeAreaView style={styles.Container}>
-            <StatusBar translucent={false} backgroundColor="black" barStyle="light-content" />
+            <StatusBar translucent={false} backgroundColor="black" barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'} />  
             <CustomHeader commingFrom={'My request'} onPress={() => navigation.goBack()} title={'My request'} />
             <ScrollView showsHorizontalScrollIndicator={false}>
 

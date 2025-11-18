@@ -242,7 +242,7 @@ export default function TransactionScreen({  }) {
 
     return (
         <SafeAreaView style={styles.Container}>
-            <StatusBar translucent={false} backgroundColor="black" barStyle="light-content" />
+            <StatusBar translucent={false} backgroundColor="black" barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'} />  
             <CustomHeader commingFrom={'Account'} onPress={() => navigation.goBack()} title={'Account'} />
             {/* <View style={{ marginHorizontal: 15, }}>
                 <Text style={styles.productText3}>Filter By Date</Text>

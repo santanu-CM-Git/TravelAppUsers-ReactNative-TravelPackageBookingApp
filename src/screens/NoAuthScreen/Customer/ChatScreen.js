@@ -1478,7 +1478,7 @@ const ChatScreen = ({ route }) => {
 
   return (
     <SafeAreaView style={[styles.Container, { paddingBottom: activeTab === 'audio' ? 0 : 10 }]}>
-      <StatusBar translucent={false} backgroundColor="black" barStyle="light-content" />
+      <StatusBar translucent={false} backgroundColor="black" barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'} />  
       <View style={styles.headerContainer}>
         <GestureTouchableOpacity onPress={handleGoBack}>
           <Ionicons name="chevron-back" size={28} color="#222" />

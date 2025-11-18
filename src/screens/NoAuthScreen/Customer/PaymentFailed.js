@@ -1,5 +1,5 @@
 import React, { useState, useEffect,useCallback } from 'react';
-import { View, Text, StyleSheet, Image, StatusBar, BackHandler } from 'react-native';
+import { View, Text, StyleSheet, Image, StatusBar, BackHandler, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Thankyou from '../../../assets/images/misc/Thankyou.svg';
@@ -41,7 +41,7 @@ const PaymentFailed = ({ route }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <StatusBar translucent={false} backgroundColor="black" barStyle="light-content" />
+            <StatusBar translucent={false} backgroundColor="black" barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'} />  
             <CustomHeader commingFrom={'Unsuccessful Tour Booking'} onPress={() => navigation.goBack()} title={'Unsuccessful Tour Booking'} />
             {/* <View style={styles.thankYouImageWrapper}>
                 <Image

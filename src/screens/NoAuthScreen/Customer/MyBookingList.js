@@ -222,7 +222,7 @@ const MyBookingList = ({ route }) => {
 
     return (
         <SafeAreaView style={styles.Container}>
-            <StatusBar translucent={false} backgroundColor="black" barStyle="light-content" />
+            <StatusBar translucent={false} backgroundColor="black" barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'} />  
             <CustomHeader commingFrom={'My booking'} onPress={() => navigation.goBack()} title={'My booking'} />
             <View style={styles.tabView}>
                 <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>

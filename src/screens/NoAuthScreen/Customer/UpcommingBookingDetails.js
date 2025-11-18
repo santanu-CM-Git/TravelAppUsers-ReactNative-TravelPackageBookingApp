@@ -256,7 +256,7 @@ export default function UpcommingBookingDetails({  }) {
         <SafeAreaView style={styles.Container}>
             {/* <CustomHeader commingFrom={'Top location'} onPressProfile={() => navigation.navigate('Profile')} title={'Top location'} /> */}
             {/* <StatusBar translucent backgroundColor="transparent" /> */}
-            <StatusBar translucent={false} backgroundColor="black" barStyle="light-content" />
+            <StatusBar translucent={false} backgroundColor="black" barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'} />  
             <ScrollView>
                 <ImageBackground
                     source={productImg} // Replace with your image URL

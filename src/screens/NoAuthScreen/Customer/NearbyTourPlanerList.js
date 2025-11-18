@@ -218,7 +218,7 @@ export default function NearbyTourPlanerList({  }) {
 
     return (
         <SafeAreaView style={styles.Container}>
-            <StatusBar translucent={false} backgroundColor="black" barStyle="light-content" />
+            <StatusBar translucent={false} backgroundColor="black" barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'} />  
             <CustomHeader commingFrom={'Nearby Tour Planner'} onPress={() => navigation.goBack()} title={'All Tour Planners'} />
             <View style={styles.searchInput}>
                 <View style={{ flexDirection: 'row', alignItems: "center", flex: 1 }}>

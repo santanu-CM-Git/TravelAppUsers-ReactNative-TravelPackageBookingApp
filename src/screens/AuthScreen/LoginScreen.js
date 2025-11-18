@@ -162,7 +162,11 @@ const LoginScreen = ({ }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar translucent backgroundColor="transparent" />
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'} // or "light-content" depending on your image
+      />
       <KeyboardAwareScrollView
         contentContainerStyle={styles.scrollContainer}
         enableOnAndroid={true}
@@ -229,39 +233,78 @@ const LoginScreen = ({ }) => {
           </View>
 
         </View>
+        {Platform.OS === 'ios' && (
+          <>
+            <View style={styles.buttonwrapper}>
+              <CustomButton label={"Send Verification Code"}
+                onPress={() => handleSubmit()}
+              //onPress={() => { navigation.navigate('Otp', { countrycode: +91, phone: '9098989898', otp: '123', fcmToken: 'fhrkwerh324234234' })}}
+              />
+            </View>
+            <View style={styles.termsView}>
+              <View style={styles.checkboxContainer}>
+                <CheckBox
+                  disabled={false}
+                  value={toggleCheckBox}
+                  onValueChange={(newValue) => setToggleCheckBox(newValue)}
+                  tintColors={{ true: '#FF455C', false: '#444343' }}
+                />
+              </View>
+              <Text style={styles.termsText}>
+                I accept{' '}
+                <Text
+                  style={styles.termsLinkText}
+                  onPress={() => navigation.navigate('Termsofuse')}>
+                  Terms & Condition
+                </Text>{' '}
+                and{' '}
+                <Text
+                  style={styles.termsLinkText}
+                  onPress={() => navigation.navigate('PrivacyPolicy')}>
+                  Privacy Policy
+                </Text>.
+              </Text>
+            </View>
+          </>
+        )}
       </KeyboardAwareScrollView>
-
-      <View style={styles.buttonwrapper}>
-        <CustomButton label={"Send Verification Code"}
-          onPress={() => handleSubmit()}
-        //onPress={() => { navigation.navigate('Otp', { countrycode: +91, phone: '9098989898', otp: '123', fcmToken: 'fhrkwerh324234234' })}}
-        />
-      </View>
-
-      <View style={styles.termsView}>
-        <View style={styles.checkboxContainer}>
-          <CheckBox
-            disabled={false}
-            value={toggleCheckBox}
-            onValueChange={(newValue) => setToggleCheckBox(newValue)}
-            tintColors={{ true: '#FF455C', false: '#444343' }}
+      {Platform.OS === 'android' && (
+        <>
+        <View style={styles.buttonwrapper}>
+          <CustomButton label={"Send Verification Code"}
+            onPress={() => handleSubmit()}
+          //onPress={() => { navigation.navigate('Otp', { countrycode: +91, phone: '9098989898', otp: '123', fcmToken: 'fhrkwerh324234234' })}}
           />
         </View>
-        <Text style={styles.termsText}>
-          I accept{' '}
-          <Text
-            style={styles.termsLinkText}
-            onPress={() => navigation.navigate('Termsofuse')}>
-            Terms & Condition
-          </Text>{' '}
-          and{' '}
-          <Text
-            style={styles.termsLinkText}
-            onPress={() => navigation.navigate('PrivacyPolicy')}>
-            Privacy Policy
-          </Text>.
-        </Text>
-      </View>
+        <View style={styles.termsView}>
+          <View style={styles.checkboxContainer}>
+            <CheckBox
+              disabled={false}
+              value={toggleCheckBox}
+              onValueChange={(newValue) => setToggleCheckBox(newValue)}
+              tintColors={{ true: '#FF455C', false: '#444343' }}
+            />
+          </View>
+          <Text style={styles.termsText}>
+            I accept{' '}
+            <Text
+              style={styles.termsLinkText}
+              onPress={() => navigation.navigate('Termsofuse')}>
+              Terms & Condition
+            </Text>{' '}
+            and{' '}
+            <Text
+              style={styles.termsLinkText}
+              onPress={() => navigation.navigate('PrivacyPolicy')}>
+              Privacy Policy
+            </Text>.
+          </Text>
+        </View>
+      </>
+      )}
+
+
+
 
       {/* <Image
         source={orImg}

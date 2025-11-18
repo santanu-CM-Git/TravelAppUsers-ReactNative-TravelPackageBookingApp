@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, Image, StatusBar, BackHandler } from 'react-native';
+import { View, Text, StyleSheet, Image, StatusBar, BackHandler, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Thankyou from '../../../assets/images/misc/Thankyou.svg';
@@ -118,7 +118,7 @@ const RefundScreen = ({ route }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <StatusBar translucent={false} backgroundColor="black" barStyle="light-content" />
+            <StatusBar translucent={false} backgroundColor="black" barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'} />  
             <CustomHeader commingFrom={'Booking is Cancelled'} onPress={() => navigation.goBack()} title={'Booking is Cancelled'} />
             <ScrollView>
                 <View style={{ borderTopColor: '#E3E3E3', borderTopWidth: 0, paddingHorizontal: 15, marginBottom: 5, justifyContent: 'center', alignItems: 'center' }}>
