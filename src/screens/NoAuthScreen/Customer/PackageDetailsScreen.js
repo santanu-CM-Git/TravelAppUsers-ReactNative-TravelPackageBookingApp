@@ -69,6 +69,8 @@ export default function PackageDetailsScreen({ route }) {
     const [toDate, setToDate] = useState(new Date());
     const [showFromDatePicker, setShowFromDatePicker] = useState(false);
     const [showToDatePicker, setShowToDatePicker] = useState(false);
+    // Temporary state for iOS date picker (before confirmation)
+    const [tempFromDate, setTempFromDate] = useState(new Date());
     const [loadingLikes, setLoadingLikes] = useState({});
     const [countryName, setCountryName] = useState('');
 
@@ -144,44 +146,99 @@ export default function PackageDetailsScreen({ route }) {
     }, [packageInfo]);
 
     useEffect(() => {
+        // Sync tempFromDate with fromDate
+        setTempFromDate(fromDate);
+    }, [fromDate]);
+
+    useEffect(() => {
         console.log('showFromDatePicker changed:', showFromDatePicker);
     }, [showFromDatePicker]);
 
     const onChangeFromDate = (event, selectedDate) => {
         if (packageInfo?.date_type == 0) return; // Disable date selection for fixed dates
 
-        setShowFromDatePicker(false); // Close picker after selection
-        if (selectedDate) {
-            const packageStartDate = new Date(packageInfo?.start_date);
-            const packageEndDate = new Date(packageInfo?.end_date);
-
-            // Ensure selected date is not before package start date
-            if (selectedDate < packageStartDate) {
-                Alert.alert('Invalid Date', 'Please select a date after the package start date');
-                return;
+        if (Platform.OS === 'ios') {
+            // On iOS, just update temporary date, don't save yet
+            if (selectedDate) {
+                setTempFromDate(selectedDate);
             }
+        } else {
+            // On Android, save immediately (default behavior)
+            setShowFromDatePicker(false); // Close picker after selection
+            if (selectedDate && event.type === 'set') {
+                const packageStartDate = new Date(packageInfo?.start_date);
+                const packageEndDate = new Date(packageInfo?.end_date);
 
-            // Ensure selected date is not after package end date
-            if (selectedDate > packageEndDate) {
-                Alert.alert('Invalid Date', 'Please select a date before the package end date');
-                return;
+                // Ensure selected date is not before package start date
+                if (selectedDate < packageStartDate) {
+                    Alert.alert('Invalid Date', 'Please select a date after the package start date');
+                    return;
+                }
+
+                // Ensure selected date is not after package end date
+                if (selectedDate > packageEndDate) {
+                    Alert.alert('Invalid Date', 'Please select a date before the package end date');
+                    return;
+                }
+
+                setFromDate(selectedDate);
+
+                // Calculate arrival date based on itinerary length
+                const itineraryLength = packageInfo?.itinerary?.length || 0;
+                const calculatedToDate = new Date(selectedDate);
+                calculatedToDate.setDate(calculatedToDate.getDate() + (itineraryLength - 1));
+
+                // Ensure calculated arrival date doesn't exceed package end date
+                if (calculatedToDate > packageEndDate) {
+                    Alert.alert('Invalid Date', 'Selected date would exceed package end date');
+                    return;
+                }
+
+                setToDate(calculatedToDate);
+            } else if (event.type === 'dismissed') {
+                setShowFromDatePicker(false);
             }
-
-            setFromDate(selectedDate);
-
-            // Calculate arrival date based on itinerary length
-            const itineraryLength = packageInfo?.itinerary?.length || 0;
-            const calculatedToDate = new Date(selectedDate);
-            calculatedToDate.setDate(calculatedToDate.getDate() + (itineraryLength - 1));
-
-            // Ensure calculated arrival date doesn't exceed package end date
-            if (calculatedToDate > packageEndDate) {
-                Alert.alert('Invalid Date', 'Selected date would exceed package end date');
-                return;
-            }
-
-            setToDate(calculatedToDate);
         }
+    };
+
+    // Confirm date selection for iOS
+    const confirmFromDate = () => {
+        const packageStartDate = new Date(packageInfo?.start_date);
+        const packageEndDate = new Date(packageInfo?.end_date);
+
+        // Ensure selected date is not before package start date
+        if (tempFromDate < packageStartDate) {
+            Alert.alert('Invalid Date', 'Please select a date after the package start date');
+            return;
+        }
+
+        // Ensure selected date is not after package end date
+        if (tempFromDate > packageEndDate) {
+            Alert.alert('Invalid Date', 'Please select a date before the package end date');
+            return;
+        }
+
+        setFromDate(tempFromDate);
+
+        // Calculate arrival date based on itinerary length
+        const itineraryLength = packageInfo?.itinerary?.length || 0;
+        const calculatedToDate = new Date(tempFromDate);
+        calculatedToDate.setDate(calculatedToDate.getDate() + (itineraryLength - 1));
+
+        // Ensure calculated arrival date doesn't exceed package end date
+        if (calculatedToDate > packageEndDate) {
+            Alert.alert('Invalid Date', 'Selected date would exceed package end date');
+            return;
+        }
+
+        setToDate(calculatedToDate);
+        setShowFromDatePicker(false);
+    };
+
+    // Cancel date selection for iOS
+    const cancelFromDate = () => {
+        setTempFromDate(fromDate); // Reset to original date
+        setShowFromDatePicker(false);
     };
 
     const onChangeToDate = (event, selectedDate) => {
@@ -701,7 +758,10 @@ export default function PackageDetailsScreen({ route }) {
                                         <TouchableOpacity
                                         onPress={() => {
                                             console.log('Departure Date pressed, date_type:', packageInfo?.date_type);
+                                            console.log('Platform.OS:', Platform.OS);
                                             if(packageInfo?.date_type == 1){
+                                                setTempFromDate(fromDate); // Initialize temp date with current date
+                                                console.log('Setting showFromDatePicker to true');
                                                 setShowFromDatePicker(true);
                                             }
                                            
@@ -723,17 +783,72 @@ export default function PackageDetailsScreen({ route }) {
                                     </TouchableOpacity>
                                     {/* )} */}
                                     
-                                    {showFromDatePicker && (
+                                    {showFromDatePicker && Platform.OS === 'android' && (
                                         <DateTimePicker
                                             testID="dateTimePicker"
                                             value={fromDate}
                                             mode="date"
                                             is24Hour={true}
-                                            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                                            display="default"
                                             onChange={onChangeFromDate}
                                             minimumDate={new Date(packageInfo?.start_date)}
                                             maximumDate={new Date(packageInfo?.end_date)}
                                         />
+                                    )}
+
+                                    {/* iOS Date Picker - Inline within booking modal */}
+                                    {showFromDatePicker && Platform.OS === 'ios' && (
+                                        <View style={{
+                                            backgroundColor: '#F5F5F5',
+                                            borderRadius: 10,
+                                            marginTop: 10,
+                                            padding: 15,
+                                            borderWidth: 1,
+                                            borderColor: '#E3E3E3',
+                                        }}>
+                                            <View style={{
+                                                flexDirection: 'row',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center',
+                                                marginBottom: 15,
+                                                paddingBottom: 10,
+                                                borderBottomWidth: 1,
+                                                borderBottomColor: '#E3E3E3',
+                                            }}>
+                                                <TouchableOpacity onPress={cancelFromDate}>
+                                                    <Text style={{
+                                                        fontSize: responsiveFontSize(1.8),
+                                                        color: '#767676',
+                                                        fontFamily: 'Poppins-Regular',
+                                                    }}>Cancel</Text>
+                                                </TouchableOpacity>
+                                                <Text style={{
+                                                    fontSize: responsiveFontSize(2),
+                                                    color: '#2D2D2D',
+                                                    fontFamily: 'Poppins-SemiBold',
+                                                }}>Select Departure Date</Text>
+                                                <TouchableOpacity onPress={confirmFromDate}>
+                                                    <Text style={{
+                                                        fontSize: responsiveFontSize(1.8),
+                                                        color: '#FF3B5C',
+                                                        fontFamily: 'Poppins-SemiBold',
+                                                    }}>Confirm</Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                            {packageInfo && (
+                                                <DateTimePicker
+                                                    testID="dateTimePickerIOS"
+                                                    value={tempFromDate}
+                                                    mode="date"
+                                                    is24Hour={true}
+                                                    display="spinner"
+                                                    onChange={onChangeFromDate}
+                                                    minimumDate={new Date(packageInfo?.start_date)}
+                                                    maximumDate={new Date(packageInfo?.end_date)}
+                                                    style={{ height: 200 }}
+                                                />
+                                            )}
+                                        </View>
                                     )}
                                 </View>
                                 <View style={{ flexDirection: 'column' }}>

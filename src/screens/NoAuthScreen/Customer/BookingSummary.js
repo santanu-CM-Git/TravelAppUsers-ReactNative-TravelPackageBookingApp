@@ -629,30 +629,35 @@ const BookingSummary = ({ route }) => {
                 <View style={styles.card}>
                     <View style={{ marginTop: 10 }}>
                         <Text style={styles.couponText}>Enter promo code</Text>
-                        <InputField
-                            label={'Enter promo code'}
-                            keyboardType="default"
-                            value={couponCode}
-                            inputType={'coupon'}
-                            onChangeText={(text) => setCouponCode(text)}
-                        />
+                        <View style={styles.couponInputContainer}>
+                            <View style={styles.couponInputWrapper}>
+                                <InputField
+                                    label={'Enter promo code'}
+                                    keyboardType="default"
+                                    value={couponCode}
+                                    inputType={'coupon'}
+                                    onChangeText={(text) => setCouponCode(text)}
+                                />
+                            </View>
+                            {!appliedCoupon ? (
+                                <TouchableOpacity
+                                    style={styles.callCouponButton}
+                                    onPress={callForCoupon}
+                                    disabled={isCouponLoading}
+                                >
+                                    {isCouponLoading ? (
+                                        <ActivityIndicator size="small" color="#FF455C" />
+                                    ) : (
+                                        <Text style={styles.callCouponText}>APPLY</Text>
+                                    )}
+                                </TouchableOpacity>
+                            ) : null}
+                        </View>
                         {couponError ? (
                             <Text style={styles.errorText}>{couponError}</Text>
                         ) : null}
                     </View>
-                    {!appliedCoupon ? (
-                        <TouchableOpacity
-                            style={styles.callCouponButton}
-                            onPress={callForCoupon}
-                            disabled={isCouponLoading}
-                        >
-                            {isCouponLoading ? (
-                                <ActivityIndicator size="small" color="#417AA4" />
-                            ) : (
-                                <Text style={styles.callCouponText}>APPLY</Text>
-                            )}
-                        </TouchableOpacity>
-                    ) : (
+                    {appliedCoupon ? (
                         <View style={styles.couponAppliedContainer}>
                             <Text style={styles.couponAppliedText}>
                                 Coupon Applied: {appliedCoupon.coupon_code} ({appliedCoupon.discount_unit}% off)
@@ -661,7 +666,7 @@ const BookingSummary = ({ route }) => {
                                 <Text style={styles.removeCouponText}>Remove</Text>
                             </TouchableOpacity>
                         </View>
-                    )}
+                    ) : null}
                 </View>
                 <View style={{ marginHorizontal: 10, }}>
                     <Text style={styles.productText3}>Price Summary</Text>
@@ -782,7 +787,30 @@ const styles = StyleSheet.create({
         marginBottom: 5
     },
     couponText: { color: '#2D2D2D', fontFamily: 'Poppins-Bold', fontSize: responsiveFontSize(1.7), marginLeft: responsiveWidth(1) },
-    callCouponButton: { position: 'absolute', right: 25, top: responsiveHeight(9) },
+    couponInputContainer: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        marginTop: responsiveHeight(1),
+    },
+    couponInputWrapper: {
+        flex: 1,
+        marginRight: 10,
+    },
+    callCouponButton: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 15,
+        ...Platform.select({
+            ios: {
+                paddingVertical: 13,
+                marginTop: responsiveHeight(1.6),
+            },
+            android: {
+                paddingVertical: 10,
+                marginTop: responsiveHeight(1.6),
+            },
+        }),
+    },
     callCouponText: { color: '#FF455C', fontFamily: 'Poppins-Bold', fontSize: responsiveFontSize(1.7), },
     callCouponText2: { position: 'absolute', right: 25, top: responsiveHeight(7), color: '#FF455C', fontFamily: 'Poppins-Bold', fontSize: responsiveFontSize(1.7), },
     card: {
