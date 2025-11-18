@@ -48,6 +48,7 @@ const menuItems = [
     { id: 7, title: 'Support', icon: supportMenuImg, page: 'CustomerSupport' },
     { id: 8, title: 'Term And Condition', icon: termMenuImg, page: 'Termsofuse' },
     { id: 9, title: 'Privacy Policy', icon: policyMenuImg, page: 'PrivacyPolicy' },
+    { id: 11, title: 'Refund Policy', icon: policyMenuImg, page: 'RefundPolicy' },
     { id: 10, title: 'Logout', icon: logoutMenuImg, page: 'Logout' },
 ];
 

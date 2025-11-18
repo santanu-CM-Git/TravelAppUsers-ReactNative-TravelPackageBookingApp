@@ -14,7 +14,7 @@ export default function PrivacyPolicy({  }) {
     const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(false);
     const { width } = useWindowDimensions();
-    const privacyPolicyUrl = "https://www.google.co.in/";
+    const privacyPolicyUrl = "https://grouptour.app/privacy-policy.html";
 
     useFocusEffect(
         useCallback(() => {

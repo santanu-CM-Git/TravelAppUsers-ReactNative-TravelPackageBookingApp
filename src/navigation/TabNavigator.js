@@ -11,6 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'; // Add this 
 import HomeScreen from '../screens/NoAuthScreen/Customer/HomeScreen';
 import NotificationScreen from '../screens/NoAuthScreen/Customer/NotificationScreen';
 import PrivacyPolicy from '../screens/NoAuthScreen/Customer/PrivacyPolicy';
+import RefundPolicy from '../screens/NoAuthScreen/Customer/RefundPolicy';
 import ChatScreen from '../screens/NoAuthScreen/Customer/ChatScreen';
 import { bookingMenu, bookmarkedFill, bookmarkedNotFill, bookmarkednotFocusedImg, calenderFocusedImg, calenderImg, homeIconFocusedImg, homeIconNotFocusedImg, menuImg, messageImg, quotesImg, talkFocusedImg, talkImg } from '../utils/Images';
 import ThankYouBookingScreen from '../screens/NoAuthScreen/Customer/ThankYouBookingScreen';
@@ -270,6 +271,11 @@ const MenuStack = ({ route }) => {
       <Stack.Screen
         name="PrivacyPolicy"
         component={PrivacyPolicy}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="RefundPolicy"
+        component={RefundPolicy}
         options={{ headerShown: false }}
       />
       <Stack.Screen
