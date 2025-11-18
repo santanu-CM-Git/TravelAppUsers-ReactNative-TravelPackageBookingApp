@@ -51,6 +51,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { ensureNotificationPermission } from '../../../utils/NotificationPermission';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import IOSDatePickerModal from '../../../components/IOSDatePickerModal';
 
 const { width } = Dimensions.get('window');
 const itemWidth = width * 0.8; // 80% of screen width
@@ -112,6 +113,8 @@ export default function HomeScreen() {
   const [toDate, setToDate] = useState(new Date());
   const [showFromDatePicker, setShowFromDatePicker] = useState(false);
   const [showToDatePicker, setShowToDatePicker] = useState(false);
+  const [showIOSFromDatePicker, setShowIOSFromDatePicker] = useState(false);
+  const [showIOSToDatePicker, setShowIOSToDatePicker] = useState(false);
 
   const [adultPassengers, setAdultPassengers] = useState("");
   const [kidsPassengers, setKidsPassengers] = useState("");
@@ -136,6 +139,9 @@ export default function HomeScreen() {
   const [toDateModal, setToDateModal] = useState(new Date());
   const [showFromDatePickerModal, setShowFromDatePickerModal] = useState(false);
   const [showToDatePickerModal, setShowToDatePickerModal] = useState(false);
+  const [showIOSFromDatePickerModal, setShowIOSFromDatePickerModal] = useState(false);
+  const [showIOSToDatePickerModal, setShowIOSToDatePickerModal] = useState(false);
+  const filterScrollViewRef = useRef(null);
   const [pricevalues, setPriceValues] = useState([0, 25000]);
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(25000);
@@ -175,24 +181,64 @@ export default function HomeScreen() {
 
   // Optimized date change handlers with useCallback
   const onChangeFromDateModal = useCallback((event, selectedDate) => {
-    setShowFromDatePickerModal(Platform.OS === "ios");
-    if (selectedDate) setFromDateModal(selectedDate);
+    if (Platform.OS === "android") {
+      setShowFromDatePickerModal(false);
+      if (event.type === 'set' && selectedDate) {
+        setFromDateModal(selectedDate);
+      }
+    } else {
+      // iOS - handled by modal
+      if (selectedDate) setFromDateModal(selectedDate);
+    }
   }, []);
 
   const onChangeToDateModal = useCallback((event, selectedDate) => {
-    setShowToDatePickerModal(Platform.OS === "ios");
-    if (selectedDate) setToDateModal(selectedDate);
+    if (Platform.OS === "android") {
+      setShowToDatePickerModal(false);
+      if (event.type === 'set' && selectedDate) {
+        setToDateModal(selectedDate);
+      }
+    } else {
+      // iOS - handled by modal
+      if (selectedDate) setToDateModal(selectedDate);
+    }
   }, []);
 
   const onChangeFromDate = useCallback((event, selectedDate) => {
-    setShowFromDatePicker(Platform.OS === "ios");
-    if (selectedDate) setFromDate(selectedDate);
+    if (Platform.OS === "android") {
+      setShowFromDatePicker(false);
+      if (event.type === 'set' && selectedDate) {
+        setFromDate(selectedDate);
+      }
+    } else {
+      // iOS - handled by modal
+      if (selectedDate) setFromDate(selectedDate);
+    }
   }, []);
 
   const onChangeToDate = useCallback((event, selectedDate) => {
-    setShowToDatePicker(Platform.OS === "ios");
-    if (selectedDate) setToDate(selectedDate);
+    if (Platform.OS === "android") {
+      setShowToDatePicker(false);
+      if (event.type === 'set' && selectedDate) {
+        setToDate(selectedDate);
+      }
+    } else {
+      // iOS - handled by modal
+      if (selectedDate) setToDate(selectedDate);
+    }
   }, []);
+
+  // iOS Modal handlers for Request Quote section
+  const handleIOSFromDateConfirm = useCallback((selectedDate) => {
+    setFromDate(selectedDate);
+    setShowIOSFromDatePicker(false);
+  }, []);
+
+  const handleIOSToDateConfirm = useCallback((selectedDate) => {
+    setToDate(selectedDate);
+    setShowIOSToDatePicker(false);
+  }, []);
+
 
   const getFCMToken = useCallback(async () => {
     try {
@@ -1457,7 +1503,13 @@ export default function HomeScreen() {
                   {/* From Date */}
                   <Text style={styles.textinputHeader}>From Date</Text>
                   <TouchableOpacity
-                    onPress={() => setShowFromDatePicker(true)}
+                    onPress={() => {
+                      if (Platform.OS === 'ios') {
+                        setShowIOSFromDatePicker(true);
+                      } else {
+                        setShowFromDatePicker(true);
+                      }
+                    }}
                     style={{
                       flexDirection: "row",
                       alignItems: "center",
@@ -1473,7 +1525,7 @@ export default function HomeScreen() {
                     <Icon name="calendar" size={20} color="red" />
                     <Text style={{ marginLeft: 10, color: '#767676', fontFamily: 'Poppins-Regular', fontSize: responsiveFontSize(1.7) }}>{fromDate.toDateString()}</Text>
                   </TouchableOpacity>
-                  {showFromDatePicker && (
+                  {Platform.OS === 'android' && showFromDatePicker && (
                     <DateTimePicker
                       value={fromDate}
                       mode="date"
@@ -1486,7 +1538,13 @@ export default function HomeScreen() {
                   {/* To Date */}
                   <Text style={styles.textinputHeader}>To Date</Text>
                   <TouchableOpacity
-                    onPress={() => setShowToDatePicker(true)}
+                    onPress={() => {
+                      if (Platform.OS === 'ios') {
+                        setShowIOSToDatePicker(true);
+                      } else {
+                        setShowToDatePicker(true);
+                      }
+                    }}
                     style={{
                       flexDirection: "row",
                       alignItems: "center",
@@ -1502,7 +1560,7 @@ export default function HomeScreen() {
                     <Icon name="calendar" size={20} color="red" />
                     <Text style={{ marginLeft: 10, color: '#767676', fontFamily: 'Poppins-Regular', fontSize: responsiveFontSize(1.7) }}>{toDate.toDateString()}</Text>
                   </TouchableOpacity>
-                  {showToDatePicker && (
+                  {Platform.OS === 'android' && showToDatePicker && (
                     <DateTimePicker
                       value={toDate}
                       mode="date"
@@ -1675,14 +1733,19 @@ export default function HomeScreen() {
               </View>
             </View>
           </View>
-          <ScrollView style={{ marginBottom: responsiveHeight(0) }}>
+          <ScrollView 
+            ref={filterScrollViewRef}
+            style={{ marginBottom: responsiveHeight(0) }}
+            contentContainerStyle={{ paddingBottom: responsiveHeight(5) }}
+          >
             <View style={{ borderTopColor: '#E3E3E3', borderTopWidth: 0, paddingHorizontal: 15, marginBottom: 5 }}>
               <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Days</Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: responsiveHeight(2) }}>
-                <View style={{ flexDirection: 'column' }}>
+              {/* Show date pickers in full width when open on iOS, otherwise show normal layout */}
+              {Platform.OS === 'ios' && showIOSFromDatePickerModal ? (
+                <View style={{ marginBottom: responsiveHeight(2) }}>
                   <Text style={styles.textinputHeader}>Departure Date</Text>
                   <TouchableOpacity
-                    onPress={() => setShowFromDatePickerModal(true)}
+                    onPress={() => setShowIOSFromDatePickerModal(false)}
                     style={{
                       flexDirection: "row",
                       alignItems: "center",
@@ -1697,19 +1760,35 @@ export default function HomeScreen() {
                     <Icon name="calendar" size={20} color="red" />
                     <Text style={{ marginLeft: 10, color: '#767676', fontFamily: 'Poppins-Regular', fontSize: responsiveFontSize(1.7) }}>{fromDateModal.toDateString()}</Text>
                   </TouchableOpacity>
-                  {showFromDatePickerModal && (
+                  <View style={styles.iosPickerContainer}>
                     <DateTimePicker
                       value={fromDateModal}
                       mode="date"
-                      display="default"
-                      onChange={onChangeFromDateModal}
+                      display="spinner"
+                      minimumDate={new Date()}
+                      onChange={(event, selectedDate) => {
+                        if (selectedDate) {
+                          setFromDateModal(selectedDate);
+                        }
+                      }}
+                      textColor="#000"
+                      themeVariant="light"
                     />
-                  )}
+                    <View style={styles.iosPickerButtons}>
+                      <TouchableOpacity
+                        onPress={() => setShowIOSFromDatePickerModal(false)}
+                        style={styles.iosPickerButton}
+                      >
+                        <Text style={styles.iosPickerButtonText}>Done</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
                 </View>
-                <View style={{ flexDirection: 'column' }}>
+              ) : Platform.OS === 'ios' && showIOSToDatePickerModal ? (
+                <View style={{ marginBottom: responsiveHeight(2) }}>
                   <Text style={styles.textinputHeader}>Return Date</Text>
                   <TouchableOpacity
-                    onPress={() => setShowToDatePickerModal(true)}
+                    onPress={() => setShowIOSToDatePickerModal(false)}
                     style={{
                       flexDirection: "row",
                       alignItems: "center",
@@ -1724,7 +1803,92 @@ export default function HomeScreen() {
                     <Icon name="calendar" size={20} color="red" />
                     <Text style={{ marginLeft: 10, color: '#767676', fontFamily: 'Poppins-Regular', fontSize: responsiveFontSize(1.7) }}>{toDateModal.toDateString()}</Text>
                   </TouchableOpacity>
-                  {showToDatePickerModal && (
+                  <View style={styles.iosPickerContainer}>
+                    <DateTimePicker
+                      value={toDateModal}
+                      mode="date"
+                      display="spinner"
+                      minimumDate={fromDateModal}
+                      onChange={(event, selectedDate) => {
+                        if (selectedDate) {
+                          setToDateModal(selectedDate);
+                        }
+                      }}
+                      textColor="#000"
+                      themeVariant="light"
+                    />
+                    <View style={styles.iosPickerButtons}>
+                      <TouchableOpacity
+                        onPress={() => setShowIOSToDatePickerModal(false)}
+                        style={styles.iosPickerButton}
+                      >
+                        <Text style={styles.iosPickerButtonText}>Done</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              ) : (
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: responsiveHeight(2) }}>
+                <View style={{ flexDirection: 'column', flex: 1, marginRight: 5 }}>
+                  <Text style={styles.textinputHeader}>Departure Date</Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (Platform.OS === 'ios') {
+                        setShowIOSFromDatePickerModal(!showIOSFromDatePickerModal);
+                        setShowIOSToDatePickerModal(false); // Close other picker if open
+                      } else {
+                        setShowFromDatePickerModal(true);
+                      }
+                    }}
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      borderWidth: 1,
+                      borderColor: "#ddd",
+                      paddingHorizontal: 10,
+                      paddingVertical: 13,
+                      borderRadius: 5,
+                      marginTop: 5,
+                    }}
+                  >
+                    <Icon name="calendar" size={20} color="red" />
+                    <Text style={{ marginLeft: 10, color: '#767676', fontFamily: 'Poppins-Regular', fontSize: responsiveFontSize(1.7) }}>{fromDateModal.toDateString()}</Text>
+                  </TouchableOpacity>
+                  {Platform.OS === 'android' && showFromDatePickerModal && (
+                    <DateTimePicker
+                      value={fromDateModal}
+                      mode="date"
+                      display="default"
+                      onChange={onChangeFromDateModal}
+                    />
+                  )}
+                </View>
+                <View style={{ flexDirection: 'column', flex: 1, marginLeft: 5 }}>
+                  <Text style={styles.textinputHeader}>Return Date</Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (Platform.OS === 'ios') {
+                        setShowIOSToDatePickerModal(!showIOSToDatePickerModal);
+                        setShowIOSFromDatePickerModal(false); // Close other picker if open
+                      } else {
+                        setShowToDatePickerModal(true);
+                      }
+                    }}
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      borderWidth: 1,
+                      borderColor: "#ddd",
+                      paddingHorizontal: 10,
+                      paddingVertical: 13,
+                      borderRadius: 5,
+                      marginTop: 5,
+                    }}
+                  >
+                    <Icon name="calendar" size={20} color="red" />
+                    <Text style={{ marginLeft: 10, color: '#767676', fontFamily: 'Poppins-Regular', fontSize: responsiveFontSize(1.7) }}>{toDateModal.toDateString()}</Text>
+                  </TouchableOpacity>
+                  {Platform.OS === 'android' && showToDatePickerModal && (
                     <DateTimePicker
                       value={toDateModal}
                       mode="date"
@@ -1735,47 +1899,53 @@ export default function HomeScreen() {
                   )}
                 </View>
               </View>
-              <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Type</Text>
-              <View style={{ marginTop: responsiveHeight(2), marginBottom: responsiveHeight(2), marginLeft: -responsiveWidth(2.5) }}>
-                <RadioGroup
-                  radioButtons={radioButtons2}
-                  onPress={setSelectedId2}
-                  selectedId={selectedId2}
-                  layout='row'
-                  containerStyle={{ flexWrap: 'wrap' }}
-                  labelStyle={{ flexShrink: 1, flexWrap: 'wrap', maxWidth: responsiveWidth(40), }}
-                />
-              </View>
-              <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Price</Text>
-              <View style={styles.slidercontainer}>
-                <MultiSlider
-                  values={pricevalues}
-                  sliderLength={responsiveWidth(80)}
-                  onValuesChange={handlePriceChange}
-                  min={minPrice}
-                  max={maxPrice}
-                  step={500}
-                  selectedStyle={{ backgroundColor: "#FF455C" }}
-                  unselectedStyle={{ backgroundColor: "rgba(0, 0, 0, 0.15)" }}
-                  markerStyle={{ backgroundColor: "#FF455C" }}
-                />
-                <View style={styles.valueContainer}>
-                  <Text style={styles.valueText}>₹{pricevalues[0]}</Text>
-                  <Text style={styles.valueText}>₹{pricevalues[1]}</Text>
-                </View>
-              </View>
-              <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Rating</Text>
-              <View style={{ width: responsiveWidth(50), marginTop: responsiveHeight(2), marginBottom: responsiveHeight(2) }}>
-                <StarRating
-                  disabled={false}
-                  maxStars={5}
-                  rating={starCount}
-                  onChange={(rating) => setStarCount(rating)}
-                  fullStarColor={'#FFCB45'}
-                  starSize={28}
-                  starStyle={{ marginHorizontal: responsiveWidth(1) }}
-                />
-              </View>
+              )}
+              {/* Hide other filter sections when date picker is open on iOS */}
+              {!(Platform.OS === 'ios' && (showIOSFromDatePickerModal || showIOSToDatePickerModal)) && (
+                <>
+                  <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Type</Text>
+                  <View style={{ marginTop: responsiveHeight(2), marginBottom: responsiveHeight(2), marginLeft: -responsiveWidth(2.5) }}>
+                    <RadioGroup
+                      radioButtons={radioButtons2}
+                      onPress={setSelectedId2}
+                      selectedId={selectedId2}
+                      layout='row'
+                      containerStyle={{ flexWrap: 'wrap' }}
+                      labelStyle={{ flexShrink: 1, flexWrap: 'wrap', maxWidth: responsiveWidth(40), }}
+                    />
+                  </View>
+                  <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Price</Text>
+                  <View style={styles.slidercontainer}>
+                    <MultiSlider
+                      values={pricevalues}
+                      sliderLength={responsiveWidth(80)}
+                      onValuesChange={handlePriceChange}
+                      min={minPrice}
+                      max={maxPrice}
+                      step={500}
+                      selectedStyle={{ backgroundColor: "#FF455C" }}
+                      unselectedStyle={{ backgroundColor: "rgba(0, 0, 0, 0.15)" }}
+                      markerStyle={{ backgroundColor: "#FF455C" }}
+                    />
+                    <View style={styles.valueContainer}>
+                      <Text style={styles.valueText}>₹{pricevalues[0]}</Text>
+                      <Text style={styles.valueText}>₹{pricevalues[1]}</Text>
+                    </View>
+                  </View>
+                  <Text style={{ fontSize: responsiveFontSize(2), color: '#2D2D2D', fontFamily: 'Poppins-SemiBold', }}>Rating</Text>
+                  <View style={{ width: responsiveWidth(50), marginTop: responsiveHeight(2), marginBottom: responsiveHeight(2) }}>
+                    <StarRating
+                      disabled={false}
+                      maxStars={5}
+                      rating={starCount}
+                      onChange={(rating) => setStarCount(rating)}
+                      fullStarColor={'#FFCB45'}
+                      starSize={28}
+                      starStyle={{ marginHorizontal: responsiveWidth(1) }}
+                    />
+                  </View>
+                </>
+              )}
             </View>
           </ScrollView>
           <View style={{ bottom: 0, width: responsiveWidth(100), paddingHorizontal: 10, borderTopColor: '#E3E3E3', borderTopWidth: 1 }}>
@@ -1800,6 +1970,27 @@ export default function HomeScreen() {
         {/* </TouchableWithoutFeedback> */}
       </Modal>
 
+      {/* iOS Date Picker Modals for Request Quote Section - Placed at root level for proper rendering */}
+      {Platform.OS === 'ios' && (
+        <>
+          <IOSDatePickerModal
+            visible={showIOSFromDatePicker}
+            date={fromDate}
+            minimumDate={new Date()}
+            onConfirm={handleIOSFromDateConfirm}
+            onCancel={() => setShowIOSFromDatePicker(false)}
+            mode="date"
+          />
+          <IOSDatePickerModal
+            visible={showIOSToDatePicker}
+            date={toDate}
+            minimumDate={fromDate} // Only allow dates after the selected From Date
+            onConfirm={handleIOSToDateConfirm}
+            onCancel={() => setShowIOSToDatePicker(false)}
+            mode="date"
+          />
+        </>
+      )}
 
     </SafeAreaView>
   );
@@ -2397,6 +2588,38 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     textAlign: 'center',
+  },
+  iosPickerContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    marginTop: 10,
+    paddingVertical: 15,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    height: responsiveHeight(35),
+    justifyContent: 'center',
+    width: '100%',
+  },
+  iosPickerButtons: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingHorizontal: 15,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+    marginTop: 10,
+  },
+  iosPickerButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    backgroundColor: '#007AFF',
+    borderRadius: 8,
+  },
+  iosPickerButtonText: {
+    color: '#FFFFFF',
+    fontSize: responsiveFontSize(1.8),
+    fontFamily: 'Poppins-SemiBold',
+    fontWeight: '600',
   },
 });
 
