@@ -72,16 +72,16 @@ const BookingSummary = ({ route }) => {
     useFocusEffect(
         useCallback(() => {
             const backAction = () => {
-               navigation.goBack()
-               return true
-              };
-          
-              const backHandler = BackHandler.addEventListener(
+                navigation.goBack()
+                return true
+            };
+
+            const backHandler = BackHandler.addEventListener(
                 'hardwareBackPress',
                 backAction,
-              );
-          
-              return () => backHandler.remove();
+            );
+
+            return () => backHandler.remove();
         }, [navigation])
     );
 
@@ -186,7 +186,7 @@ const BookingSummary = ({ route }) => {
     };
 
     const handlePayment = async () => {
-       
+
         const totalAmount = calculateTotalAmount().finalAmount.toFixed(2);
         console.log('asdgaskdgaksdgaks')
         console.log(totalAmount, 'totalAmounttotalAmounttotalAmount')
@@ -254,7 +254,7 @@ const BookingSummary = ({ route }) => {
                         .then((data) => {
                             // Payment successful
                             console.log("razorpay response data", data);
-                            submitForm(data.razorpay_payment_id,order_id,data.razorpay_signature,response.data.order.transfers[0].id);
+                            submitForm(data.razorpay_payment_id, order_id, data.razorpay_signature, response.data.order.transfers[0].id);
                         })
                         .catch((error) => {
                             // Payment failed
@@ -271,7 +271,7 @@ const BookingSummary = ({ route }) => {
         }
     };
 
-    const submitForm = (transactionId,order_id,razorpay_signature,transfer_id) => {
+    const submitForm = (transactionId, order_id, razorpay_signature, transfer_id) => {
         console.log(packageInfo, 'packageInfopackageInfopackageInfo')
         console.log(bookingDetails, 'bookingDetailsbookingDetailsbookingDetails')
 
@@ -373,8 +373,8 @@ const BookingSummary = ({ route }) => {
             setCouponError('Please enter a coupon code');
             return;
         }
-        console.log(availableCoupons,'sdfdsf')
-        
+        console.log(availableCoupons, 'sdfdsf')
+
         if (!Array.isArray(availableCoupons)) {
             setCouponError('No available coupons');
             return;
@@ -659,7 +659,7 @@ const BookingSummary = ({ route }) => {
                 <View style={styles.buttonwrapper}>
                     <Text style={styles.termsText}>Please contact the agent to complete the payment</Text>
                 </View>
-                 :
+                :
                 <View style={styles.buttonwrapper}>
                     <View style={styles.buttonwrapperSection1}>
                         <Text style={styles.buttonwrapperText2}>₹ {calculateTotalAmount().finalAmount.toFixed(2)}</Text>
@@ -706,7 +706,28 @@ const styles = StyleSheet.create({
     buttonwrapperSection1: { flexDirection: 'column', },
     buttonwrapperText1: { color: '#746868', fontSize: responsiveFontSize(1.7), fontFamily: 'Poppins-Medium', },
     buttonwrapperText2: { color: '#444343', fontSize: responsiveFontSize(2.5), fontFamily: 'Poppins-Bold', },
-    total3Value: { width: responsiveWidth(89), height: responsiveHeight(15), backgroundColor: '#FFF', padding: 10, borderRadius: 15, elevation: 5, justifyContent: 'center', marginTop: responsiveHeight(2), alignSelf: 'center', marginBottom: 5 },
+    total3Value: {
+        width: responsiveWidth(89),
+        height: responsiveHeight(15),
+        backgroundColor: '#FFF',
+        padding: 10,
+        borderRadius: 15,
+        ...Platform.select({
+            android: {
+                elevation: 5, // Only for Android
+            },
+            ios: {
+                shadowColor: '#000', // Only for iOS
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.3,
+                shadowRadius: 5,
+            },
+        }),
+        justifyContent: 'center',
+        marginTop: responsiveHeight(2),
+        alignSelf: 'center',
+        marginBottom: 5
+    },
     couponText: { color: '#2D2D2D', fontFamily: 'Poppins-Bold', fontSize: responsiveFontSize(1.7), marginLeft: responsiveWidth(1) },
     callCouponButton: { position: 'absolute', right: 25, top: responsiveHeight(9) },
     callCouponText: { color: '#FF455C', fontFamily: 'Poppins-Bold', fontSize: responsiveFontSize(1.7), },

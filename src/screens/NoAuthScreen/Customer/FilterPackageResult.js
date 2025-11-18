@@ -561,7 +561,17 @@ const styles = StyleSheet.create({
         //justifyContent: 'center',
         padding: 5,
         borderRadius: 15,
-        elevation: 5,
+        ...Platform.select({
+            android: {
+              elevation: 5, // Only for Android
+            },
+            ios: {
+              shadowColor: '#000', // Only for iOS
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.3,
+              shadowRadius: 5,
+            },
+          }),
         margin: 2,
         marginBottom: responsiveHeight(2),
         marginRight: 5

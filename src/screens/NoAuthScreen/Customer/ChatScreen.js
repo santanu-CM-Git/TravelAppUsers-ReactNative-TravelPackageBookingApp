@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react'
-import { View, Text, StyleSheet, ScrollView, ImageBackground, Image, PermissionsAndroid, Alert, BackHandler, Platform, Linking, Modal, TouchableOpacity, TouchableWithoutFeedback, StatusBar } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, ImageBackground, Image, PermissionsAndroid, Alert, BackHandler, Platform, Linking, Modal, TouchableOpacity, TouchableWithoutFeedback, StatusBar, Keyboard } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
 import { TouchableOpacity as GestureTouchableOpacity } from 'react-native-gesture-handler'
@@ -67,6 +67,7 @@ const ChatScreen = ({ route }) => {
   const [isAttachPopupVisible, setIsAttachPopupVisible] = useState(false);
   const [previewImageUri, setPreviewImageUri] = useState(null);
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   // useEffect(() => {
   //   // console.log(routepage.name);
@@ -223,7 +224,10 @@ const ChatScreen = ({ route }) => {
   const customInputToolbar = (props) => {
     return (
       <View style={styles.inputToolbarWrapper}>
-        <GestureTouchableOpacity style={styles.pinIconWrapper} onPress={() => setIsAttachPopupVisible(!isAttachPopupVisible)}>
+        <GestureTouchableOpacity style={styles.pinIconWrapper} onPress={() => {
+          Keyboard.dismiss();
+          setIsAttachPopupVisible(!isAttachPopupVisible);
+        }}>
           <Image source={filesendImg} style={styles.pinIcon} />
         </GestureTouchableOpacity>
         <View style={styles.inputFieldWrapper}>
@@ -1080,6 +1084,27 @@ const ChatScreen = ({ route }) => {
       return unsubscribe;
     }
   }, [])
+
+  // Keyboard listener to track keyboard height
+  useEffect(() => {
+    const keyboardWillShowListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      (e) => {
+        setKeyboardHeight(e.endCoordinates.height);
+      }
+    );
+    const keyboardWillHideListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        setKeyboardHeight(0);
+      }
+    );
+
+    return () => {
+      keyboardWillShowListener.remove();
+      keyboardWillHideListener.remove();
+    };
+  }, [])
   // Add this function to handle file upload to Firebase Storage
   const uploadFileToStorage = async (uri, fileName, fileType) => {
     try {
@@ -1565,7 +1590,7 @@ const ChatScreen = ({ route }) => {
       ) : null}
       {/* </View> */}
       {isAttachPopupVisible && (
-        <View style={styles.attachPopupOverlay} pointerEvents="box-none">
+        <View style={[styles.attachPopupOverlay, { bottom: keyboardHeight > 0 ? keyboardHeight + 70 : 70 }]} pointerEvents="box-none">
           {/* Backdrop to close popup */}
           <GestureTouchableOpacity style={styles.attachPopupBackdrop} activeOpacity={1} onPress={() => setIsAttachPopupVisible(false)} />
           <View style={styles.attachPopupContainer}>
@@ -1617,7 +1642,17 @@ const ChatScreen = ({ route }) => {
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.3,
                 shadowRadius: 3,
-                elevation: 5,          // for Android shadow
+                ...Platform.select({
+                  android: {
+                    elevation: 5, // Only for Android
+                  },
+                  ios: {
+                    shadowColor: '#000', // Only for iOS
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 5,
+                  },
+                }),        // for Android shadow
               }}
             >
               <Text style={{ fontSize: 18, color: '#222' }}>✕</Text>
@@ -1683,7 +1718,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginHorizontal: 15,
     marginBottom: 10,
-    elevation: 5,
+    ...Platform.select({
+      android: {
+        elevation: 5, // Only for Android
+      },
+      ios: {
+        shadowColor: '#000', // Only for iOS
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+      },
+    }),
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -1745,7 +1790,17 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
-    elevation: 4,
+    ...Platform.select({
+      android: {
+        elevation: 5, // Only for Android
+      },
+      ios: {
+        shadowColor: '#000', // Only for iOS
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+      },
+    }),
   },
   sendIcon: {
     width: 30,
@@ -1903,7 +1958,17 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
-    elevation: 8,
+    ...Platform.select({
+      android: {
+        elevation: 5, // Only for Android
+      },
+      ios: {
+        shadowColor: '#000', // Only for iOS
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+      },
+    }),
     borderWidth: 1, // for debugging
     borderColor: '#eee', // for debugging
   },
