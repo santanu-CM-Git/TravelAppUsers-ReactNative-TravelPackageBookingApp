@@ -26,28 +26,9 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:323164360540:android:dc4c05a5cc012a47963b99",
+        "mobilesdk_app_id": "1:323164360540:android:83e8e07f8e99b6dd963b99",
         "android_client_info": {
-          "package_name": "com.travel.travelapp"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDIjUHoULegSoVa1aUjTF327vD2r4frkEI"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:323164360540:android:17d10beab826470d963b99",
-        "android_client_info": {
-          "package_name": "com.travel.travelappagent"
+          "package_name": "com.grouptour.travelappagent"
         }
       },
       "oauth_client": [],
