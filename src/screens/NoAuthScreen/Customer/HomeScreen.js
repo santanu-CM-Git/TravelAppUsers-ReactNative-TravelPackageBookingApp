@@ -308,7 +308,7 @@ export default function HomeScreen() {
     useCallback(() => {
       fetchRecentViewed()
     }, [])
-);
+  );
 
   const requestLocationPermission = useCallback(async () => {
     try {
@@ -850,40 +850,47 @@ export default function HomeScreen() {
     </TouchableWithoutFeedback>
   ), [navigation]);
 
-  const renderNearbyTourPlanner = useCallback(({ item }) => (
-    <TouchableWithoutFeedback onPress={() => navigation.navigate('TravelAgencyDetails', { item: item, countryName: countryName })}>
-      <View style={styles.productSection}>
-        <View style={styles.topAstrologerSection}>
-          <View style={styles.totalValue3}>
-            <Image source={{ uri: item?.profile_photo_url }} style={styles.productImg3} />
-            <View style={{ margin: 5 }}>
-              <Text style={styles.productText3}>{item.name}</Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: 10 }}>
-                <Image source={mappinImg} style={styles.pinImg} />
-                <Text style={styles.addressText} numberOfLines={1}>{item.address}</Text>
-              </View>
-              <View
-                style={{
-                  borderBottomColor: '#C0C0C0',
-                  borderBottomWidth: StyleSheet.hairlineWidth,
-                  marginVertical: 5,
-                }}
-              />
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 5 }}>
-                <Text style={styles.packageAvlText}>Package : {item.no_of_active_packages}</Text>
-                {item?.rating !== null && item?.rating !== undefined && item?.rating !== 0 && (
-                  <View style={styles.rateingView}>
-                    <Image source={starImg} style={[styles.staricon, { marginTop: -5 }]} />
-                    <Text style={styles.ratingText}>{item.rating}</Text>
-                  </View>
-                )}
+  const renderNearbyTourPlanner = useCallback(({ item }) => {
+    // Return null if no active packages
+    if (!item.no_of_active_packages || item.no_of_active_packages <= 0) {
+      return null;
+    }
+
+    return (
+      <TouchableWithoutFeedback onPress={() => navigation.navigate('TravelAgencyDetails', { item: item, countryName: countryName })}>
+        <View style={styles.productSection}>
+          <View style={styles.topAstrologerSection}>
+            <View style={styles.totalValue3}>
+              <Image source={{ uri: item?.profile_photo_url }} style={styles.productImg3} />
+              <View style={{ margin: 5 }}>
+                <Text style={styles.productText3}>{item.name}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: 10 }}>
+                  <Image source={mappinImg} style={styles.pinImg} />
+                  <Text style={styles.addressText} numberOfLines={1}>{item.address}</Text>
+                </View>
+                <View
+                  style={{
+                    borderBottomColor: '#C0C0C0',
+                    borderBottomWidth: StyleSheet.hairlineWidth,
+                    marginVertical: 5,
+                  }}
+                />
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 5 }}>
+                  <Text style={styles.packageAvlText}>Package : {item.no_of_active_packages}</Text>
+                  {item?.rating !== null && item?.rating !== undefined && item?.rating !== 0 && (
+                    <View style={styles.rateingView}>
+                      <Image source={starImg} style={[styles.staricon, { marginTop: -5 }]} />
+                      <Text style={styles.ratingText}>{item.rating}</Text>
+                    </View>
+                  )}
+                </View>
               </View>
             </View>
           </View>
         </View>
-      </View>
-    </TouchableWithoutFeedback>
-  ), [navigation, countryName]);
+      </TouchableWithoutFeedback>
+    );
+  }, [navigation, countryName]);
 
   const formatNumber = useCallback((num) => {
     if (num >= 100000) {
@@ -1421,18 +1428,18 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
         {destinationsData.length > 0 ? (
-            <FlatList
-              data={destinationsData}
-              keyExtractor={keyExtractor}
-              renderItem={renderTopLocationItem}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingHorizontal: 10 }}
-              style={styles.topLocationScrollView}
-              removeClippedSubviews={true}
-              maxToRenderPerBatch={3}
-              windowSize={5}
-            />
+          <FlatList
+            data={destinationsData}
+            keyExtractor={keyExtractor}
+            renderItem={renderTopLocationItem}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 10 }}
+            style={styles.topLocationScrollView}
+            removeClippedSubviews={true}
+            maxToRenderPerBatch={3}
+            windowSize={5}
+          />
         ) : (
           <View style={styles.noLocationContainer}>
             <Text style={styles.noLocationText}>No location found</Text>
@@ -1735,7 +1742,7 @@ export default function HomeScreen() {
               </View>
             </View>
           </View>
-          <ScrollView 
+          <ScrollView
             ref={filterScrollViewRef}
             style={{ marginBottom: responsiveHeight(0) }}
             contentContainerStyle={{ paddingBottom: responsiveHeight(5) }}
@@ -1831,76 +1838,76 @@ export default function HomeScreen() {
                 </View>
               ) : (
                 <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: responsiveHeight(2) }}>
-                <View style={{ flexDirection: 'column', flex: 1, marginRight: 5 }}>
-                  <Text style={styles.textinputHeader}>Departure Date</Text>
-                  <TouchableOpacity
-                    onPress={() => {
-                      if (Platform.OS === 'ios') {
-                        setShowIOSFromDatePickerModal(!showIOSFromDatePickerModal);
-                        setShowIOSToDatePickerModal(false); // Close other picker if open
-                      } else {
-                        setShowFromDatePickerModal(true);
-                      }
-                    }}
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      borderWidth: 1,
-                      borderColor: "#ddd",
-                      paddingHorizontal: 10,
-                      paddingVertical: 13,
-                      borderRadius: 5,
-                      marginTop: 5,
-                    }}
-                  >
-                    <Icon name="calendar" size={20} color="red" />
-                    <Text style={{ marginLeft: 10, color: '#767676', fontFamily: 'Poppins-Regular', fontSize: responsiveFontSize(1.7) }}>{fromDateModal.toDateString()}</Text>
-                  </TouchableOpacity>
-                  {Platform.OS === 'android' && showFromDatePickerModal && (
-                    <DateTimePicker
-                      value={fromDateModal}
-                      mode="date"
-                      display="default"
-                      onChange={onChangeFromDateModal}
-                    />
-                  )}
+                  <View style={{ flexDirection: 'column', flex: 1, marginRight: 5 }}>
+                    <Text style={styles.textinputHeader}>Departure Date</Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        if (Platform.OS === 'ios') {
+                          setShowIOSFromDatePickerModal(!showIOSFromDatePickerModal);
+                          setShowIOSToDatePickerModal(false); // Close other picker if open
+                        } else {
+                          setShowFromDatePickerModal(true);
+                        }
+                      }}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        borderWidth: 1,
+                        borderColor: "#ddd",
+                        paddingHorizontal: 10,
+                        paddingVertical: 13,
+                        borderRadius: 5,
+                        marginTop: 5,
+                      }}
+                    >
+                      <Icon name="calendar" size={20} color="red" />
+                      <Text style={{ marginLeft: 10, color: '#767676', fontFamily: 'Poppins-Regular', fontSize: responsiveFontSize(1.7) }}>{fromDateModal.toDateString()}</Text>
+                    </TouchableOpacity>
+                    {Platform.OS === 'android' && showFromDatePickerModal && (
+                      <DateTimePicker
+                        value={fromDateModal}
+                        mode="date"
+                        display="default"
+                        onChange={onChangeFromDateModal}
+                      />
+                    )}
+                  </View>
+                  <View style={{ flexDirection: 'column', flex: 1, marginLeft: 5 }}>
+                    <Text style={styles.textinputHeader}>Return Date</Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        if (Platform.OS === 'ios') {
+                          setShowIOSToDatePickerModal(!showIOSToDatePickerModal);
+                          setShowIOSFromDatePickerModal(false); // Close other picker if open
+                        } else {
+                          setShowToDatePickerModal(true);
+                        }
+                      }}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        borderWidth: 1,
+                        borderColor: "#ddd",
+                        paddingHorizontal: 10,
+                        paddingVertical: 13,
+                        borderRadius: 5,
+                        marginTop: 5,
+                      }}
+                    >
+                      <Icon name="calendar" size={20} color="red" />
+                      <Text style={{ marginLeft: 10, color: '#767676', fontFamily: 'Poppins-Regular', fontSize: responsiveFontSize(1.7) }}>{toDateModal.toDateString()}</Text>
+                    </TouchableOpacity>
+                    {Platform.OS === 'android' && showToDatePickerModal && (
+                      <DateTimePicker
+                        value={toDateModal}
+                        mode="date"
+                        display="default"
+                        onChange={onChangeToDateModal}
+                        minimumDate={fromDateModal} // Only allow dates after the selected From Date in modal
+                      />
+                    )}
+                  </View>
                 </View>
-                <View style={{ flexDirection: 'column', flex: 1, marginLeft: 5 }}>
-                  <Text style={styles.textinputHeader}>Return Date</Text>
-                  <TouchableOpacity
-                    onPress={() => {
-                      if (Platform.OS === 'ios') {
-                        setShowIOSToDatePickerModal(!showIOSToDatePickerModal);
-                        setShowIOSFromDatePickerModal(false); // Close other picker if open
-                      } else {
-                        setShowToDatePickerModal(true);
-                      }
-                    }}
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      borderWidth: 1,
-                      borderColor: "#ddd",
-                      paddingHorizontal: 10,
-                      paddingVertical: 13,
-                      borderRadius: 5,
-                      marginTop: 5,
-                    }}
-                  >
-                    <Icon name="calendar" size={20} color="red" />
-                    <Text style={{ marginLeft: 10, color: '#767676', fontFamily: 'Poppins-Regular', fontSize: responsiveFontSize(1.7) }}>{toDateModal.toDateString()}</Text>
-                  </TouchableOpacity>
-                  {Platform.OS === 'android' && showToDatePickerModal && (
-                    <DateTimePicker
-                      value={toDateModal}
-                      mode="date"
-                      display="default"
-                      onChange={onChangeToDateModal}
-                      minimumDate={fromDateModal} // Only allow dates after the selected From Date in modal
-                    />
-                  )}
-                </View>
-              </View>
               )}
               {/* Hide other filter sections when date picker is open on iOS */}
               {!(Platform.OS === 'ios' && (showIOSFromDatePickerModal || showIOSToDatePickerModal)) && (

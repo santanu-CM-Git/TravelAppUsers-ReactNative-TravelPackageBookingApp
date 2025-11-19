@@ -47,7 +47,7 @@ const { width } = Dimensions.get('window');
 const itemWidth = width * 0.8; // 80% of screen width
 const imageHeight = itemWidth * 0.5; // Maintain a 4:3 aspect ratio
 
-export default function NearbyTourPlanerList({  }) {
+export default function NearbyTourPlanerList({ }) {
     const navigation = useNavigation();
     const carouselRef = useRef(null);
     const dispatch = useDispatch();
@@ -173,41 +173,48 @@ export default function NearbyTourPlanerList({  }) {
     useEffect(() => {
         setFilteredData(nearbyTourAgent);
     }, [nearbyTourAgent]);
- 
-    const renderNearbyTourPlanner = ({ item }) => (
-        <TouchableWithoutFeedback onPress={() => navigation.navigate('TravelAgencyDetails', { item:item,countryName:countryName })}>
-            <View style={styles.productSection}>
-                <View style={styles.topAstrologerSection}> 
-                    <View style={styles.totalValue3}>
-                        <Image source={{ uri: item?.profile_photo_url }} style={styles.productImg3} />
-                        <View style={{ margin: 5 }}>
-                            <Text style={styles.productText3}>{item.name}</Text>
-                            <View style={{ flexDirection: 'row', alignItems: 'center',paddingRight: 10 }}>
-                                <Image source={mappinImg} style={styles.pinImg} />
-                                <Text style={styles.addressText} numberOfLines={1}>{item.address}</Text>
-                            </View>
-                            <View
-                                style={{
-                                    borderBottomColor: '#C0C0C0',
-                                    borderBottomWidth: StyleSheet.hairlineWidth,
-                                    marginVertical: 5,
-                                }}
-                            />
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Text style={styles.packageAvlText}>Package : {item.no_of_active_packages}</Text>
-                                {item?.rating !== null && item?.rating !== undefined && item?.rating !== 0 && (
-                                    <View style={styles.rateingView}>
-                                        <Image source={starImg} style={[styles.staricon, { marginTop: -5 }]} />
-                                        <Text style={styles.ratingText}>{item.rating}</Text>
-                                    </View>
-                                )}
+
+    const renderNearbyTourPlanner = ({ item }) => {
+        // Return null if no active packages
+        if (!item.no_of_active_packages || item.no_of_active_packages <= 0) {
+            return null;
+        }
+
+        return (
+            <TouchableWithoutFeedback onPress={() => navigation.navigate('TravelAgencyDetails', { item: item, countryName: countryName })}>
+                <View style={styles.productSection}>
+                    <View style={styles.topAstrologerSection}>
+                        <View style={styles.totalValue3}>
+                            <Image source={{ uri: item?.profile_photo_url }} style={styles.productImg3} />
+                            <View style={{ margin: 5 }}>
+                                <Text style={styles.productText3}>{item.name}</Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: 10 }}>
+                                    <Image source={mappinImg} style={styles.pinImg} />
+                                    <Text style={styles.addressText} numberOfLines={1}>{item.address}</Text>
+                                </View>
+                                <View
+                                    style={{
+                                        borderBottomColor: '#C0C0C0',
+                                        borderBottomWidth: StyleSheet.hairlineWidth,
+                                        marginVertical: 5,
+                                    }}
+                                />
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <Text style={styles.packageAvlText}>Package : {item.no_of_active_packages}</Text>
+                                    {item?.rating !== null && item?.rating !== undefined && item?.rating !== 0 && (
+                                        <View style={styles.rateingView}>
+                                            <Image source={starImg} style={[styles.staricon, { marginTop: -5 }]} />
+                                            <Text style={styles.ratingText}>{item.rating}</Text>
+                                        </View>
+                                    )}
+                                </View>
                             </View>
                         </View>
                     </View>
                 </View>
-            </View>
-        </TouchableWithoutFeedback>
-    );
+            </TouchableWithoutFeedback>
+        );
+    };
 
     if (isLoading) {
         return (
@@ -217,7 +224,7 @@ export default function NearbyTourPlanerList({  }) {
 
     return (
         <SafeAreaView style={styles.Container}>
-            <StatusBar translucent={false} backgroundColor="black" barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'} />  
+            <StatusBar translucent={false} backgroundColor="black" barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'} />
             <CustomHeader commingFrom={'Nearby Tour Planner'} onPress={() => navigation.goBack()} title={'All Tour Planners'} />
             <View style={styles.searchInput}>
                 <View style={{ flexDirection: 'row', alignItems: "center", flex: 1 }}>
@@ -314,15 +321,15 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         ...Platform.select({
             android: {
-              elevation: 5, // Only for Android
+                elevation: 5, // Only for Android
             },
             ios: {
-              shadowColor: '#000', // Only for iOS
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.3,
-              shadowRadius: 5,
+                shadowColor: '#000', // Only for iOS
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.3,
+                shadowRadius: 5,
             },
-          }),
+        }),
         margin: 2,
         marginBottom: responsiveHeight(2),
         marginRight: 5
