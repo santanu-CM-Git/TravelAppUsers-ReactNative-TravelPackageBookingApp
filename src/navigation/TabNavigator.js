@@ -521,8 +521,6 @@ const getTabBarVisibility = route => {
     return 'none';
   } else if (routeName == 'RefundScreen') {
     return 'none';
-  } else if (routeName == 'PaymentSuccessScreen') {
-    return 'none';
   } else if (routeName == 'MyBookingDetails') {
     return 'none';
   } else if (routeName == 'NearbyTourPlanerList') {
