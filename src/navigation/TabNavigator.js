@@ -46,12 +46,12 @@ const Stack = createNativeStackNavigator();
 
 const HomeStack = ({  }) => {
   const navigation = useNavigation();
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     // Reset to the initial screen (TherapistList) whenever the tab is focused
-  //     navigation.navigate('Home');
-  //   }, [navigation])
-  // );
+  useFocusEffect(
+    React.useCallback(() => {
+      // Reset to the initial screen (TherapistList) whenever the tab is focused
+      navigation.navigate('Home');
+    }, [navigation])
+  );
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -145,12 +145,12 @@ const HomeStack = ({  }) => {
 
 const QuotesStack = ({ route }) => {
   const navigation = useNavigation();
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     // Reset to the initial screen (TherapistList) whenever the tab is focused
-  //     navigation.navigate('QuotesScreen');
-  //   }, [navigation])
-  // );
+  useFocusEffect(
+    React.useCallback(() => {
+      // Reset to the initial screen (TherapistList) whenever the tab is focused
+      navigation.navigate('QuotesScreen');
+    }, [navigation])
+  );
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -170,12 +170,12 @@ const QuotesStack = ({ route }) => {
 
 const MessageStack = ({ route }) => {
   const navigation = useNavigation();
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     // Reset to the initial screen (TherapistList) whenever the tab is focused
-  //     navigation.navigate('ChatListScreen');
-  //   }, [navigation])
-  // );
+  useFocusEffect(
+    React.useCallback(() => {
+      // Reset to the initial screen (TherapistList) whenever the tab is focused
+      navigation.navigate('ChatListScreen');
+    }, [navigation])
+  );
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -195,12 +195,12 @@ const MessageStack = ({ route }) => {
 
 const BookingStack = ({ route }) => {
   const navigation = useNavigation();
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     // Reset to the initial screen (TherapistList) whenever the tab is focused
-  //     navigation.navigate('MyBookingList');
-  //   }, [navigation])
-  // );
+  useFocusEffect(
+    React.useCallback(() => {
+      // Reset to the initial screen (TherapistList) whenever the tab is focused
+      navigation.navigate('MyBookingList');
+    }, [navigation])
+  );
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -226,11 +226,11 @@ const BookingStack = ({ route }) => {
 
 const MenuStack = ({ route }) => {
   const navigation = useNavigation();
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     navigation.navigate('MenuScreen');
-  //   }, [navigation])
-  // );
+  useFocusEffect(
+    React.useCallback(() => {
+      navigation.navigate('MenuScreen');
+    }, [navigation])
+  );
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -349,15 +349,15 @@ const TabNavigator = ({  }) => {
           // Get the current state of the navigator
           const state = navigation.getState();
           
-          // Find the index of the current tab
-          const tabIndex = state.routes.findIndex((r) => r.key === route.key);
+          // Find the index of the tab being pressed
+          const targetTabIndex = state.routes.findIndex((r) => r.name === route.name);
           
           // Check if we're already on this tab
-          const isFocused = state.index === tabIndex;
+          const isFocused = state.index === targetTabIndex;
           
           if (isFocused) {
             // If already on this tab, reset the stack to initial screen
-            const currentRoute = state.routes[tabIndex];
+            const currentRoute = state.routes[targetTabIndex];
             if (currentRoute.state && currentRoute.state.index > 0) {
               // Prevent default behavior
               e.preventDefault();
@@ -368,6 +368,11 @@ const TabNavigator = ({  }) => {
                 routes: [{ name: route.name }],
               });
             }
+          } else {
+            // When switching tabs, explicitly navigate to ensure proper tab switch
+            // This helps when coming from deeply nested screens
+            e.preventDefault();
+            navigation.navigate(route.name);
           }
         },
       })}
