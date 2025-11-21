@@ -279,7 +279,8 @@ export default MenuScreen;
 const styles = StyleSheet.create({
     container: {
         backgroundColor: '#FAFAFA',
-        flex: 1
+        flex: 1,
+        marginBottom: Platform.OS === 'ios' ? -responsiveHeight(3):0,
     },
     wrapper: {
         paddingHorizontal: 10,

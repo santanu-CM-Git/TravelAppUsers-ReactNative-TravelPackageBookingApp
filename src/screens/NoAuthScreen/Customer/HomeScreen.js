@@ -2010,6 +2010,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FAFAFA',
     //paddingTop: responsiveHeight(1),
+    marginBottom: Platform.OS === 'ios' ? -responsiveHeight(3):0,
   },
   homeHeaderView: {
     width: responsiveWidth(100),

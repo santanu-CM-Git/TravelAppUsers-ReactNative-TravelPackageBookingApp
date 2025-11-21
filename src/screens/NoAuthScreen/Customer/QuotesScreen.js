@@ -214,7 +214,8 @@ export default QuotesScreen
 const styles = StyleSheet.create({
     Container: {
         flex: 1,
-        backgroundColor: '#FAFAFA'
+        backgroundColor: '#FAFAFA',
+        marginBottom: Platform.OS === 'ios' ? -responsiveHeight(3):0,
     },
     cardContainer: {
         flexDirection: 'row',
