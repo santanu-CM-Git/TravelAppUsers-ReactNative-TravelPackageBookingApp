@@ -46,12 +46,12 @@ const Stack = createNativeStackNavigator();
 
 const HomeStack = ({  }) => {
   const navigation = useNavigation();
-  useFocusEffect(
-    React.useCallback(() => {
-      // Reset to the initial screen (TherapistList) whenever the tab is focused
-      navigation.navigate('Home');
-    }, [navigation])
-  );
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     // Reset to the initial screen (TherapistList) whenever the tab is focused
+  //     navigation.navigate('Home');
+  //   }, [navigation])
+  // );
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -145,12 +145,12 @@ const HomeStack = ({  }) => {
 
 const QuotesStack = ({ route }) => {
   const navigation = useNavigation();
-  useFocusEffect(
-    React.useCallback(() => {
-      // Reset to the initial screen (TherapistList) whenever the tab is focused
-      navigation.navigate('QuotesScreen');
-    }, [navigation])
-  );
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     // Reset to the initial screen (TherapistList) whenever the tab is focused
+  //     navigation.navigate('QuotesScreen');
+  //   }, [navigation])
+  // );
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -170,12 +170,12 @@ const QuotesStack = ({ route }) => {
 
 const MessageStack = ({ route }) => {
   const navigation = useNavigation();
-  useFocusEffect(
-    React.useCallback(() => {
-      // Reset to the initial screen (TherapistList) whenever the tab is focused
-      navigation.navigate('ChatListScreen');
-    }, [navigation])
-  );
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     // Reset to the initial screen (TherapistList) whenever the tab is focused
+  //     navigation.navigate('ChatListScreen');
+  //   }, [navigation])
+  // );
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -195,12 +195,12 @@ const MessageStack = ({ route }) => {
 
 const BookingStack = ({ route }) => {
   const navigation = useNavigation();
-  useFocusEffect(
-    React.useCallback(() => {
-      // Reset to the initial screen (TherapistList) whenever the tab is focused
-      navigation.navigate('MyBookingList');
-    }, [navigation])
-  );
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     // Reset to the initial screen (TherapistList) whenever the tab is focused
+  //     navigation.navigate('MyBookingList');
+  //   }, [navigation])
+  // );
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -226,11 +226,11 @@ const BookingStack = ({ route }) => {
 
 const MenuStack = ({ route }) => {
   const navigation = useNavigation();
-  useFocusEffect(
-    React.useCallback(() => {
-      navigation.navigate('MenuScreen');
-    }, [navigation])
-  );
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     navigation.navigate('MenuScreen');
+  //   }, [navigation])
+  // );
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -344,6 +344,33 @@ const TabNavigator = ({  }) => {
           paddingBottom: insets.bottom, // Add padding for safe area
         },
       }}
+      screenListeners={({ navigation, route }) => ({
+        tabPress: (e) => {
+          // Get the current state of the navigator
+          const state = navigation.getState();
+          
+          // Find the index of the current tab
+          const tabIndex = state.routes.findIndex((r) => r.key === route.key);
+          
+          // Check if we're already on this tab
+          const isFocused = state.index === tabIndex;
+          
+          if (isFocused) {
+            // If already on this tab, reset the stack to initial screen
+            const currentRoute = state.routes[tabIndex];
+            if (currentRoute.state && currentRoute.state.index > 0) {
+              // Prevent default behavior
+              e.preventDefault();
+              
+              // Reset the stack navigator to initial screen
+              navigation.reset({
+                index: 0,
+                routes: [{ name: route.name }],
+              });
+            }
+          }
+        },
+      })}
     >
       <Tab.Screen
         name="HOME"
