@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import {
+    Platform,
     StyleSheet,
     useWindowDimensions,
 } from 'react-native';
@@ -8,6 +9,7 @@ import CustomHeader from '../../../components/CustomHeader';
 import Loader from '../../../utils/Loader';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { responsiveHeight } from 'react-native-responsive-dimensions';
 
 export default function Termsofuse({  }) {
     const navigation = useNavigation();
@@ -37,7 +39,8 @@ const styles = StyleSheet.create({
     Container: {
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: 10
+        paddingTop: 10,
+        marginBottom: Platform.OS === 'ios' ? -responsiveHeight(3):0,
     },
     webview: {
         flex: 1,
