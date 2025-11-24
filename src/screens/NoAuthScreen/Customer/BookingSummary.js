@@ -261,66 +261,96 @@ const BookingSummary = ({ route }) => {
                 console.log(packageInfo?.agent_id);
                 console.log(totalAmount * 100);
 
+                const options = {
+                    "amount": totalAmount * 100, // Convert to smallest currency unit
+                    "tax": (calculation.packageGST) * 100,
+                    "booking_tax": (calculation.platformFeeGST) * 100,
+                    "booking_charge": calculation.platformFee * 100,
+                    "agent_id": packageInfo?.agent_id,
+                    "currency": 'INR'
+                }
+                console.log(options, 'optionsoptionsoptions')
+                console.log(userToken, 'userTokenuserTokenuserToken')
                 // Step 2: Create an order on the server
-                const response = await axios.post(
-                    `${API_URL}/customer/razorpay-order-create`,
-                    {
-                        "amount": totalAmount * 100, // Convert to smallest currency unit
-                        "tax": (calculation.packageGST) * 100,
-                        "booking_tax": (calculation.platformFeeGST) * 100,
-                        "booking_charge": calculation.platformFee * 100,
-                        "agent_id": packageInfo?.agent_id,
-                        "currency": 'INR'
-                    },
-                    {
-                        headers: {
-                            Accept: 'application/json',
-                            Authorization: `Bearer ${userToken}`, // Add token to headers
-                        },
+                try {
+                    const response = await axios.post(
+                        `${API_URL}/customer/razorpay-order-create`,
+                        options,
+                        {
+                            headers: {
+                                Accept: 'application/json',
+                                Authorization: `Bearer ${userToken}`, // Add token to headers
+                            },
+                        }
+                    );
+
+                    console.log(JSON.stringify(response.data.order.transfers[0].id), 'response from razorpay-order-create')
+
+                    const { id: order_id } = response.data.order; // Assuming the response includes { order_id: 'order_xyz' }
+
+                    console.log(order_id)
+                    console.log(response, 'response.data.responseresponse.data.response')
+                    if (order_id) {
+                        setIsLoading(false)
+                        // Step 3: Open Razorpay Checkout
+                        const options = {
+                            description: 'Group Tour',
+                            image: `https://res.cloudinary.com/dzl5v6ndv/image/upload/v1749474430/gt_icon_JPG_1_1_b29bdc.png`,
+                            currency: 'INR',
+                            key: razorpayKeyId,
+                            amount: totalAmount * 100, // Amount in smallest currency unit
+                            name: bookingDetails?.description,
+                            order_id: order_id, // Use the order ID from the server
+                            prefill: {
+                                contact: formatPhoneForRazorpay(userData?.country_code, userData?.mobile),
+                                name: userData?.full_name,
+                            },
+                            theme: { color: '#FF455C' },
+                        };
+
+                        RazorpayCheckout.open(options)
+                            .then((data) => {
+                                // Payment successful
+                                console.log("razorpay response data", data);
+                                submitForm(data.razorpay_payment_id, order_id, data.razorpay_signature, response.data.order.transfers[0].id);
+                            })
+                            .catch((error) => {
+                                // Payment failed
+                                console.error('Payment failed:', error.description);
+                                navigation.navigate('PaymentFailed', { message: error.description, order_id: order_id, amount: totalAmount });
+                            });
+                    } else {
+                        setIsLoading(false)
+                        Alert.alert('Oops..', 'Order creation failed', [
+                            { text: 'OK', onPress: () => console.log('OK Pressed') },
+                        ]);
                     }
-                );
-
-                console.log(JSON.stringify(response.data.order.transfers[0].id), 'response from razorpay-order-create')
-
-                const { id: order_id } = response.data.order; // Assuming the response includes { order_id: 'order_xyz' }
-
-                console.log(order_id)
-                if (order_id) {
+                } catch (error) {
                     setIsLoading(false)
-                    // Step 3: Open Razorpay Checkout
-                    const options = {
-                        description: 'Group Tour',
-                        image: `https://res.cloudinary.com/dzl5v6ndv/image/upload/v1749474430/gt_icon_JPG_1_1_b29bdc.png`,
-                        currency: 'INR',
-                        key: razorpayKeyId,
-                        amount: totalAmount * 100, // Amount in smallest currency unit
-                        name: bookingDetails?.description,
-                        order_id: order_id, // Use the order ID from the server
-                        prefill: {
-                            contact: formatPhoneForRazorpay(userData?.country_code, userData?.mobile),
-                            name: userData?.full_name,
-                        },
-                        theme: { color: '#FF455C' },
-                    };
-
-                    RazorpayCheckout.open(options)
-                        .then((data) => {
-                            // Payment successful
-                            console.log("razorpay response data", data);
-                            submitForm(data.razorpay_payment_id, order_id, data.razorpay_signature, response.data.order.transfers[0].id);
-                        })
-                        .catch((error) => {
-                            // Payment failed
-                            console.error('Payment failed:', error.description);
-                            navigation.navigate('PaymentFailed', { message: error.description, order_id: order_id, amount: totalAmount });
-                        });
-                } else {
-                    navigation.navigate('PaymentFailed', { message: 'Order creation failed' });
+                    console.error('Error creating razorpay order:', error);
+                    const errorMessage = error.response?.data?.message || 
+                                       error.response?.data?.error || 
+                                       error.message || 
+                                       'Failed to create order. Please try again.';
+                    const statusCode = error.response?.status;
+                    
+                    if (statusCode === 500) {
+                        Alert.alert('Server Error', `Server error occurred: ${errorMessage}`, [
+                            { text: 'OK', onPress: () => console.log('OK Pressed') },
+                        ]);
+                    } else {
+                        Alert.alert('Oops..', errorMessage, [
+                            { text: 'OK', onPress: () => error.response?.data?.message == 'Unauthorized' ? logout() : console.log('OK Pressed') },
+                        ]);
+                    }
                 }
             });
         } catch (error) {
+            setIsLoading(false)
             console.error('Error creating order:', error);
-            navigation.navigate('PaymentFailed', { message: 'Failed to create order' });
+            Alert.alert('Oops..', error.message || 'Failed to create order', [
+                { text: 'OK', onPress: () => console.log('OK Pressed') },
+            ]);
         }
     };
 
