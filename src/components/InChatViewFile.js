@@ -6,7 +6,7 @@ import {
   StyleSheet,
   Text,
 } from 'react-native';
-import Pdf from 'react-native-pdf';
+//import Pdf from 'react-native-pdf';
 
 function InChatViewFile({props, visible, onClose}) {
   const {currentMessage} = props;
@@ -18,7 +18,7 @@ function InChatViewFile({props, visible, onClose}) {
       style={{height: 600}}
     >
       <View style={{padding: 20}}>
-        <Pdf source={{uri: currentMessage.file.url}} style={{height: '100%', width: '100%'}} />
+        {/* <Pdf source={{uri: currentMessage.file.url}} style={{height: '100%', width: '100%'}} /> */}
         <TouchableOpacity onPress={onClose} style={styles.buttonCancel}>
           <Text style={styles.textBtn}>X</Text>
         </TouchableOpacity>
