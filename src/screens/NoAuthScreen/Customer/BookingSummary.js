@@ -328,20 +328,74 @@ const BookingSummary = ({ route }) => {
                 } catch (error) {
                     setIsLoading(false)
                     console.error('Error creating razorpay order:', error);
-                    const errorMessage = error.response?.data?.message || 
-                                       error.response?.data?.error || 
-                                       error.message || 
-                                       'Failed to create order. Please try again.';
-                    const statusCode = error.response?.status;
                     
-                    if (statusCode === 500) {
-                        Alert.alert('Server Error', `Server error occurred: ${errorMessage}`, [
-                            { text: 'OK', onPress: () => console.log('OK Pressed') },
-                        ]);
-                    } else {
-                        Alert.alert('Oops..', errorMessage, [
-                            { text: 'OK', onPress: () => error.response?.data?.message == 'Unauthorized' ? logout() : console.log('OK Pressed') },
-                        ]);
+                    try {
+                        // Safely extract error message
+                        let errorMessage = 'Failed to create order. Please try again.';
+                        let statusCode = null;
+                        
+                        if (error && typeof error === 'object') {
+                            if (error.response) {
+                                statusCode = error.response.status;
+                                if (error.response.data) {
+                                    const data = error.response.data;
+                                    
+                                    // Handle Razorpay nested error structure: data.message.error.description
+                                    if (data.message && typeof data.message === 'object') {
+                                        if (data.message.error && data.message.error.description) {
+                                            errorMessage = data.message.error.description;
+                                        } else if (data.message.error && data.message.error.message) {
+                                            errorMessage = data.message.error.message;
+                                        } else if (typeof data.message === 'string') {
+                                            errorMessage = data.message;
+                                        }
+                                    } else if (typeof data.message === 'string') {
+                                        errorMessage = data.message;
+                                    } else if (data.error) {
+                                        // Handle different error formats
+                                        if (typeof data.error === 'string') {
+                                            errorMessage = data.error;
+                                        } else if (data.error.description) {
+                                            errorMessage = data.error.description;
+                                        } else if (data.error.message) {
+                                            errorMessage = data.error.message;
+                                        }
+                                    }
+                                }
+                            } else if (error.message) {
+                                errorMessage = error.message;
+                            }
+                        } else if (typeof error === 'string') {
+                            errorMessage = error;
+                        }
+                        
+                        // Ensure errorMessage is a string
+                        errorMessage = String(errorMessage || 'Failed to create order. Please try again.');
+                        
+                        if (statusCode === 500) {
+                            Alert.alert('Server Error', `Server error occurred: ${errorMessage}`, [
+                                { text: 'OK', onPress: () => console.log('OK Pressed') },
+                            ]);
+                        } else if (statusCode === 400) {
+                            Alert.alert('Oops..', errorMessage, [
+                                { text: 'OK', onPress: () => console.log('OK Pressed') }, 
+                            ]);
+                        } else {
+                            const isUnauthorized = error?.response?.data?.message === 'Unauthorized';
+                            Alert.alert('Oops..', errorMessage, [
+                                { text: 'OK', onPress: () => isUnauthorized ? logout() : console.log('OK Pressed') },
+                            ]);
+                        }
+                    } catch (alertError) {
+                        // If Alert itself fails, at least log the error
+                        console.error('Error showing alert:', alertError);
+                        console.error('Original error:', error);
+                        // Fallback: try to show a simple alert
+                        try {
+                            Alert.alert('Error', 'An error occurred while processing your payment. Please try again.');
+                        } catch (fallbackError) {
+                            console.error('Fallback alert also failed:', fallbackError);
+                        }
                     }
                 }
             });
