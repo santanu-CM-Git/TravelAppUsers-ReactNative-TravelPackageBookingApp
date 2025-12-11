@@ -227,10 +227,26 @@ const ProfileEditScreen = ({ route }) => {
         Alert.alert('Error', "Failed to update profile");
       }
     })
-    .catch(e => {
+    .catch(error => {
       setIsLoading(false);
-      console.log('Profile update error:', e);
-      Alert.alert('Error', "Failed to update profile");
+      console.log(`user update error ${error}`)
+      if (error.response?.data?.errors) {
+        // Handle validation errors
+        const errors = error.response.data.errors;
+        Object.keys(errors).forEach(key => {
+          Toast.show({
+            type: 'error',
+            text1: 'Validation Error',
+            text2: errors[key][0]
+          });
+        });
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: error.response?.data?.message || 'Something went wrong'
+        });
+      }
     });
   }
 
