@@ -109,16 +109,18 @@ export default function InputField({
           placeholderTextColor="#808080"
         />
       ) : inputType == 'coupon' ? (
-        <TextInput
-          style={styles.editinputforCupon}
-          onChangeText={onChangeText}
-          value={value}
-          placeholder={label}
-          keyboardType={keyboardType}
-          editable={inputType == 'nonedit' ? false : true}
-          multiline={inputFieldType == 'address' ? true : false}
-          placeholderTextColor="#808080"
-        />
+        <View style={styles.couponContainer}>
+          <TextInput
+            style={styles.editinputforCupon}
+            onChangeText={onChangeText}
+            value={value}
+            placeholder={label}
+            keyboardType={keyboardType}
+            editable={inputType == 'nonedit' ? false : true}
+            multiline={inputFieldType == 'address' ? true : false}
+            placeholderTextColor="#808080"
+          />
+        </View>
       ) : (
         <MTextInput
           variant="outlined"
@@ -239,6 +241,10 @@ const styles = StyleSheet.create({
     width: responsiveWidth(70),
     height: responsiveHeight(6),
   },
+  couponContainer: {
+    flex: 1,
+    marginBottom: 0,
+  },
   editinputforCupon: {
     color: '#808080',
     fontFamily: 'Poppins-Regular',
@@ -249,7 +255,7 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
     borderWidth: 1,
     borderRadius: 8,
-    width: responsiveWidth(83),
+    width: '100%',
     height: responsiveHeight(6),
   }
 

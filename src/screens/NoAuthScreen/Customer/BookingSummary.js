@@ -874,17 +874,19 @@ const styles = StyleSheet.create({
     couponText: { color: '#2D2D2D', fontFamily: 'Poppins-Bold', fontSize: responsiveFontSize(1.7), marginLeft: responsiveWidth(1) },
     couponInputContainer: {
         flexDirection: 'row',
-        alignItems: 'flex-start',
+        alignItems: 'center',
         marginTop: responsiveHeight(1),
     },
     couponInputWrapper: {
         flex: 1,
         marginRight: 10,
+        minWidth: 0,
     },
     callCouponButton: {
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 15,
+        alignSelf: 'flex-start',
         ...Platform.select({
             ios: {
                 paddingVertical: 13,
