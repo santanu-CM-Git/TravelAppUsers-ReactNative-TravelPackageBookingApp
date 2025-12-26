@@ -125,6 +125,16 @@ export default function HomeScreen() {
   const MIN_KIDS_PASSENGERS = 0;
   const MAX_KIDS_PASSENGERS = 100;
 
+  // Maximum date for request quote (5 years from current year - end of 5th year)
+  const MAX_QUOTE_DATE = useMemo(() => {
+    const maxDate = new Date();
+    const currentYear = maxDate.getFullYear();
+    // Set to December 31st of the 5th year from now
+    maxDate.setFullYear(currentYear + 5, 11, 31); // Month 11 = December, day 31
+    maxDate.setHours(23, 59, 59, 999); // Set to end of day
+    return maxDate;
+  }, []);
+
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
   const [locationName, setLocationName] = useState('');
@@ -1612,6 +1622,8 @@ export default function HomeScreen() {
                       mode="date"
                       display="default"
                       onChange={onChangeFromDate}
+                      minimumDate={new Date()}
+                      maximumDate={MAX_QUOTE_DATE}
                     />
                   )}
                 </View>
@@ -1648,6 +1660,7 @@ export default function HomeScreen() {
                       display="default"
                       onChange={onChangeToDate}
                       minimumDate={fromDate} // Only allow dates after the selected From Date
+                      maximumDate={MAX_QUOTE_DATE}
                     />
                   )}
                 </View>
@@ -2066,6 +2079,7 @@ export default function HomeScreen() {
             visible={showIOSFromDatePicker}
             date={fromDate}
             minimumDate={new Date()}
+            maximumDate={MAX_QUOTE_DATE}
             onConfirm={handleIOSFromDateConfirm}
             onCancel={() => setShowIOSFromDatePicker(false)}
             mode="date"
@@ -2074,6 +2088,7 @@ export default function HomeScreen() {
             visible={showIOSToDatePicker}
             date={toDate}
             minimumDate={fromDate} // Only allow dates after the selected From Date
+            maximumDate={MAX_QUOTE_DATE}
             onConfirm={handleIOSToDateConfirm}
             onCancel={() => setShowIOSToDatePicker(false)}
             mode="date"

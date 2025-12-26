@@ -41,7 +41,15 @@ const IOSDatePickerModal = ({
   const [tempDate, setTempDate] = useState(date);
 
   const handleConfirm = () => {
-    onConfirm(tempDate);
+    // Ensure the date is within bounds before confirming
+    let finalDate = tempDate;
+    if (minimumDate && finalDate < minimumDate) {
+      finalDate = minimumDate;
+    }
+    if (maximumDate && finalDate > maximumDate) {
+      finalDate = maximumDate;
+    }
+    onConfirm(finalDate);
   };
 
   const handleCancel = () => {
@@ -51,14 +59,46 @@ const IOSDatePickerModal = ({
 
   const handleDateChange = (event, selectedDate) => {
     if (selectedDate) {
-      setTempDate(selectedDate);
+      // Clamp the date to be within minimum and maximum bounds
+      let clampedDate = selectedDate;
+      if (minimumDate && clampedDate < minimumDate) {
+        clampedDate = minimumDate;
+      }
+      if (maximumDate && clampedDate > maximumDate) {
+        clampedDate = maximumDate;
+      }
+      setTempDate(clampedDate);
     }
   };
 
-  // Update tempDate when date prop changes
+  // Update tempDate when date prop changes and clamp it to bounds
   React.useEffect(() => {
-    setTempDate(date);
-  }, [date]);
+    let clampedDate = date;
+    if (minimumDate && clampedDate < minimumDate) {
+      clampedDate = minimumDate;
+    }
+    if (maximumDate && clampedDate > maximumDate) {
+      clampedDate = maximumDate;
+    }
+    setTempDate(clampedDate);
+  }, [date, minimumDate, maximumDate]);
+
+  // Clamp tempDate when modal becomes visible to ensure it's within bounds
+  React.useEffect(() => {
+    if (visible) {
+      let clampedDate = tempDate;
+      if (minimumDate && clampedDate < minimumDate) {
+        clampedDate = minimumDate;
+      }
+      if (maximumDate && clampedDate > maximumDate) {
+        clampedDate = maximumDate;
+      }
+      if (clampedDate.getTime() !== tempDate.getTime()) {
+        setTempDate(clampedDate);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
 
   if (Platform.OS !== 'ios') {
     // For Android, you can return null or use a different implementation
