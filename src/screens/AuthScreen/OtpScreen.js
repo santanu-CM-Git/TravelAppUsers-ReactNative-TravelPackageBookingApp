@@ -156,7 +156,7 @@ const OtpScreen = ({ route }) => {
                     setIsLoading(false)
                     console.log(`user login error ${e}`)
                     console.log(e.response)
-                    Alert.alert('Oops..', e.response?.data?.message, [
+                    Alert.alert('Oops..', e.response?.data?.message || "Something went wrong. Please try again.", [
                         {
                             text: 'Cancel',
                             onPress: () => console.log('Cancel Pressed'),
