@@ -788,6 +788,7 @@ const BookingSummary = ({ route }) => {
                             value={toggleCheckBox}
                             onValueChange={(newValue) => setToggleCheckBox(newValue)}
                             tintColors={{ true: '#FF455C', false: '#444343' }}
+                            style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
                         />
                     </View>
                     <Text style={styles.termsText}>
