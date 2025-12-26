@@ -119,20 +119,28 @@ const PersonalInformation = ({ navigation, route }) => {
 
 
   const changeFirstname = (text) => {
-    setFirstname(text)
-    if (text) {
-      setFirstNameError('')
+    if (text.length <= 30) {
+      setFirstname(text)
+      if (text) {
+        setFirstNameError('')
+      } else {
+        setFirstNameError('Please enter First name.')
+      }
     } else {
-      setFirstNameError('Please enter First name.')
+      setFirstNameError('First name must be 30 characters or less.')
     }
   }
 
   const changeLastname = (text) => {
-    setLastname(text)
-    if (text) {
-      setLastnameError('')
+    if (text.length <= 30) {
+      setLastname(text)
+      if (text) {
+        setLastnameError('')
+      } else {
+        setLastnameError('Please enter Last name.')
+      }
     } else {
-      setLastnameError('Please enter Last name.')
+      setLastnameError('Last name must be 30 characters or less.')
     }
   }
 
@@ -389,6 +397,7 @@ const PersonalInformation = ({ navigation, route }) => {
                 //helperText={'Please enter lastname'}
                 inputType={'others'}
                 onChangeText={(text) => changeFirstname(text)}
+                maxLength={30}
               />
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -404,6 +413,7 @@ const PersonalInformation = ({ navigation, route }) => {
                 //helperText={'Please enter lastname'}
                 inputType={'others'}
                 onChangeText={(text) => changeLastname(text)}
+                maxLength={30}
               />
             </View>
 

@@ -149,20 +149,28 @@ const ProfileEditScreen = ({ route }) => {
   };
 
   const changeFirstname = (text) => {
-    setFirstname(text);
-    if (text) {
-      setFirstNameError('');
+    if (text.length <= 30) {
+      setFirstname(text);
+      if (text) {
+        setFirstNameError('');
+      } else {
+        setFirstNameError('Please enter first name.');
+      }
     } else {
-      setFirstNameError('Please enter first name.');
+      setFirstNameError('First name must be 30 characters or less.');
     }
   };
 
   const changeLastname = (text) => {
-    setLastname(text);
-    if (text) {
-      setLastNameError('');
+    if (text.length <= 30) {
+      setLastname(text);
+      if (text) {
+        setLastNameError('');
+      } else {
+        setLastNameError('Please enter last name.');
+      }
     } else {
-      setLastNameError('Please enter last name.');
+      setLastNameError('Last name must be 30 characters or less.');
     }
   };
 
@@ -390,6 +398,7 @@ const ProfileEditScreen = ({ route }) => {
                 value={firstname}
                 inputType={'others'}
                 onChangeText={(text) => changeFirstname(text)}
+                maxLength={30}
               />
             </View>
 
@@ -405,6 +414,7 @@ const ProfileEditScreen = ({ route }) => {
                 value={lastname}
                 inputType={'others'}
                 onChangeText={(text) => changeLastname(text)}
+                maxLength={30}
               />
             </View>
 
