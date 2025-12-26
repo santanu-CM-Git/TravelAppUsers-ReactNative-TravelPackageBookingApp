@@ -126,6 +126,15 @@ export default function MyBookingDetails({ route }) {
     }, []);
 
     const toggleFilterModal = () => {
+        // Prevent opening modal for single person bookings
+        if (isSinglePersonBooking) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Co-travelers cannot be added for single person bookings'
+            });
+            return;
+        }
         setFilterModalVisible(!isFilterModalVisible);
     };
 
@@ -218,6 +227,16 @@ export default function MyBookingDetails({ route }) {
     }
 
     const submitForFilter = async () => {
+        // Prevent adding co-travelers for single person bookings
+        if (isSinglePersonBooking) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Co-travelers cannot be added for single person bookings'
+            });
+            return;
+        }
+
         if (!phoneno) {
             setphoneError('Please enter phone no');
             return;
@@ -405,6 +424,12 @@ export default function MyBookingDetails({ route }) {
         return currentDate.isAfter(endDate, 'day');
     }, [bookingData?.end_date]);
 
+    // Check if booking is for single person
+    const isSinglePersonBooking = useMemo(() => {
+        const totalSlots = Number(bookingData?.adult || 0) + Number(bookingData?.children || 0);
+        return totalSlots === 1;
+    }, [bookingData?.adult, bookingData?.children]);
+
     useFocusEffect(
         useCallback(() => {
             const backAction = () => {
@@ -530,14 +555,14 @@ export default function MyBookingDetails({ route }) {
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: responsiveHeight(1) }}>
                         <Text style={styles.productText3}>Co Traveler</Text>
                         <TouchableOpacity 
-                            onPress={() => !isBookingExpired && toggleFilterModal()}
-                            disabled={isBookingExpired}
-                            style={[styles.addNewButtonContainer, isBookingExpired && styles.disabledButtonContainer]}
+                            onPress={() => !isBookingExpired && !isSinglePersonBooking && toggleFilterModal()}
+                            disabled={isBookingExpired || isSinglePersonBooking}
+                            style={[styles.addNewButtonContainer, (isBookingExpired || isSinglePersonBooking) && styles.disabledButtonContainer]}
                         >
                             {bookingData?.status === 'rejected' || bookingData?.status === 'cancelled' ? null :
                             <Image
                                 source={addnewImg}
-                                style={[styles.addnewIcon, isBookingExpired && styles.disabledAddnewIcon]}
+                                style={[styles.addnewIcon, (isBookingExpired || isSinglePersonBooking) && styles.disabledAddnewIcon]}
                             />}
                         </TouchableOpacity>
                     </View>
