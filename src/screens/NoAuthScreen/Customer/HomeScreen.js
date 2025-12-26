@@ -118,6 +118,12 @@ export default function HomeScreen() {
 
   const [adultPassengers, setAdultPassengers] = useState("");
   const [kidsPassengers, setKidsPassengers] = useState("");
+  
+  // Passenger limits
+  const MIN_ADULT_PASSENGERS = 1;
+  const MAX_ADULT_PASSENGERS = 100;
+  const MIN_KIDS_PASSENGERS = 0;
+  const MAX_KIDS_PASSENGERS = 100;
 
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
@@ -237,6 +243,59 @@ export default function HomeScreen() {
   const handleIOSToDateConfirm = useCallback((selectedDate) => {
     setToDate(selectedDate);
     setShowIOSToDatePicker(false);
+  }, []);
+
+  // Validation handlers for passenger inputs
+  const handleAdultPassengersChange = useCallback((text) => {
+    // Allow empty string for clearing
+    if (text === '') {
+      setAdultPassengers('');
+      return;
+    }
+    
+    // Only allow numeric input
+    const numericValue = text.replace(/[^0-9]/g, '');
+    if (numericValue === '') {
+      setAdultPassengers('');
+      return;
+    }
+    
+    const numValue = parseInt(numericValue, 10);
+    
+    // Enforce min/max limits
+    if (numValue < MIN_ADULT_PASSENGERS) {
+      setAdultPassengers(MIN_ADULT_PASSENGERS.toString());
+    } else if (numValue > MAX_ADULT_PASSENGERS) {
+      setAdultPassengers(MAX_ADULT_PASSENGERS.toString());
+    } else {
+      setAdultPassengers(numericValue);
+    }
+  }, []);
+
+  const handleKidsPassengersChange = useCallback((text) => {
+    // Allow empty string for clearing
+    if (text === '') {
+      setKidsPassengers('');
+      return;
+    }
+    
+    // Only allow numeric input
+    const numericValue = text.replace(/[^0-9]/g, '');
+    if (numericValue === '') {
+      setKidsPassengers('');
+      return;
+    }
+    
+    const numValue = parseInt(numericValue, 10);
+    
+    // Enforce min/max limits
+    if (numValue < MIN_KIDS_PASSENGERS) {
+      setKidsPassengers(MIN_KIDS_PASSENGERS.toString());
+    } else if (numValue > MAX_KIDS_PASSENGERS) {
+      setKidsPassengers(MAX_KIDS_PASSENGERS.toString());
+    } else {
+      setKidsPassengers(numericValue);
+    }
   }, []);
 
 
@@ -1098,7 +1157,22 @@ export default function HomeScreen() {
       }
 
       if (!adultPassengers) {
-        Alert.alert('Error', 'Please enter number of passengers');
+        Alert.alert('Error', 'Please enter number of adult passengers');
+        return;
+      }
+
+      const adultCount = parseInt(adultPassengers, 10);
+      const kidsCount = kidsPassengers ? parseInt(kidsPassengers, 10) : 0;
+
+      // Validate adult passengers limits
+      if (adultCount < MIN_ADULT_PASSENGERS || adultCount > MAX_ADULT_PASSENGERS) {
+        Alert.alert('Error', `Adult passengers must be between ${MIN_ADULT_PASSENGERS} and ${MAX_ADULT_PASSENGERS}`);
+        return;
+      }
+
+      // Validate kids passengers limits
+      if (kidsCount < MIN_KIDS_PASSENGERS || kidsCount > MAX_KIDS_PASSENGERS) {
+        Alert.alert('Error', `Kids passengers must be between ${MIN_KIDS_PASSENGERS} and ${MAX_KIDS_PASSENGERS}`);
         return;
       }
 
@@ -1109,8 +1183,8 @@ export default function HomeScreen() {
         location_id: locationId,
         sdate: moment(fromDate).format('YYYY-MM-DD'),
         edate: moment(toDate).format('YYYY-MM-DD'),
-        edults: parseInt(adultPassengers),
-        kids: kidsPassengers ? parseInt(kidsPassengers) : 0,
+        edults: adultCount,
+        kids: kidsCount,
       };
 
       const usertoken = await AsyncStorage.getItem('userToken');
@@ -1599,10 +1673,13 @@ export default function HomeScreen() {
                   placeholder="Enter total adults"
                   keyboardType="numeric"
                   value={adultPassengers}
-                  onChangeText={setAdultPassengers}
+                  onChangeText={handleAdultPassengersChange}
                   placeholderTextColor="#767676"
                 />
               </View>
+              <Text style={styles.helperText}>
+                Min: {MIN_ADULT_PASSENGERS} | Max: {MAX_ADULT_PASSENGERS}
+              </Text>
 
               {/* Total Kids Passengers Input */}
               <Text style={styles.textinputHeader}>Total Kids Passengers</Text>
@@ -1625,10 +1702,13 @@ export default function HomeScreen() {
                   placeholder="Enter total kids"
                   keyboardType="numeric"
                   value={kidsPassengers}
-                  onChangeText={setKidsPassengers}
+                  onChangeText={handleKidsPassengersChange}
                   placeholderTextColor="#767676"
                 />
               </View>
+              <Text style={styles.helperText}>
+                Min: {MIN_KIDS_PASSENGERS} | Max: {MAX_KIDS_PASSENGERS}
+              </Text>
             </View>
 
 
@@ -2422,6 +2502,14 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Medium',
     marginBottom: 5,
     marginTop: 10
+  },
+  helperText: {
+    fontSize: responsiveFontSize(1.3),
+    color: '#767676',
+    fontFamily: 'Poppins-Regular',
+    marginTop: 3,
+    marginLeft: 5,
+    marginBottom: 5
   },
 
   topLocationScrollView: {
