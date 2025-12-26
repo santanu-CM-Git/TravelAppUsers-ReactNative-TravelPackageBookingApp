@@ -534,16 +534,8 @@ const ChatScreen = ({ route }) => {
         // Don't throw here as the message was already sent to Firestore
       }
 
-      // Update local state with the correct user ID
-      const localMessage = {
-        ...message,
-        user: {
-          _id: userId,
-          name: userName || 'User',
-          avatar: userProfilePic
-        }
-      };
-      setMessages(previousMessages => GiftedChat.append(previousMessages, [localMessage]));
+      // Note: Don't update local state here - the Firestore listener will handle it
+      // This prevents duplicate messages from appearing
     } catch (error) {
       console.error('Error sending message:', error);
       Alert.alert('Error', error.message || 'Failed to send message. Please try again.');
@@ -1267,8 +1259,8 @@ const ChatScreen = ({ route }) => {
         .add(firestoreData);
 
       console.log('Message stored in Firestore');
-      // Update local state for immediate UI update
-      setMessages(previousMessages => GiftedChat.append(previousMessages, [messageData]));
+      // Note: Don't update local state here - the Firestore listener will handle it
+      // This prevents duplicate messages from appearing
       // Call message-send API
       try {
         const userToken = await AsyncStorage.getItem('userToken');
@@ -1392,8 +1384,8 @@ const ChatScreen = ({ route }) => {
         .add(firestoreData);
 
       console.log('Image message stored in Firestore');
-      // Update local state for immediate UI update
-      setMessages(previousMessages => GiftedChat.append(previousMessages, [messageData]));
+      // Note: Don't update local state here - the Firestore listener will handle it
+      // This prevents duplicate messages from appearing
       // Call message-send API
       try {
         const userToken = await AsyncStorage.getItem('userToken');
