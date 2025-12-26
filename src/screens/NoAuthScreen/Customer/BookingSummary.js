@@ -668,7 +668,13 @@ const BookingSummary = ({ route }) => {
     };
 
     const getCancellationTimeLabel = (condition) => {
+        if (condition === null || condition === undefined || condition === '') {
+            return 'N/A';
+        }
         const days = parseInt(condition, 10);
+        if (isNaN(days)) {
+            return 'N/A';
+        }
         if (days === 0) return 'On the Day of Travel';
         if (days === 1) return '1 Day Before Travel';
         return `${days} Days Before Travel`;
@@ -763,23 +769,40 @@ const BookingSummary = ({ route }) => {
                     <Text style={styles.productText3}>Cancellation Policy</Text>
                 </View>
                 <View style={[styles.cancelContainer, { marginBottom: responsiveHeight(5) }]}>
-                    {/* Table Header */}
-                    <View style={[styles.cancelRow, styles.cancelHeader]}>
-                        <Text style={[styles.cancelText, styles.cancelBold]}>Time Of Cancellation</Text>
-                        <Text style={[styles.cancelText, styles.cancelBold]}>Refund Percentage</Text>
-                    </View>
-
-                    {packageInfo?.refund.map((item, index) => {
-                        const isNonRefundable = item.refund === "0";
-                        return (
-                            <View key={index} style={styles.cancelRow}>
-                                <Text style={styles.cancelText}>{getCancellationTimeLabel(item.condition)}</Text>
-                                <Text style={[styles.cancelText, isNonRefundable && styles.cancelGreyText]}>
-                                    {isNonRefundable ? 'Non Refundable' : `${item.refund} %`}
-                                </Text>
+                    {packageInfo?.refund && Array.isArray(packageInfo.refund) && packageInfo.refund.length > 0 ? (
+                        <>
+                            {/* Table Header */}
+                            <View style={[styles.cancelRow, styles.cancelHeader]}>
+                                <Text style={[styles.cancelText, styles.cancelBold]}>Time Of Cancellation</Text>
+                                <Text style={[styles.cancelText, styles.cancelBold]}>Refund Percentage</Text>
                             </View>
-                        );
-                    })}
+
+                            {packageInfo.refund.map((item, index) => {
+                                if (!item) return null;
+                                
+                                const refundValue = item.refund;
+                                const isNonRefundable = refundValue === "0" || refundValue === 0 || refundValue === null || refundValue === undefined;
+                                const refundText = isNonRefundable 
+                                    ? 'Non Refundable' 
+                                    : (refundValue !== null && refundValue !== undefined && !isNaN(parseFloat(refundValue)))
+                                        ? `${refundValue} %`
+                                        : 'N/A';
+                                
+                                return (
+                                    <View key={index} style={styles.cancelRow}>
+                                        <Text style={styles.cancelText}>{getCancellationTimeLabel(item.condition)}</Text>
+                                        <Text style={[styles.cancelText, isNonRefundable && styles.cancelGreyText]}>
+                                            {refundText}
+                                        </Text>
+                                    </View>
+                                );
+                            })}
+                        </>
+                    ) : (
+                        <View style={styles.cancelRow}>
+                            <Text style={styles.cancelText}>No cancellation policy configured</Text>
+                        </View>
+                    )}
                 </View>
                 <View style={styles.termsView}>
                     <View style={styles.checkboxContainer}>
