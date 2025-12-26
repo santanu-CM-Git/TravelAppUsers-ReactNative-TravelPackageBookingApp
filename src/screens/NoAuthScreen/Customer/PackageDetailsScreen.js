@@ -570,7 +570,7 @@ export default function PackageDetailsScreen({ route }) {
                         {packageInfo?.date_type == 0 ? (
                             <Text style={styles.packageAvlTextMain}>{moment(packageInfo?.start_date).format('DD MMMM YYYY')}</Text>
                         ) : (
-                            <Text style={styles.packageAvlTextMain}>Package Expire at {moment(packageInfo?.end_date).format("DD MMMM YYYY")}</Text>
+                            <Text style={styles.packageAvlTextMain}>Package expires at {moment(packageInfo?.end_date).format("DD MMMM YYYY")}</Text>
                         )}
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                             <Image
