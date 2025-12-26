@@ -846,6 +846,7 @@ export default function PackageDetailsScreen({ route }) {
                                                     minimumDate={new Date(packageInfo?.start_date)}
                                                     maximumDate={new Date(packageInfo?.end_date)}
                                                     style={{ height: 200 }}
+                                                    textColor="#2D2D2D"
                                                 />
                                             )}
                                         </View>
