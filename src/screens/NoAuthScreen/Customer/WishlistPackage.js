@@ -134,7 +134,7 @@ export default function WishlistPackage({ route }) {
 
             if (response.data.response) {
                 // Remove the package from the wishlist
-                setWishlistPackages(prevList => 
+                setWishlistPackages(prevList =>
                     prevList.filter(item => item.id !== packageId)
                 );
             }
@@ -177,7 +177,7 @@ export default function WishlistPackage({ route }) {
     return (
         <SafeAreaView style={styles.Container}>
             <CustomHeader commingFrom={'Wishlist Packages'} onPress={() => navigation.goBack()} title={'Wishlist Packages'} />
-            <View style={{ margin: 1, paddingHorizontal: 10,marginBottom: responsiveHeight(5) }}>
+            <View style={{ margin: 1, paddingHorizontal: 10, marginBottom: responsiveHeight(5) }}>
                 <View style={styles.productSection}>
                     <FlatList
                         data={wishlistPackages}
@@ -200,7 +200,11 @@ export default function WishlistPackage({ route }) {
                                         </View>
                                         <Text style={styles.travelerText}>{item?.package?.agent?.name}</Text>
                                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', }}>
-                                            <Text style={styles.addressText}>Slots : {item?.package?.seat_slots - item?.package?.booked_slots}</Text>
+                                            {item?.package?.date_type == 0 ?
+                                                <Text style={styles.addressText}>Slots : {item?.package?.seat_slots - item?.package?.booked_slots}</Text>
+                                                :
+                                                null
+                                            }
                                             <Text style={styles.priceText2}>₹{formatNumber(item?.package?.discounted_price)}</Text>
                                         </View>
                                         <View
@@ -211,14 +215,30 @@ export default function WishlistPackage({ route }) {
                                             }}
                                         />
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <Text style={styles.packageAvlText}>{moment(item?.package?.end_date).diff(moment(item?.package?.start_date), 'days')} Days {moment(item?.package?.end_date).diff(moment(item?.package?.start_date), 'days') - 1} Nights</Text>
-                                            <View style={styles.rateingView}>
-                                                <Image
-                                                    source={starImg}
-                                                    style={[styles.staricon, { marginTop: -5 }]}
-                                                />
-                                                <Text style={styles.ratingText}>{item?.package?.rating || '0'}</Text>
-                                            </View>
+                                            {/* <Text style={styles.packageAvlText}>{moment(item?.package?.end_date).diff(moment(item?.package?.start_date), 'days')} Days {moment(item?.package?.end_date).diff(moment(item?.package?.start_date), 'days') - 1} Nights</Text> */}
+                                            {item?.package?.date_type == 0 ?
+                                                <Text style={styles.packageAvlText}>
+                                                    {(() => {
+                                                        const start = moment(item?.package?.start_date);
+                                                        const end = moment(item?.package?.end_date);
+                                                        const days = end.diff(start, 'days') + 1;
+                                                        const nights = days > 0 ? days - 1 : 0;
+                                                        return `${days} Days ${nights} Nights`;
+                                                    })()}
+                                                </Text> :
+                                                <Text style={styles.packageAvlText}>
+                                                    {item?.package?.itinerary.length} Days {item?.package?.itinerary.length - 1} Nights
+                                                </Text>
+                                            }
+                                            {item?.package?.rating != null && item?.package?.rating != undefined && item?.package?.rating != 0 && (
+                                                <View style={styles.rateingView}>
+                                                    <Image
+                                                        source={starImg}
+                                                        style={[styles.staricon, { marginTop: -5 }]}
+                                                    />
+                                                    <Text style={styles.ratingText}>{item?.package?.rating || '0'}</Text>
+                                                </View>
+                                            )}
                                         </View>
                                     </View>
                                     <TouchableOpacity
@@ -234,12 +254,13 @@ export default function WishlistPackage({ route }) {
                                             tintColor="#FF455C"
                                         />
                                     </TouchableOpacity>
+                                    {item?.package?.date_type == 0 ?
                                     <View style={styles.tagTextView4}>
                                         <View style={styles.dateContainer}>
                                             <Image source={calendarImg} tintColor={'#FFFFFF'} style={[styles.timeimage, { marginRight: 5 }]} />
                                             <Text style={styles.dateText}>{moment(item?.package?.start_date).format('DD MMM YYYY')}</Text>
                                         </View>
-                                    </View>
+                                    </View>:null}
                                 </View>
                             </TouchableWithoutFeedback>
                         )}
@@ -427,7 +448,7 @@ const styles = StyleSheet.create({
     /* tab section */
     productSection: {
         marginTop: responsiveHeight(0),
-        alignSelf:'center',
+        alignSelf: 'center',
         //marginLeft: 20
     },
     //product section
@@ -447,15 +468,15 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         ...Platform.select({
             android: {
-              elevation: 5, // Only for Android
+                elevation: 5, // Only for Android
             },
             ios: {
-              shadowColor: '#000', // Only for iOS
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.3,
-              shadowRadius: 5,
+                shadowColor: '#000', // Only for iOS
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.3,
+                shadowRadius: 5,
             },
-          }),
+        }),
         margin: 2,
         marginBottom: responsiveHeight(2),
         marginRight: 5
@@ -557,15 +578,15 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         ...Platform.select({
             android: {
-              elevation: 5, // Only for Android
+                elevation: 5, // Only for Android
             },
             ios: {
-              shadowColor: '#000', // Only for iOS
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.3,
-              shadowRadius: 5,
+                shadowColor: '#000', // Only for iOS
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.3,
+                shadowRadius: 5,
             },
-          }),
+        }),
         marginBottom: 10,
     },
     header2: {
