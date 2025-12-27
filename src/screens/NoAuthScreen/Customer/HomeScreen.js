@@ -1505,12 +1505,14 @@ export default function HomeScreen() {
             windowSize={5}
           />
         </View>
+        {destinationsData.length > 0 ? (
         <View style={styles.sectionHeaderView}>
           <Text style={styles.sectionHeaderText}>Top location</Text>
           <TouchableOpacity onPress={() => navigation.navigate('TopLocationScreen')}>
             <Text style={styles.seeallText}>View All</Text>
           </TouchableOpacity>
         </View>
+        ) : null}
         {destinationsData.length > 0 ? (
           <FlatList
             data={destinationsData}
@@ -1525,9 +1527,7 @@ export default function HomeScreen() {
             windowSize={5}
           />
         ) : (
-          <View style={styles.noLocationContainer}>
-            <Text style={styles.noLocationText}>No location found</Text>
-          </View>
+          null
         )}
         <View style={styles.sectionHeaderView}>
           <Text style={styles.sectionHeaderText}>Request for quote</Text>
