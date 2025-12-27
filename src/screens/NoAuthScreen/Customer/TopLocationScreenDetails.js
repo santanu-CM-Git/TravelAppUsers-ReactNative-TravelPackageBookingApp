@@ -604,17 +604,19 @@ export default function TopLocationScreenDetails({ route }) {
                     </View>
 
                     {/* Filter Button with Badge */}
-                    <TouchableOpacity style={styles.filterButton} onPress={() => toggleFilterModal()}>
-                        <Image
-                            source={filterImg}
-                            style={[styles.filterIcon]}
-                        />
-                        {getActiveFiltersCount() > 0 && (
-                            <View style={styles.filterBadge}>
-                                <Text style={styles.filterBadgeText}>{getActiveFiltersCount()}</Text>
-                            </View>
-                        )}
-                    </TouchableOpacity>
+                    {locationList && locationList.length > 0 && (
+                        <TouchableOpacity style={styles.filterButton} onPress={() => toggleFilterModal()}>
+                            <Image
+                                source={filterImg}
+                                style={[styles.filterIcon]}
+                            />
+                            {getActiveFiltersCount() > 0 && (
+                                <View style={styles.filterBadge}>
+                                    <Text style={styles.filterBadgeText}>{getActiveFiltersCount()}</Text>
+                                </View>
+                            )}
+                        </TouchableOpacity>
+                    )}
                 </ImageBackground>
                 <FlatList
                     data={locationList}

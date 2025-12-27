@@ -52,15 +52,11 @@ export default function WishlistPackage({ route }) {
     const [isLoading, setIsLoading] = useState(false);
     const [wishlistPackages, setWishlistPackages] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
-    const [hasMore, setHasMore] = useState(true);
-    const [page, setPage] = useState(1);
     const { logout } = useContext(AuthContext);
 
-    const fetchWishlistPackages = async (pageNum = 1, isRefresh = false) => {
+    const fetchWishlistPackages = async () => {
         try {
-            if (pageNum === 1) {
-                setIsLoading(true);
-            }
+            setIsLoading(true);
             const usertoken = await AsyncStorage.getItem('userToken');
             if (!usertoken) {
                 Alert.alert('Error', 'Please login to view wishlist');
@@ -71,9 +67,6 @@ export default function WishlistPackage({ route }) {
                 `${API_URL}/customer/wishlist`,
                 {},
                 {
-                    params: {
-                        page: pageNum,
-                    },
                     headers: {
                         'Accept': 'application/json',
                         'Authorization': `Bearer ${usertoken}`,
@@ -82,14 +75,9 @@ export default function WishlistPackage({ route }) {
             );
 
             if (response.data.response == true) {
-                const newData = response.data.data.data;
+                const newData = response.data.data;
                 console.log(newData, 'new wishlisted data');
-                if (isRefresh) {
-                    setWishlistPackages(newData);
-                } else {
-                    setWishlistPackages(prevData => [...prevData, ...newData]);
-                }
-                setHasMore(newData.length > 0);
+                setWishlistPackages(newData);
             }
         } catch (error) {
             console.log('Fetch wishlist error:', error);
@@ -104,13 +92,12 @@ export default function WishlistPackage({ route }) {
     };
 
     useEffect(() => {
-        fetchWishlistPackages(1);
+        fetchWishlistPackages();
     }, []);
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
-        setPage(1);
-        fetchWishlistPackages(1, true);
+        fetchWishlistPackages();
     }, []);
 
     const handleWishlist = async (packageId) => {
@@ -132,11 +119,12 @@ export default function WishlistPackage({ route }) {
                 }
             );
 
-            if (response.data.response) {
+            if (response.data.response  == true) {
                 // Remove the package from the wishlist
-                setWishlistPackages(prevList =>
-                    prevList.filter(item => item.id !== packageId)
-                );
+                // setWishlistPackages(prevList =>
+                //     prevList.filter(item => item.id !== packageId)
+                // );
+                fetchWishlistPackages();
             }
         } catch (error) {
             console.log('Wishlist error:', error);
@@ -161,16 +149,7 @@ export default function WishlistPackage({ route }) {
         );
     };
 
-    const renderFooter = () => {
-        if (!isLoading || !hasMore) return null;
-        return (
-            <View style={{ paddingVertical: 20 }}>
-                <ActivityIndicator size="large" color="#FF455C" />
-            </View>
-        );
-    };
-
-    if (isLoading && page === 1) {
+    if (isLoading) {
         return <Loader />;
     }
 
@@ -245,7 +224,7 @@ export default function WishlistPackage({ route }) {
                                         style={styles.tagTextView3}
                                         onPress={(e) => {
                                             e.stopPropagation();
-                                            handleWishlist(item.id);
+                                            handleWishlist(item?.package?.id);
                                         }}
                                     >
                                         <Image
@@ -270,15 +249,7 @@ export default function WishlistPackage({ route }) {
                                 onRefresh={onRefresh}
                             />
                         }
-                        onEndReached={() => {
-                            if (hasMore && !isLoading) {
-                                setPage(prevPage => prevPage + 1);
-                                fetchWishlistPackages(page + 1);
-                            }
-                        }}
-                        onEndReachedThreshold={0.5}
                         ListEmptyComponent={renderEmptyComponent}
-                        ListFooterComponent={renderFooter}
                         numColumns={2}
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={{ paddingBottom: 20 }}
