@@ -183,7 +183,7 @@ const LoginScreen = ({ }) => {
 
           <Image
             source={gtIconImg}
-            style={{ height: 60, width: 55, resizeMode: 'cover', position: 'absolute', top: 30, right: 20, borderRadius: 10 }}
+            style={{ height: 60, width: 55, resizeMode: 'cover', position: 'absolute', top: 45, right: 20, borderRadius: 10 }}
           />
         </View>
 
@@ -256,7 +256,7 @@ const LoginScreen = ({ }) => {
                 <Text
                   style={styles.termsLinkText}
                   onPress={() => navigation.navigate('Termsofuse')}>
-                  Terms & Condition
+                  Terms & Conditions
                 </Text>{' '}
                 and{' '}
                 <Text
@@ -284,6 +284,7 @@ const LoginScreen = ({ }) => {
               value={toggleCheckBox}
               onValueChange={(newValue) => setToggleCheckBox(newValue)}
               tintColors={{ true: '#FF455C', false: '#444343' }}
+              style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
             />
           </View>
           <Text style={styles.termsText}>
@@ -291,7 +292,7 @@ const LoginScreen = ({ }) => {
             <Text
               style={styles.termsLinkText}
               onPress={() => navigation.navigate('Termsofuse')}>
-              Terms & Condition
+              Terms & Conditions
             </Text>{' '}
             and{' '}
             <Text
