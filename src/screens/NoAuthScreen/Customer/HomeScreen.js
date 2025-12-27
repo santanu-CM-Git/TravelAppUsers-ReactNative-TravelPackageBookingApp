@@ -1193,7 +1193,7 @@ export default function HomeScreen() {
         location_id: locationId,
         sdate: moment(fromDate).format('YYYY-MM-DD'),
         edate: moment(toDate).format('YYYY-MM-DD'),
-        edults: adultCount,
+        adults: adultCount,
         kids: kidsCount,
       };
 
