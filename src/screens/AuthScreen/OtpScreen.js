@@ -30,7 +30,7 @@ const OtpScreen = ({ route }) => {
     const navigation = useNavigation();
     const [otp, setOtp] = useState(['', '', '', '']);
     const [comingOTP, setComingOTP] = useState(route?.params?.otp)
-    const [errors, setError] = useState(true)
+    const [errors, setError] = useState(false)
     const [errorText, setErrorText] = useState('Please enter OTP.')
     const [isLoading, setIsLoading] = useState(false)
     const [isResendDisabled, setIsResendDisabled] = useState(true);
