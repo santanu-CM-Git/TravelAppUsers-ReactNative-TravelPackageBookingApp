@@ -299,8 +299,12 @@ const OtpScreen = ({ route }) => {
                     <Text style={styles.errorText}>{errorText}</Text>
                 }
                 <View style={styles.bottomSection}>
-                    <Text style={styles.otpText}>Didn’t receive OTP?</Text>
-                    <Text style={styles.timerText}>{formatTime(timer)}</Text>
+                    <Text style={styles.otpText}>Didn't receive OTP?</Text>
+                    {timer > 0 ? (
+                        <Text style={styles.timerText}>{formatTime(timer)}</Text>
+                    ) : (
+                        <Text style={styles.expiredText}>OTP expired</Text>
+                    )}
                     <TouchableOpacity onPress={() => resendOtp()} disabled={isResendDisabled}>
                         <Text style={[styles.resendText, isResendDisabled && { color: '#808080' }]}>Resend OTP</Text>
                     </TouchableOpacity>
@@ -407,6 +411,11 @@ const styles = StyleSheet.create({
     },
     timerText: {
         color: '#808080',
+        fontFamily: 'Poppins-Medium',
+        fontSize: responsiveFontSize(1.7)
+    },
+    expiredText: {
+        color: '#FF0000',
         fontFamily: 'Poppins-Medium',
         fontSize: responsiveFontSize(1.7)
     },
