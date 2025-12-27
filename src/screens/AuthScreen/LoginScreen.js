@@ -197,7 +197,7 @@ const LoginScreen = ({ }) => {
               <TouchableOpacity onPress={() => setShow(true)} style={styles.countryInputView}>
                 <Text style={{ color: '#808080', fontSize: responsiveFontSize(2) }}>{countryCode}</Text>
               </TouchableOpacity>
-              {Platform.OS === 'android' && (
+              {/* {Platform.OS === 'android' && (
                 <CountryPicker
                   show={show}
                   initialState={''}
@@ -220,7 +220,7 @@ const LoginScreen = ({ }) => {
                     }
                   }}
                 />
-              )}
+              )} */}
             </View>
             <InputField
               label={'Mobile Number'}
