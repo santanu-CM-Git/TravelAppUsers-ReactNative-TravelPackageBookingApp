@@ -94,7 +94,7 @@ const NotificationScreen = ({  }) => {
   return (
     <SafeAreaView style={styles.Container}>
       <StatusBar translucent={false} backgroundColor="black" barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'} />  
-      <CustomHeader commingFrom={'Notification'} onPress={() => navigation.goBack()} title={'Notification'} />
+      <CustomHeader commingFrom={'Notification'} onPress={() => navigation.goBack()} title={'Notifications'} />
       <ScrollView 
         style={styles.wrapper}
         refreshControl={
