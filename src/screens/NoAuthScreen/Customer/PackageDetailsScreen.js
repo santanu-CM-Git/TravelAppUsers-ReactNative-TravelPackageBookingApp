@@ -46,6 +46,7 @@ import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import { ActivityIndicator } from '@react-native-material/core';
 import StaticMap from '../../../utils/StaticMap';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 
 const { width } = Dimensions.get('window');
 const itemWidth = width * 0.8; // 80% of screen width
@@ -390,6 +391,10 @@ export default function PackageDetailsScreen({ route }) {
             if (response.data.response == true) {
                 // Update the wishlist status in the locationList
                 console.log(response.data.message)
+                Toast.show({
+                    text1: response.data.message,
+                    type: 'success',
+                });
                 fetchPackageDetails()
             }
         } catch (error) {
