@@ -21,7 +21,7 @@ export default function Termsofuse({  }) {
         <SafeAreaView style={styles.Container}>
             <CustomHeader
                 commingFrom={'Terms of use'}
-                title={'Terms of use'}
+                title={'Terms and Conditions'}
                 onPress={() => navigation.goBack()}
                 onPressProfile={() => navigation.navigate('Profile')}
             />
