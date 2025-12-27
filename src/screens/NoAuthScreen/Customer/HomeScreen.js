@@ -1373,7 +1373,7 @@ export default function HomeScreen() {
       <View style={styles.homeHeaderView}>
         <View style={styles.nameSection}>
           <View style={styles.collumnView}>
-            <Text style={styles.username}>HI, {userInfo?.first_name}</Text>
+            <Text style={styles.username} numberOfLines={1} ellipsizeMode="tail">HI, {userInfo?.first_name}</Text>
             <View style={styles.locationView}>
               <Image
                 source={markerImg}
@@ -2142,7 +2142,7 @@ const styles = StyleSheet.create({
   },
   username: {
     color: '#757575',
-    fontFamily: 'Poppins-Regular',
+    fontFamily: 'Poppins-Bold',
     fontSize: responsiveFontSize(1.7),
     marginLeft: responsiveWidth(5)
   },
