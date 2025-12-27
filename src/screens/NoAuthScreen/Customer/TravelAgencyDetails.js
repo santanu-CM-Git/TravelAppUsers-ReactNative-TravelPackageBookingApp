@@ -412,7 +412,7 @@ export default function TravelAgencyDetails({ route }) {
                     {/* <Text style={styles.travelerText}>Omega Tours</Text> */}
                     {/* <Text style={styles.packageAvlText}>04 September 2024</Text> */}
                     {travelAgencyData?.no_of_active_packages ?
-                        <Text style={styles.packageAvlText}>available package : {travelAgencyData?.no_of_active_packages}</Text>
+                        <Text style={styles.packageAvlText}>Available package : {travelAgencyData?.no_of_active_packages}</Text>
                         : null}
                     <Text style={styles.productText3}>About</Text>
                     <Text style={styles.addressText}>{travelAgencyData?.tag_line}</Text>
