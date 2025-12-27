@@ -228,8 +228,17 @@ const MenuStack = ({ route }) => {
   const navigation = useNavigation();
   useFocusEffect(
     React.useCallback(() => {
-      navigation.navigate('MenuScreen');
-    }, [navigation])
+      // Get the current route name in this stack
+      const routeName = getFocusedRouteNameFromRoute(route) ?? 'MenuScreen';
+      
+      // Only reset to MenuScreen if we're already on MenuScreen (at root)
+      // This prevents resetting when navigating back from nested screens like MyBookingList or MyBookingDetails
+      if (routeName === 'MenuScreen') {
+        navigation.navigate('MenuScreen');
+      }
+      // If we're on any other screen (MyBookingList, MyBookingDetails, etc.), don't reset
+      // This allows the back button to work correctly
+    }, [navigation, route])
   );
   return (
     <Stack.Navigator>
