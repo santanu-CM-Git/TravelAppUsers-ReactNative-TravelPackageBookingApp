@@ -195,6 +195,30 @@ export default function TravelAgencyDetails({ route }) {
     );
 
     const renderEmptyComponent = () => {
+        // Show loading indicator while fetching packages
+        if (loading) {
+            return (
+                <View style={styles.emptyContainer}>
+                    <ActivityIndicator size="large" color="#FF455C" />
+                </View>
+            );
+        }
+        return (
+            <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>No data found</Text>
+            </View>
+        )
+    }
+
+    const renderEmptyReviewsComponent = () => {
+        // Show loading indicator while fetching reviews
+        if (loadingReviews) {
+            return (
+                <View style={styles.emptyContainer}>
+                    <ActivityIndicator size="large" color="#FF455C" />
+                </View>
+            );
+        }
         return (
             <View style={styles.emptyContainer}>
                 <Text style={styles.emptyText}>No data found</Text>
@@ -521,7 +545,8 @@ export default function TravelAgencyDetails({ route }) {
                                 onEndReachedThreshold={0.5}
                                 ListEmptyComponent={renderEmptyComponent}
                                 ListFooterComponent={() => {
-                                    if (loading) {
+                                    // Only show footer loader when there are items (pagination)
+                                    if (loading && packages.length > 0) {
                                         return (
                                             <View style={{ paddingVertical: 20 }}>
                                                 <ActivityIndicator size="large" color="#FF455C" />
@@ -571,9 +596,10 @@ export default function TravelAgencyDetails({ route }) {
                                     }
                                 }}
                                 onEndReachedThreshold={0.5}
-                                ListEmptyComponent={renderEmptyComponent}
+                                ListEmptyComponent={renderEmptyReviewsComponent}
                                 ListFooterComponent={() => {
-                                    if (loadingReviews) {
+                                    // Only show footer loader when there are items (pagination)
+                                    if (loadingReviews && reviews.length > 0) {
                                         return (
                                             <View style={{ paddingVertical: 20 }}>
                                                 <ActivityIndicator size="large" color="#FF455C" />
