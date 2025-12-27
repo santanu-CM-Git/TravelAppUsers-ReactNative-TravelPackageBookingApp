@@ -44,7 +44,7 @@ const LoginScreen = ({ }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [show, setShow] = useState(false);
   const [countryCode, setCountryCode] = useState('+91');
-  const [toggleCheckBox, setToggleCheckBox] = useState(true)
+  const [toggleCheckBox, setToggleCheckBox] = useState(false)
 
   const { login, userToken } = useContext(AuthContext);
 

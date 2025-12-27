@@ -3,17 +3,37 @@ import React from 'react';
 import { chatImg, forwordImg } from '../utils/Images';
 
 export default function CustomButton({ label, onPress, buttonIcon, buttonColor, disabled, style }) {
+  const getButtonStyle = () => {
+    if (disabled) {
+      return styles.buttonViewDisabled;
+    }
+    if (buttonColor == 'red') return styles.buttonViewRed;
+    if (buttonColor === 'delete') return styles.buttonViewDelete;
+    if (buttonColor == 'gray') return styles.buttonViewGray;
+    if (buttonColor == 'small') return styles.buttonViewSmall;
+    return styles.buttonView;
+  };
+
+  const getTextStyle = () => {
+    if (disabled) {
+      return styles.buttonTextDisabled;
+    }
+    if (buttonColor == 'red') return styles.buttonTextRed;
+    if (buttonColor === 'delete') return styles.buttonTextDelete;
+    return styles.buttonText;
+  };
+
   return (
     <TouchableOpacity
       onPress={onPress}
       disabled={disabled}
-      style={[buttonColor == 'red' ? styles.buttonViewRed : buttonColor === 'delete' ? styles.buttonViewDelete : buttonColor == 'gray' ? styles.buttonViewGray : buttonColor == 'small' ? styles.buttonViewSmall : styles.buttonView, style]}>
+      style={[getButtonStyle(), style]}
+      activeOpacity={disabled ? 1 : 0.7}>
 
-      <Text
-        style={buttonColor == 'red' ? styles.buttonTextRed : buttonColor === 'delete' ? styles.buttonTextDelete : styles.buttonText}>
+      <Text style={getTextStyle()}>
         {label}
       </Text>
-      {buttonIcon ? <Image source={forwordImg} style={styles.iconImage} tintColor={'#FFF'} /> : null}
+      {buttonIcon ? <Image source={forwordImg} style={styles.iconImage} tintColor={disabled ? '#999999' : '#FFF'} /> : null}
     </TouchableOpacity>
   );
 }
@@ -69,6 +89,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center'
   },
+  buttonViewDisabled: {
+    backgroundColor: '#E0E0E0',
+    borderColor: '#E0E0E0',
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 20,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    opacity: 0.6
+  },
   buttonText: {
     fontFamily: 'Poppins-Bold',
     textAlign: 'center',
@@ -89,6 +120,13 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     fontSize: 16,
     color: '#E1293B',
+  },
+  buttonTextDisabled: {
+    fontFamily: 'Poppins-Bold',
+    textAlign: 'center',
+    fontWeight: '400',
+    fontSize: 16,
+    color: '#999999',
   },
   iconImage: {
     width: 23,
