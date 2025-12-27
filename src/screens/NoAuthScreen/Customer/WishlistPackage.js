@@ -183,7 +183,7 @@ export default function WishlistPackage({ route }) {
                         data={wishlistPackages}
                         keyExtractor={(item) => item.id.toString()}
                         renderItem={({ item }) => (
-                            <TouchableWithoutFeedback onPress={() => navigation.navigate('MenuPackageDetailsScreen', { packageId: item.id })}>
+                            <TouchableWithoutFeedback onPress={() => navigation.navigate('MenuPackageDetailsScreen', { packageId: item?.package?.id })}>
                                 <View style={styles.totalValue4}>
                                     <Image
                                         source={{ uri: item?.package?.cover_photo_url }}
