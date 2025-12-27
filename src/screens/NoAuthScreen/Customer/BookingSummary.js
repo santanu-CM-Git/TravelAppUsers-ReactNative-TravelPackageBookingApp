@@ -833,7 +833,7 @@ const BookingSummary = ({ route }) => {
                     </Text>
                 </View>
             </ScrollView>
-            {!packageInfo?.agent_bank_details ?
+            {!packageInfo?.agent_bank_details.kyc_verified == 1 ?
                 <View style={styles.buttonwrapper}>
                     <Text style={styles.termsText}>Please contact the agent to complete the payment</Text>
                 </View>
