@@ -401,6 +401,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     fontSize: responsiveFontSize(1.5),
     textAlign: 'center',
+    marginLeft: 5,
   },
   termsLinkText: {
     color: '#746868',
