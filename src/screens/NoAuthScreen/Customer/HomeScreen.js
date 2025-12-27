@@ -37,7 +37,6 @@ import { API_URL, GOOGLE_MAP_KEY } from '@env'
 import { Dropdown } from 'react-native-element-dropdown';
 import messaging from '@react-native-firebase/messaging';
 import StarRating from 'react-native-star-rating-widget';
-import SwitchSelector from "react-native-switch-selector";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Geolocation from 'react-native-geolocation-service';
@@ -1360,6 +1359,13 @@ export default function HomeScreen() {
   const keyExtractor = useCallback((item, index) => item.id?.toString() ?? index.toString(), []);
   const recentViewKeyExtractor = useCallback((item) => item.id?.toString(), []);
 
+  // Custom switch handler - optimized to prevent lag
+  const handleCustomSwitch = useCallback((value) => {
+    if (activeTab2 !== value) {
+      setActiveTab2(value);
+    }
+  }, [activeTab2]);
+
   if (isLoading) {
     return (
       <Loader />
@@ -1757,21 +1763,33 @@ export default function HomeScreen() {
           />
         </View>
         <View style={{ paddingHorizontal: 15, marginVertical: responsiveHeight(1) }}>
-          <SwitchSelector
-            initial={activeButtonNo}
-            onPress={value => setActiveTab2(value)}
-            textColor={'#746868'}
-            selectedColor={'#FFFFFF'}
-            buttonColor={'#FF455C'}
-            backgroundColor={'#F4F5F5'}
-            borderWidth={0}
-            height={responsiveHeight(7)}
-            valuePadding={6}
-            hasPadding
-            options={SWITCH_OPTIONS}
-            testID="gender-switch-selector"
-            accessibilityLabel="gender-switch-selector"
-          />
+          <View style={styles.customSwitchContainer}>
+            {SWITCH_OPTIONS.map((option, index) => {
+              const isSelected = activeTab2 === option.value;
+              return (
+                <TouchableOpacity
+                  key={option.value}
+                  activeOpacity={0.7}
+                  onPress={() => handleCustomSwitch(option.value)}
+                  style={[
+                    styles.customSwitchButton,
+                    isSelected && styles.customSwitchButtonActive,
+                    index === 0 && styles.customSwitchButtonFirst,
+                    index === SWITCH_OPTIONS.length - 1 && styles.customSwitchButtonLast,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.customSwitchText,
+                      isSelected && styles.customSwitchTextActive,
+                    ]}
+                  >
+                    {option.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
         </View>
         {activeTab2 == 'New Packages' ?
           <FlatList
@@ -2733,6 +2751,40 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(1.8),
     fontFamily: 'Poppins-SemiBold',
     fontWeight: '600',
+  },
+  customSwitchContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#F4F5F5',
+    borderRadius: 8,
+    padding: 4,
+    height: responsiveHeight(7),
+  },
+  customSwitchButton: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 6,
+  },
+  customSwitchButtonActive: {
+    backgroundColor: '#FF455C',
+  },
+  customSwitchButtonFirst: {
+    marginRight: 2,
+  },
+  customSwitchButtonLast: {
+    marginLeft: 2,
+  },
+  customSwitchText: {
+    color: '#746868',
+    fontFamily: 'Poppins-Medium',
+    fontSize: responsiveFontSize(1.7),
+  },
+  customSwitchTextActive: {
+    color: '#FFFFFF',
+    fontFamily: 'Poppins-Medium',
+    fontSize: responsiveFontSize(1.7),
   },
 });
 
