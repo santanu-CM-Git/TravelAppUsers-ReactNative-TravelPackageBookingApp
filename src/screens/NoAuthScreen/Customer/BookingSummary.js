@@ -815,7 +815,19 @@ const BookingSummary = ({ route }) => {
                         />
                     </View>
                     <Text style={styles.termsText}>
-                        I accept term and condition and privacy policy and cancellation policy.
+                        I accept{' '}
+                        <Text
+                            style={styles.termsLinkText}
+                            onPress={() => navigation.navigate('Termsofuse')}>
+                            terms and conditions
+                        </Text>{' '}
+                        and{' '}
+                        <Text
+                            style={styles.termsLinkText}
+                            onPress={() => navigation.navigate('PrivacyPolicy')}>
+                            privacy policy
+                        </Text>
+                        {' '}and cancellation policy.
                         <Text style={{ fontFamily: 'Poppins-Medium', color: '#746868', fontSize: responsiveFontSize(1.5), textAlign: 'center', paddingHorizontal: 10, lineHeight: 18, }}>You are about to make a payment to {packageInfo?.agent?.name || 'the travel agency'}. Please ensure you have fully read the travel package details and the cancellation policy provided by the travel agency.</Text>
 
                     </Text>
@@ -1105,6 +1117,13 @@ const styles = StyleSheet.create({
         fontFamily: 'Poppins-Regular',
         fontSize: responsiveFontSize(1.5),
         textAlign: 'left',
+    },
+    termsLinkText: {
+        color: '#746868',
+        fontFamily: 'Poppins-Regular',
+        fontSize: responsiveFontSize(1.5),
+        textAlign: 'left',
+        textDecorationLine: 'underline',
     },
     checkboxContainer: {
         transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],

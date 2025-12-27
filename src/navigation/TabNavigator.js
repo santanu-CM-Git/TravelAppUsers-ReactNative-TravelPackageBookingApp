@@ -139,6 +139,16 @@ const HomeStack = ({  }) => {
         component={FilterPackageResult}
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="Termsofuse"
+        component={Termsofuse}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="PrivacyPolicy"
+        component={PrivacyPolicy}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 };
