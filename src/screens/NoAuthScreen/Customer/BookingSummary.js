@@ -487,6 +487,10 @@ const BookingSummary = ({ route }) => {
 
     const changeCouponCode = (text) => {
         setCouponCode(text);
+        // Clear error when user starts typing
+        if (couponError) {
+            setCouponError('');
+        }
     };
 
     const fetchAvailableCoupons = async () => {
@@ -508,49 +512,81 @@ const BookingSummary = ({ route }) => {
         }
     };
 
-    const callForCoupon = () => {
+    const callForCoupon = async () => {
         if (!couponCode) {
             setCouponError('Please enter a coupon code');
             return;
         }
-        console.log(availableCoupons, 'sdfdsf')
 
-        if (!Array.isArray(availableCoupons)) {
-            setCouponError('No available coupons');
-            return;
-        }
-        const coupon = availableCoupons.find(c => c.coupon_code.toLowerCase() === couponCode.toLowerCase());
-
-        if (!coupon) {
-            setCouponError('Invalid coupon code');
-            return;
-        }
-
-        // Check if coupon is valid
-        if (coupon.status !== 'Active') {
-            setCouponError('Coupon is not active');
-            return;
-        }
-
-        // Check if coupon is within date range
-        const currentDate = new Date();
-        const startDate = new Date(coupon.sdate);
-        const endDate = new Date(coupon.edate);
-
-        if (currentDate < startDate || currentDate > endDate) {
-            setCouponError('Coupon is not valid for current date');
-            return;
-        }
-
-        // Check if coupon usage limit is reached
-        if (coupon.applied <= coupon.available_for) {
-            setCouponError('Coupon usage limit reached');
-            return;
-        }
-
-        // Apply the coupon
-        setAppliedCoupon(coupon);
+        setIsCouponLoading(true);
         setCouponError('');
+
+        try {
+            // Fetch fresh coupon data before validating
+            const userToken = await AsyncStorage.getItem('userToken');
+            const response = await axios.post(`${API_URL}/customer/coupon`, {}, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${userToken}`,
+                },
+            });
+            
+            let coupons = response.data.data;
+            if (coupons && !Array.isArray(coupons)) {
+                coupons = [coupons];
+            }
+            
+            // Update available coupons state
+            setAvailableCoupons(coupons);
+
+            if (!Array.isArray(coupons) || coupons.length === 0) {
+                setCouponError('No available coupons');
+                setIsCouponLoading(false);
+                return;
+            }
+
+            const coupon = coupons.find(c => c.coupon_code.toLowerCase() === couponCode.toLowerCase());
+
+            if (!coupon) {
+                setCouponError('Invalid coupon code');
+                setIsCouponLoading(false);
+                return;
+            }
+
+            // Check if coupon is valid
+            if (coupon.status !== 'Active') {
+                setCouponError('Coupon is not active');
+                setIsCouponLoading(false);
+                return;
+            }
+
+            // Check if coupon is within date range
+            const currentDate = new Date();
+            const startDate = new Date(coupon.sdate);
+            const endDate = new Date(coupon.edate);
+
+            if (currentDate < startDate || currentDate > endDate) {
+                setCouponError('Coupon is not valid for current date');
+                setIsCouponLoading(false);
+                return;
+            }
+
+            // Check if coupon usage limit is reached
+            if (coupon.applied <= coupon.available_for) {
+                setCouponError('Coupon usage limit reached');
+                setIsCouponLoading(false);
+                return;
+            }
+
+            // Apply the coupon
+            setAppliedCoupon(coupon);
+            setCouponError('');
+            setIsCouponLoading(false);
+        } catch (error) {
+            console.error('Error fetching/validating coupon:', error);
+            setCouponError('Failed to validate coupon. Please try again.');
+            setIsCouponLoading(false);
+        }
     };
 
     const removeCoupon = () => {
@@ -726,25 +762,37 @@ const BookingSummary = ({ route }) => {
                                     keyboardType="default"
                                     value={couponCode}
                                     inputType={'coupon'}
-                                    onChangeText={(text) => setCouponCode(text)}
+                                    onChangeText={changeCouponCode}
                                 />
                             </View>
                             {!appliedCoupon ? (
-                                <TouchableOpacity
-                                    style={styles.callCouponButton}
-                                    onPress={callForCoupon}
-                                    disabled={isCouponLoading}
-                                >
-                                    {isCouponLoading ? (
-                                        <ActivityIndicator size="small" color="#FF455C" />
-                                    ) : (
-                                        <Text style={styles.callCouponText}>APPLY</Text>
-                                    )}
-                                </TouchableOpacity>
+                                <>
+                                    {(couponCode || couponError) ? (
+                                        <TouchableOpacity
+                                            style={styles.callCouponButton}
+                                            onPress={removeCoupon}
+                                        >
+                                            <Text style={styles.removeCouponText}>CLEAR</Text>
+                                        </TouchableOpacity>
+                                    ) : null}
+                                    <TouchableOpacity
+                                        style={styles.callCouponButton}
+                                        onPress={callForCoupon}
+                                        disabled={isCouponLoading || !couponCode}
+                                    >
+                                        {isCouponLoading ? (
+                                            <ActivityIndicator size="small" color="#FF455C" />
+                                        ) : (
+                                            <Text style={[styles.callCouponText, !couponCode && { opacity: 0.5 }]}>APPLY</Text>
+                                        )}
+                                    </TouchableOpacity>
+                                </>
                             ) : null}
                         </View>
                         {couponError ? (
-                            <Text style={styles.errorText}>{couponError}</Text>
+                            <View style={styles.errorContainer}>
+                                <Text style={styles.errorText}>{couponError}</Text>
+                            </View>
                         ) : null}
                     </View>
                     {appliedCoupon ? (
@@ -1150,6 +1198,10 @@ const styles = StyleSheet.create({
         color: '#FF0000',
         fontSize: 14,
         fontWeight: 'bold',
+    },
+    errorContainer: {
+        marginTop: 5,
+        marginLeft: 5,
     },
     disabledButton: {
         opacity: 0.5,
