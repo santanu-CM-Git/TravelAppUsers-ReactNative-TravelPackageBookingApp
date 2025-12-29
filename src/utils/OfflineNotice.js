@@ -31,8 +31,10 @@ export default function OfflineNotice({ navigation }) {
     if (isConnected === false) {
 
         return (
-            <SafeAreaView style={styles.offlineContainer}>
-                <Text style={styles.offlineText}>No Internet Connection</Text>
+            <SafeAreaView edges={['top']} style={{ backgroundColor: '#b52424' }}>
+                <View style={styles.offlineContainer}>
+                    <Text style={styles.offlineText}>No Internet Connection</Text>
+                </View>
             </SafeAreaView>
         )
     }
