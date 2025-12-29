@@ -565,11 +565,11 @@ const BookingSummary = ({ route }) => {
             const startDate = new Date(coupon.sdate);
             const endDate = new Date(coupon.edate);
 
-            if (currentDate < startDate || currentDate > endDate) {
-                setCouponError('Coupon is not valid for current date');
-                setIsCouponLoading(false);
-                return;
-            }
+            // if (currentDate < startDate || currentDate > endDate) {
+            //     setCouponError('Coupon is not valid for current date');
+            //     setIsCouponLoading(false);
+            //     return;
+            // }
 
             // Check if coupon usage limit is reached
             if (coupon.applied <= coupon.available_for) {
