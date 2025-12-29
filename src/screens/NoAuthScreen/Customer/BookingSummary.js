@@ -165,7 +165,7 @@ const BookingSummary = ({ route }) => {
                 },
             })
                 .then(res => {
-                    console.log(res)
+                    console.log(res,'resresres')
                     if (res.data.response == true) {
                         //setIsLoading(false)
                         handlePayment()
