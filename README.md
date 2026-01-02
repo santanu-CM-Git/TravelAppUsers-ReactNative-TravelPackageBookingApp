@@ -4,52 +4,52 @@ A comprehensive React Native mobile application for group travel booking and man
 
 ## Features
 
-- 🎫 **Travel Package Management**
+-  **Travel Package Management**
   - Browse and search travel packages
   - View package details with images and descriptions
   - Filter packages by location, price, and other criteria
   - Top locations and popular destinations
   - Wishlist functionality
 
-- 👥 **User Management**
+-  **User Management**
   - Customer and Agent authentication
   - User profiles and personal information
   - OTP-based verification
   - Password reset functionality
 
-- 💬 **Real-time Communication**
+-  **Real-time Communication**
   - Chat with travel agents
   - File and document sharing
   - Push notifications
   - Video/audio calling integration (Agora)
 
-- 📅 **Booking System**
+-  **Booking System**
   - Package booking flow
   - Booking summary and details
   - Upcoming and completed bookings
   - Booking cancellation and refunds
 
-- 💳 **Payment Integration**
+-  **Payment Integration**
   - Razorpay payment gateway
   - Wallet functionality
   - Transaction history
   - Payment success/failure handling
 
-- 🔔 **Notifications**
+-  **Notifications**
   - Firebase Cloud Messaging (FCM)
   - Push notifications for bookings, messages, and updates
   - Notification history
 
-- ⭐ **Reviews & Ratings**
+-  **Reviews & Ratings**
   - Rate and review packages
   - View package ratings
 
-- 🗺️ **Location Services**
+-  **Location Services**
   - Nearby tour planners
   - Location-based search
   - Travel agency details
 
-- 📄 **Additional Features**
+-  **Additional Features**
   - Quotes system for custom packages
   - Privacy policy and terms of use
   - Customer support
